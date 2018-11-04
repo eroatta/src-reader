@@ -7,7 +7,6 @@ import (
 	"gopkg.in/src-d/go-billy.v4/memfs"
 
 	"github.com/eroatta/src-reader/url"
-	"gopkg.in/src-d/go-git.v4"
 	"gopkg.in/src-d/go-git.v4/storage/memory"
 )
 
@@ -24,7 +23,7 @@ func main() {
 		log.Fatal("Error reading the repository")
 	}
 
-	log.Println("Repo read")
+	log.Println("Repo read...")
 
 	// get files from filesystem
 	files, err := getFilesFromFileSystem(repository)
