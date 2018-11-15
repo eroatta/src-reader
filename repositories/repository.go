@@ -14,6 +14,7 @@ import (
 
 type Cloner interface {
 	Clone(url string) (*Repository, error)
+	GetFiles(repo string)
 }
 
 func DefaultGithubCloner() Cloner {
@@ -44,4 +45,9 @@ func Clone(url string) (*Repository, error) {
 // Repository represents a remote GitHub repository.
 type Repository struct {
 	repository *git.Repository
+
+	ID           string
+	Hash         string
+	Language     string
+	Contributors int
 }
