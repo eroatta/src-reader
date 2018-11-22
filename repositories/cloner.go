@@ -9,7 +9,7 @@ import (
 type Cloner interface {
 	Name() string
 	Clone(url string) (*Repository, error)
-	GetFilesInfo(repo string) ([]os.FileInfo, error)
+	GetFilesInfo() ([]os.FileInfo, error)
 	GetFile(filename string) ([]byte, error)
 }
 
@@ -19,6 +19,8 @@ func DefaultGithubCloner() Cloner {
 	return GoGitCloner{}
 }
 
+// GoGitCloner stores information and provides the required methods to implement the Cloner interface
+// for the src{d}/go-git GitHub client.
 type GoGitCloner struct {
 }
 
@@ -33,10 +35,12 @@ func (c GoGitCloner) Clone(url string) (*Repository, error) {
 	return nil, nil
 }
 
-func (c GoGitCloner) GetFilesInfo(repo string) ([]os.FileInfo, error) {
+// GetFilesInfo retrieves the list of files on a given repository.
+func (c GoGitCloner) GetFilesInfo() ([]os.FileInfo, error) {
 	return make([]os.FileInfo, 0), nil
 }
 
+// GetFile retrieves the raw file as an array of bytes.
 func (c GoGitCloner) GetFile(filename string) ([]byte, error) {
 	return make([]byte, 0), nil
 }
