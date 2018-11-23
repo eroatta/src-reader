@@ -1,34 +1,30 @@
 package repositories
 
 import (
-	"log"
+	"os"
 
-	"gopkg.in/src-d/go-billy.v4/memfs"
 	git "gopkg.in/src-d/go-git.v4"
-	"gopkg.in/src-d/go-git.v4/storage/memory"
 )
 
-// Clone clones a GitHub repository, and return a struct that represents it.
-func Clone(url string) (*Repository, error) {
-	log.Println("Cloning repository...")
-	repository, err := git.Clone(memory.NewStorage(), memfs.New(), &git.CloneOptions{
-		URL: url,
-	})
-
-	if err != nil {
-		return nil, err
-	}
-
-	return &Repository{repository: repository}, nil
+// Repository represents a remote repository.
+type Repository interface {
+	GetFilesInfo() ([]os.FileInfo, error)
+	GetFile(filename string) ([]byte, error)
 }
 
-// Repository represents a remote GitHub repository.
-type Repository struct {
-	repository *git.Repository
+// GoGitRepository represents a remote GitHub repository.
+type GoGitRepository struct {
+	//Repository
 
-	ID           string
-	Hash         string
-	Language     string
-	Contributors int
-	Files        []string
+	repository *git.Repository
+}
+
+// GetFilesInfo retrieves the list of files on a given repository.
+func (r GoGitRepository) GetFilesInfo() ([]os.FileInfo, error) {
+	return make([]os.FileInfo, 0), nil
+}
+
+// GetFile retrieves the raw file as an array of bytes.
+func (r GoGitRepository) GetFile(filename string) ([]byte, error) {
+	return make([]byte, 0), nil
 }

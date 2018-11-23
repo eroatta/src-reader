@@ -6,31 +6,37 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestClone_NoExistingGithubRepository_ShouldThrowError(t *testing.T) {
-	_, err := Clone("http://github.com/mercadolibre/fury_credits-api")
-	// "authentication required"
-	// "http://githu.com/eroatta/repo" -> "invalid pkt-len found"
-	assert.EqualError(t, err, "remote repository not found")
-}
-
-func TestClone_GithubRemoteError_ShouldThrowError(t *testing.T) {
-	assert.Fail(t, "unimplemented test")
-}
-func TestClone_GithubRepository_ShouldReturnRepository(t *testing.T) {
-	assert.Fail(t, "unimplemented test")
-}
-
-func TestRepository_FilesOnPlainRepo_ShouldReturnAllFiles(t *testing.T) {
-	assert.Fail(t, "unimplemented test")
-}
-
-func TestRepository_FilesOnRepoWithDirs_ShouldReturnAllFiles(t *testing.T) {
-	assert.Fail(t, "unimplemented test")
-}
-
 func TestReadDirAndSubDirs(t *testing.T) {
 	//fs := memfs.New()
 
 	//files, err := GetFiles()
 	//assert.Equal(t, 4, len(files), "should match number of files")
+}
+
+func TestGetFilesInfo_GoGitRepositoryWith5Files_ShouldReturnAnArrayOfFileInfoWith5Elements(t *testing.T) {
+	assert.Fail(t, "unimplemented test")
+}
+
+func TestGetFilesInfo_GoGitRepositoryWith2Files1Folder_ShouldReturnAnArrayOfFileInfoWith2Elements(t *testing.T) {
+	assert.Fail(t, "unimplemented test")
+}
+
+func TestGetFilesInfo_GoGitRepositoryNoFiles_ShouldReturnAnEmptyArray(t *testing.T) {
+	assert.Fail(t, "unimplemented test")
+}
+
+func TestGetFilesInfo_GoGitRepositoryError_ShouldReturnAnError(t *testing.T) {
+	assert.Fail(t, "unimplemented test")
+}
+
+func TestGetFile_GoGitRepositoryEmptyFilename_ShouldReturnAnEmptyArray(t *testing.T) {
+	assert.Fail(t, "unimplemented test")
+}
+
+func TestGetFile_GoGitRepositoryExistingFile_ShouldReturnAnArrayOfBytes(t *testing.T) {
+	assert.Fail(t, "unimplemented test")
+}
+
+func TestGetFile_GoGitRepositoryNoFile_ShouldReturnAnError(t *testing.T) {
+	assert.Fail(t, "unimplemented test")
 }
