@@ -14,7 +14,23 @@ func TestReadDirAndSubDirs(t *testing.T) {
 }
 
 func TestGetFilesInfo_GoGitRepositoryWith5Files_ShouldReturnAnArrayOfFileInfoWith5Elements(t *testing.T) {
-	assert.Fail(t, "unimplemented test")
+
+	expectedFilenames := []string{"main.go", "file.go", "file_test.go", "README.md", "license.txt"}
+
+	repository := GoGitRepository{}
+
+	files, err := repository.GetFilesInfo()
+	if err != nil {
+		assert.Fail(t, "shouldn't get an error while retrieving the list of files")
+	}
+
+	filenames := make([]string, 0)
+	for _, file := range files {
+		filenames = append(filenames, file.Name())
+	}
+
+	assert.Equal(t, 5, len(files), "number of files must be equal")
+	assert.ElementsMatch(t, expectedFilenames, filenames, "filenames don't match")
 }
 
 func TestGetFilesInfo_GoGitRepositoryWith2Files1Folder_ShouldReturnAnArrayOfFileInfoWith2Elements(t *testing.T) {
