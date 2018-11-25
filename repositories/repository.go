@@ -10,6 +10,11 @@ import (
 	"gopkg.in/src-d/go-git.v4/storage/memory"
 )
 
+var (
+	// ErrorCloningRepository represents the default error message when an error occurs while cloning a repository.
+	ErrorCloningRepository = errors.New("Error cloning the remote repository")
+)
+
 // ClonerFunc defines the interface for cloning a remote Git repository.
 type ClonerFunc func(url string) (*git.Repository, error)
 
@@ -19,7 +24,7 @@ func Clone(cloner ClonerFunc, url string) (*git.Repository, error) {
 	log.Println("Cloning repository...")
 	repository, err := cloner(url)
 	if err != nil {
-		return nil, errors.New("Error cloning remote repository")
+		return nil, ErrorCloningRepository
 	}
 
 	return repository, nil

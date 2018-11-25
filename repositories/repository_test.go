@@ -1,6 +1,7 @@
 package repositories
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -8,11 +9,23 @@ import (
 )
 
 func TestClone_ClonerOK_ShouldReturnRepository(t *testing.T) {
-	assert.Fail(t, "unimplemented test")
+	repo, err := Clone(func(url string) (*git.Repository, error) {
+		return &git.Repository{}, nil
+	}, "git@github.com/test/case")
+
+	assert.Nil(t, err, "error should be nil")
+	assert.NotNil(t, repo, "cloned repository shouldn't be nil")
 }
 func TestClone_ClonerError_ShouldReturnAnError(t *testing.T) {
-	assert.Fail(t, "unimplemented test")
+	repo, err := Clone(func(url string) (*git.Repository, error) {
+		return nil, errors.New("connection error")
+	}, "git@github.com/test/case")
+
+	assert.Nil(t, repo, "cloned repository should be nil")
+	assert.Equal(t, err.Error(), "Error cloning the remote repository")
 }
+
+// TODO add tests for GoGitClonerFunc
 
 func TestFilesInfo_RepositoryWith5Files_ShouldReturnAnArrayOfFileInfoWith5Elements(t *testing.T) {
 
