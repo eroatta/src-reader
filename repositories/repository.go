@@ -3,7 +3,6 @@ package repositories
 import (
 	"errors"
 	"log"
-	"os"
 
 	billy "gopkg.in/src-d/go-billy.v4"
 	"gopkg.in/src-d/go-billy.v4/memfs"
@@ -42,8 +41,8 @@ func GoGitClonerFunc(url string) (*git.Repository, error) {
 	})
 }
 
-// FilesInfo retrieves the list of files and its related information on a given repository.
-func FilesInfo(repository *git.Repository) ([]os.FileInfo, error) {
+// Filenames retrieves the list of files in a given repository.
+func Filenames(repository *git.Repository) ([]string, error) {
 	wt, err := repository.Worktree()
 	if err != nil {
 		return nil, err
@@ -52,30 +51,48 @@ func FilesInfo(repository *git.Repository) ([]os.FileInfo, error) {
 	return read(wt.Filesystem, rootDir)
 }
 
-func read(fs billy.Filesystem, rootDir string) ([]os.FileInfo, error) {
+func read(fs billy.Filesystem, rootDir string) ([]string, error) {
 	files, err := fs.ReadDir(rootDir)
 	if err != nil {
 		return nil, err
 	}
 
-	filesInfo := make([]os.FileInfo, 0)
+	names := make([]string, 0)
 	for _, file := range files {
 		if file.IsDir() {
-			subFiles, err := read(fs, file.Name())
+			subDirFilenames, err := read(fs, file.Name())
 			if err != nil {
 				return nil, err
 			}
 
-			filesInfo = append(filesInfo, subFiles...)
+			names = append(names, subDirFilenames...)
 		} else {
-			filesInfo = append(filesInfo, file)
+			names = append(names, rootDir+"/"+file.Name())
 		}
 	}
 
-	return filesInfo, nil
+	return names, nil
 }
 
 // File retrieves the raw file as an array of bytes.
 func File(repository *git.Repository, filename string) ([]byte, error) {
-	return make([]byte, 0), nil
+	wt, err := repository.Worktree()
+	if err != nil {
+		return nil, err
+	}
+
+	fileInfo, err := wt.Filesystem.Stat(filename)
+	if err != nil {
+		return nil, err
+	}
+
+	file, err := wt.Filesystem.Open(filename)
+	if err != nil {
+		return nil, err
+	}
+
+	bytes := make([]byte, fileInfo.Size())
+	_, err = file.Read(bytes)
+
+	return bytes, err
 }
