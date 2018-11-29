@@ -1,14 +1,13 @@
 package main
 
 import (
+	"fmt"
 	"log"
-	"os"
 
-	"gopkg.in/src-d/go-billy.v4/memfs"
+	"github.com/eroatta/src-reader/repositories"
+	"gopkg.in/src-d/go-git.v4/plumbing/object"
 
 	"github.com/eroatta/src-reader/url"
-	"gopkg.in/src-d/go-git.v4"
-	"gopkg.in/src-d/go-git.v4/storage/memory"
 )
 
 func main() {
@@ -19,43 +18,27 @@ func main() {
 		log.Fatal("Invalid Repo URI")
 	}
 
-	repository, err := read(uri)
+	repository, err := repositories.Clone(repositories.GoGitClonerFunc, uri)
 	if err != nil {
 		log.Fatal("Error reading the repository")
 	}
 
 	log.Println("Repo read...")
 
+	head, err := repository.Head()
+	commit, err := repository.CommitObject(head.Hash())
+	tree, err := commit.Tree()
+	tree.Files().ForEach(func(f *object.File) error {
+		fmt.Printf("100644 blob %s    %s\n", f.Hash, f.Name)
+		return nil
+	})
 	// get files from filesystem
-	files, err := getFilesFromFileSystem(repository)
+	files, err := repositories.FilesInfo(repository)
 	if err != nil {
 		log.Fatal("Error retrieving files...")
 	}
 
 	for _, file := range files {
 		log.Println(file.Name())
-
 	}
-}
-
-func read(url string) (*git.Repository, error) {
-	repository, err := git.Clone(memory.NewStorage(), memfs.New(), &git.CloneOptions{
-		URL: url,
-	})
-
-	return repository, err
-}
-
-func getFilesFromFileSystem(repository *git.Repository) ([]os.FileInfo, error) {
-	wt, err := repository.Worktree()
-	if err != nil {
-		return nil, err
-	}
-
-	files, err := wt.Filesystem.ReadDir("")
-	if err != nil {
-		return nil, err
-	}
-
-	return files, nil
 }
