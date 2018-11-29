@@ -1,11 +1,12 @@
 package main
 
 import (
-	"fmt"
+	"go/ast"
+	"go/parser"
+	"go/token"
 	"log"
 
 	"github.com/eroatta/src-reader/repositories"
-	"gopkg.in/src-d/go-git.v4/plumbing/object"
 
 	"github.com/eroatta/src-reader/url"
 )
@@ -25,20 +26,25 @@ func main() {
 
 	log.Println("Repo read...")
 
-	head, err := repository.Head()
-	commit, err := repository.CommitObject(head.Hash())
-	tree, err := commit.Tree()
-	tree.Files().ForEach(func(f *object.File) error {
-		fmt.Printf("100644 blob %s    %s\n", f.Hash, f.Name)
-		return nil
-	})
-	// get files from filesystem
-	files, err := repositories.FilesInfo(repository)
+	filenames, err := repositories.Filenames(repository)
 	if err != nil {
-		log.Fatal("Error retrieving files...")
+		log.Fatal(err)
+	}
+	for _, name := range filenames {
+		log.Println(name)
 	}
 
-	for _, file := range files {
-		log.Println(file.Name())
+	rawFile, err := repositories.File(repository, "common.go")
+	if err != nil {
+		log.Fatal(err)
 	}
+
+	fset := token.NewFileSet() // positions are relative to fset
+	f, err := parser.ParseFile(fset, "common.go", rawFile, 0)
+	if err != nil {
+		panic(err)
+	}
+
+	// Print the AST.
+	ast.Print(fset, f)
 }
