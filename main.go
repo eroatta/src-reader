@@ -47,4 +47,24 @@ func main() {
 
 	// Print the AST.
 	ast.Print(fset, f)
+
+	visitor := visitor{}
+	ast.Walk(visitor, f)
+}
+
+type visitor struct {
+}
+
+func (v visitor) Visit(node ast.Node) ast.Visitor {
+	if node == nil {
+		return nil
+	}
+
+	switch stmt := node.(type) {
+	case *ast.FuncDecl:
+		ident := *stmt.Name
+		log.Println(ident.Name)
+	}
+
+	return v
 }
