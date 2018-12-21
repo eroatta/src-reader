@@ -1,7 +1,9 @@
 package extractors
 
 import (
+	"go/ast"
 	"go/parser"
+	"go/token"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -42,4 +44,26 @@ func TestVisit_OnSamuraiWithNotNilNode_ShouldReturnVisitor(t *testing.T) {
 	got := extractor.Visit(node)
 
 	assert.NotNil(t, got)
+}
+
+func TestVisit_OnSamuraiWithIdentNode_ShouldSplitTheName(t *testing.T) {
+	samurai := NewSamuraiExtractor()
+
+	fs := token.NewFileSet()
+	var src = `
+		package main
+		var testIden string
+	`
+
+	node, _ := parser.ParseFile(fs, "", []byte(src), parser.AllErrors)
+	ast.Print(fs, node)
+	visitor := samurai.Visit(node)
+
+	assert.NotNil(t, visitor)
+
+	extractor := visitor.(SamuraiExtractor)
+	assert.NotEmpty(t, extractor.words)
+
+	sam := samurai.(SamuraiExtractor)
+	assert.NotEmpty(t, sam.words)
 }
