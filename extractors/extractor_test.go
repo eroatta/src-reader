@@ -46,7 +46,7 @@ func TestVisit_OnSamuraiWithNotNilNode_ShouldReturnVisitor(t *testing.T) {
 	assert.NotNil(t, got)
 }
 
-func TestVisit_OnSamuraiWithIdentNode_ShouldSplitTheName(t *testing.T) {
+func TestVisit_OnSamuraiWithVarDeclNode_ShouldSplitTheName(t *testing.T) {
 	samurai := NewSamuraiExtractor()
 
 	fs := token.NewFileSet()
@@ -56,14 +56,14 @@ func TestVisit_OnSamuraiWithIdentNode_ShouldSplitTheName(t *testing.T) {
 	`
 
 	node, _ := parser.ParseFile(fs, "", []byte(src), parser.AllErrors)
-	ast.Print(fs, node)
-	visitor := samurai.Visit(node)
+	//ast.Print(fs, node)
+	ast.Walk(samurai, node)
 
-	assert.NotNil(t, visitor)
+	assert.NotNil(t, samurai)
 
-	extractor := visitor.(SamuraiExtractor)
+	extractor := samurai.(SamuraiExtractor)
 	assert.NotEmpty(t, extractor.words)
-
-	sam := samurai.(SamuraiExtractor)
-	assert.NotEmpty(t, sam.words)
+	assert.Equal(t, 1, extractor.words["testIden"])
+	assert.Equal(t, 0, extractor.words["test"])
+	assert.Equal(t, 0, extractor.words["iden"])
 }

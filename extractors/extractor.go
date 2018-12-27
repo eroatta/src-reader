@@ -42,8 +42,14 @@ func (e SamuraiExtractor) Visit(node ast.Node) ast.Visitor {
 
 	log.Println(node)
 	switch elem := node.(type) {
+	case *ast.GenDecl:
+		decl := *elem
+		//log.Println(decl.Tok.String())
+		if len(decl.Specs) > 0 {
+			spec, _ := decl.Specs[0].(*ast.ValueSpec)
+			e.words[spec.Names[0].Name]++
+		}
 	case *ast.Ident:
-		log.Println("Un ident")
 		ident := *elem
 		e.words[ident.Name] = 1
 	}
