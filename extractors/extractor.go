@@ -57,51 +57,27 @@ func (e SamuraiExtractor) Visit(node ast.Node) ast.Visitor {
 
 	switch elem := node.(type) {
 	case *ast.GenDecl:
-		if elem.Tok == token.VAR {
-			for _, spec := range elem.Specs {
-				if valSpec, ok := spec.(*ast.ValueSpec); ok {
-					for _, name := range valSpec.Names {
-						if name.Name == "_" {
-							continue
-						}
+		if elem.Tok != token.VAR && elem.Tok != token.CONST {
+			return e
+		}
 
-						tokens = append(tokens, name.Name)
+		for _, spec := range elem.Specs {
+			if valSpec, ok := spec.(*ast.ValueSpec); ok {
+				for _, name := range valSpec.Names {
+					if name.Name == "_" {
+						continue
+					}
+
+					tokens = append(tokens, name.Name)
+				}
+
+				for _, value := range valSpec.Values {
+					if val, ok := value.(*ast.BasicLit); ok && val.Kind == token.STRING {
+						tokens = append(tokens, strings.Replace(val.Value, "\"", "", -1))
 					}
 				}
 			}
 		}
-
-		if elem.Tok == token.CONST {
-			for _, spec := range elem.Specs {
-				if valSpec, ok := spec.(*ast.ValueSpec); ok {
-					for _, name := range valSpec.Names {
-						if name.Name == "_" {
-							continue
-						}
-
-						tokens = append(tokens, name.Name)
-					}
-
-					for _, value := range valSpec.Values {
-						if val, ok := value.(*ast.BasicLit); ok && val.Kind == token.STRING {
-							tokens = append(tokens, strings.Replace(val.Value, "\"", "", -1))
-						}
-					}
-				}
-			}
-		}
-
-		// for _, spec := range elem.Specs {
-		// 	if valSpec, ok := spec.(*ast.ValueSpec); ok {
-		// 		for _, name := range valSpec.Names {
-		// 			if name.Name == "_" {
-		// 				continue
-		// 			}
-
-		// 			tokens = append(tokens, name.Name)
-		// 		}
-		// 	}
-		// }
 	}
 
 	for _, token := range tokens {
