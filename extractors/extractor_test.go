@@ -63,7 +63,6 @@ func TestVisit_OnSamuraiWithVarDeclNode_ShouldSplitTheName(t *testing.T) {
 
 	extractor := samurai.(SamuraiExtractor)
 	assert.NotEmpty(t, extractor.words)
-	assert.Equal(t, 1, extractor.words["testIden"])
-	assert.Equal(t, 0, extractor.words["test"])
-	assert.Equal(t, 0, extractor.words["iden"])
+	assert.Equal(t, 1, extractor.words["test"])
+	assert.Equal(t, 1, extractor.words["iden"])
 }

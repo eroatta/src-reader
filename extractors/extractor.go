@@ -1,8 +1,13 @@
 package extractors
 
 import (
+	"fmt"
 	"go/ast"
+	"go/token"
 	"log"
+	"strings"
+
+	"github.com/eroatta/token-splitex/splitters"
 )
 
 // Process traverses the Abstract Systax Tree node and applies the extraction method defined by the extractor.
@@ -19,14 +24,19 @@ type Extractor interface {
 // SamuraiExtractor represents an extractor that reads and stores the required data for the Samurai
 // splitting algorithm.
 type SamuraiExtractor struct {
-	name  string
-	words map[string]int
+	name     string
+	words    map[string]int
+	splitter splitters.Splitter
 }
 
 // NewSamuraiExtractor creates an instance capable of exploring the Abstract Systax Tree
 // and extracting the data related to the Samurai splitting algorithm.
 func NewSamuraiExtractor() Extractor {
-	return SamuraiExtractor{name: "samurai", words: map[string]int{}}
+	return SamuraiExtractor{
+		name:     "samurai",
+		words:    map[string]int{},
+		splitter: splitters.NewConserv(),
+	}
 }
 
 // Name returns the specific name for the extractor.
@@ -40,18 +50,40 @@ func (e SamuraiExtractor) Visit(node ast.Node) ast.Visitor {
 		return nil
 	}
 
+	var tokens []string
+
+	// TODO: remove after development
 	log.Println(node)
+
 	switch elem := node.(type) {
 	case *ast.GenDecl:
-		decl := *elem
-		//log.Println(decl.Tok.String())
-		if len(decl.Specs) > 0 {
-			spec, _ := decl.Specs[0].(*ast.ValueSpec)
-			e.words[spec.Names[0].Name]++
+		if elem.Tok != token.VAR {
+			return e
 		}
-	case *ast.Ident:
-		ident := *elem
-		e.words[ident.Name] = 1
+
+		for _, spec := range elem.Specs {
+			if valSpec, ok := spec.(*ast.ValueSpec); ok {
+				for _, name := range valSpec.Names {
+					if name.Name == "_" {
+						continue
+					}
+
+					tokens = append(tokens, name.Name)
+				}
+			}
+		}
+	}
+
+	for _, token := range tokens {
+		splittings, err := e.splitter.Split(token)
+		if err != nil {
+			log.Println(fmt.Sprintf("An error occurred while splitting %s: %v", token, err))
+			continue
+		}
+
+		for _, splitting := range splittings {
+			e.words[strings.ToLower(splitting)]++
+		}
 	}
 
 	return e
