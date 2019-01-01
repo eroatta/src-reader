@@ -46,6 +46,25 @@ func TestVisit_OnSamuraiWithNotNilNode_ShouldReturnVisitor(t *testing.T) {
 	assert.NotNil(t, got)
 }
 
+func TestVisit_OnSamuraiWithPackageNode_ShouldSplitTheName(t *testing.T) {
+	samurai := NewSamuraiExtractor()
+
+	fs := token.NewFileSet()
+	var src = `
+		package samurai_test
+	`
+
+	node, _ := parser.ParseFile(fs, "", []byte(src), parser.AllErrors)
+	ast.Print(fs, node)
+	ast.Walk(samurai, node)
+
+	assert.NotNil(t, samurai)
+
+	extractor := samurai.(SamuraiExtractor)
+	assert.NotEmpty(t, extractor.words)
+	assert.Equal(t, 1, extractor.words["samurai"])
+	assert.Equal(t, 1, extractor.words["test"])
+}
 func TestVisit_OnSamuraiWithVarDeclNode_ShouldSplitTheName(t *testing.T) {
 	samurai := NewSamuraiExtractor()
 
@@ -201,4 +220,4 @@ func TestVisit_OnSamuraiWithFuncDeclNode_ShouldSplitTheName(t *testing.T) {
 	assert.Fail(t, "unimplemented test")
 }
 
-// TODO: add tests for interfaces, imports and comments
+// TODO: add tests for interfaces, package names and comments

@@ -78,6 +78,8 @@ func (e SamuraiExtractor) Visit(node ast.Node) ast.Visitor {
 				}
 			}
 		}
+	case *ast.File:
+		tokens = append(tokens, elem.Name.Name)
 	}
 
 	for _, token := range tokens {
