@@ -46,25 +46,6 @@ func TestVisit_OnSamuraiWithNotNilNode_ShouldReturnVisitor(t *testing.T) {
 	assert.NotNil(t, got)
 }
 
-func TestVisit_OnSamuraiWithPackageNode_ShouldSplitTheName(t *testing.T) {
-	samurai := NewSamuraiExtractor()
-
-	fs := token.NewFileSet()
-	var src = `
-		package samurai_test
-	`
-
-	node, _ := parser.ParseFile(fs, "", []byte(src), parser.AllErrors)
-	ast.Print(fs, node)
-	ast.Walk(samurai, node)
-
-	assert.NotNil(t, samurai)
-
-	extractor := samurai.(SamuraiExtractor)
-	assert.NotEmpty(t, extractor.words)
-	assert.Equal(t, 1, extractor.words["samurai"])
-	assert.Equal(t, 1, extractor.words["test"])
-}
 func TestVisit_OnSamuraiWithVarDeclNode_ShouldSplitTheName(t *testing.T) {
 	samurai := NewSamuraiExtractor()
 
@@ -208,15 +189,36 @@ func TestVisit_OnSamuraiWithConstDeclBlock_ShouldSplitAllTheNames(t *testing.T) 
 	assert.Equal(t, 1, extractor.words["bar"])
 }
 
+// func TestVisit_OnSamuraiWithFuncDeclNode_ShouldSplitTheName(t *testing.T) {
+// 	samurai := NewSamuraiExtractor()
+
+// 	fs := token.NewFileSet()
+// 	var src = `
+// 		package main
+
+// 		import "fmt"
+
+// 		func salute() {
+// 			fmt.Println("Hello Samurai Extractor!")
+// 		}
+// 	`
+
+// 	node, _ := parser.ParseFile(fs, "", []byte(src), parser.AllErrors)
+// 	ast.Print(fs, node)
+// 	ast.Walk(samurai, node)
+
+// 	assert.NotNil(t, samurai)
+
+// 	extractor := samurai.(SamuraiExtractor)
+// 	assert.NotEmpty(t, extractor.words)
+// 	assert.Equal(t, 1, extractor.words["salute"])
+// }
+
 func TestVisit_OnSamuraiWithTypeDeclNode_ShouldSplitTheName(t *testing.T) {
 	assert.Fail(t, "unimplemented test")
 }
 
 func TestVisit_OnSamuraiWithTypeDeclNodeAndMultipleNames_ShouldSplitAllTheNames(t *testing.T) {
-	assert.Fail(t, "unimplemented test")
-}
-
-func TestVisit_OnSamuraiWithFuncDeclNode_ShouldSplitTheName(t *testing.T) {
 	assert.Fail(t, "unimplemented test")
 }
 
