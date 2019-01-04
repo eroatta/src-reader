@@ -52,9 +52,6 @@ func (e SamuraiExtractor) Visit(node ast.Node) ast.Visitor {
 
 	var tokens []string
 
-	// TODO: remove after development
-	log.Println(node)
-
 	switch elem := node.(type) {
 	case *ast.GenDecl:
 		if elem.Tok != token.VAR && elem.Tok != token.CONST {
@@ -75,6 +72,24 @@ func (e SamuraiExtractor) Visit(node ast.Node) ast.Visitor {
 					if val, ok := value.(*ast.BasicLit); ok && val.Kind == token.STRING {
 						tokens = append(tokens, strings.Replace(val.Value, "\"", "", -1))
 					}
+				}
+			}
+		}
+	case *ast.FuncDecl:
+		tokens = append(tokens, elem.Name.Name)
+
+		// TODO: skip _
+		for _, in := range elem.Type.Params.List {
+			for _, arg := range in.Names {
+				tokens = append(tokens, arg.Name)
+			}
+		}
+
+		results := elem.Type.Results
+		if results != nil {
+			for _, out := range results.List {
+				for _, arg := range out.Names {
+					tokens = append(tokens, arg.Name)
 				}
 			}
 		}

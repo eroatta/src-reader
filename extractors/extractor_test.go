@@ -189,30 +189,102 @@ func TestVisit_OnSamuraiWithConstDeclBlock_ShouldSplitAllTheNames(t *testing.T) 
 	assert.Equal(t, 1, extractor.words["bar"])
 }
 
-// func TestVisit_OnSamuraiWithFuncDeclNode_ShouldSplitTheName(t *testing.T) {
-// 	samurai := NewSamuraiExtractor()
+func TestVisit_OnSamuraiWithFuncDeclNode_ShouldSplitTheName(t *testing.T) {
+	samurai := NewSamuraiExtractor()
 
-// 	fs := token.NewFileSet()
-// 	var src = `
-// 		package main
+	fs := token.NewFileSet()
+	var src = `
+		package main
 
-// 		import "fmt"
+		import "fmt"
 
-// 		func salute() {
-// 			fmt.Println("Hello Samurai Extractor!")
-// 		}
-// 	`
+		func main() {
+			fmt.Println("Hello Samurai Extractor!")
+		}
+	`
 
-// 	node, _ := parser.ParseFile(fs, "", []byte(src), parser.AllErrors)
-// 	ast.Print(fs, node)
-// 	ast.Walk(samurai, node)
+	node, _ := parser.ParseFile(fs, "", []byte(src), parser.AllErrors)
+	//ast.Print(fs, node)
+	ast.Walk(samurai, node)
 
-// 	assert.NotNil(t, samurai)
+	assert.NotNil(t, samurai)
 
-// 	extractor := samurai.(SamuraiExtractor)
-// 	assert.NotEmpty(t, extractor.words)
-// 	assert.Equal(t, 1, extractor.words["salute"])
-// }
+	extractor := samurai.(SamuraiExtractor)
+	assert.NotEmpty(t, extractor.words)
+	assert.Equal(t, 1, extractor.words["main"])
+}
+
+func TestVisit_OnSamuraiWithFuncDeclNodeWithArgs_ShouldSplitAllTheNames(t *testing.T) {
+	samurai := NewSamuraiExtractor()
+
+	fs := token.NewFileSet()
+	var src = `
+		package main
+
+		import (
+			"fmt"
+			"gin"
+		)
+
+		func main() {
+			engine := gin.New()
+			engine.Delims("first_argument", "second_argument")
+		}
+
+		func (engine *Engine) Delims(left, right string) *Engine {
+			engine.delims = render.Delims{Left: left, Right: right}
+			return engine
+		}
+	`
+
+	node, _ := parser.ParseFile(fs, "", []byte(src), parser.AllErrors)
+	//ast.Print(fs, node)
+	ast.Walk(samurai, node)
+
+	assert.NotNil(t, samurai)
+
+	extractor := samurai.(SamuraiExtractor)
+	assert.NotEmpty(t, extractor.words)
+	assert.Equal(t, 1, extractor.words["main"])
+	assert.Equal(t, 1, extractor.words["delims"])
+	assert.Equal(t, 1, extractor.words["left"])
+	assert.Equal(t, 1, extractor.words["right"])
+}
+
+func TestVisit_OnSamuraiWithFuncDeclNodeWithNamedResults_ShouldSplitAllTheNames(t *testing.T) {
+	samurai := NewSamuraiExtractor()
+
+	fs := token.NewFileSet()
+	var src = `
+		package main
+
+		import (
+			"fmt"
+		)
+		
+		func main() {
+			text, number := results()
+			fmt.Println(fmt.Sprintf("%s, %d", text, number))
+		}
+		
+		func results() (text string, number int) {
+			return "text", 10
+		}
+	`
+
+	node, _ := parser.ParseFile(fs, "", []byte(src), parser.AllErrors)
+	//ast.Print(fs, node)
+	ast.Walk(samurai, node)
+
+	assert.NotNil(t, samurai)
+
+	extractor := samurai.(SamuraiExtractor)
+	assert.NotEmpty(t, extractor.words)
+	assert.Equal(t, 1, extractor.words["main"])
+	assert.Equal(t, 1, extractor.words["results"])
+	assert.Equal(t, 1, extractor.words["text"])
+	assert.Equal(t, 1, extractor.words["number"])
+}
 
 func TestVisit_OnSamuraiWithTypeDeclNode_ShouldSplitTheName(t *testing.T) {
 	assert.Fail(t, "unimplemented test")
