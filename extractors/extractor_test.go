@@ -344,7 +344,7 @@ func TestVisit_OnSamuraiWithStructTypeDeclNodeWithTwoFields_ShouldSplitAllTheNam
 	`
 
 	node, _ := parser.ParseFile(fs, "", []byte(src), parser.AllErrors)
-	ast.Print(fs, node)
+	//ast.Print(fs, node)
 	ast.Walk(samurai, node)
 
 	assert.NotNil(t, samurai)
@@ -357,4 +357,52 @@ func TestVisit_OnSamuraiWithStructTypeDeclNodeWithTwoFields_ShouldSplitAllTheNam
 	assert.Equal(t, 1, extractor.words["second"])
 }
 
-// TODO: add tests for interfaces and comments
+func TestVisit_OnSamuraiWithInterfaceTypeDeclNode_ShouldSplitTheName(t *testing.T) {
+	samurai := NewSamuraiExtractor()
+
+	fs := token.NewFileSet()
+	var src = `
+		package main
+
+		type myInterface interface
+	`
+
+	node, _ := parser.ParseFile(fs, "", []byte(src), parser.AllErrors)
+	//ast.Print(fs, node)
+	ast.Walk(samurai, node)
+
+	assert.NotNil(t, samurai)
+
+	extractor := samurai.(SamuraiExtractor)
+	assert.NotEmpty(t, extractor.words)
+	assert.Equal(t, 1, extractor.words["my"])
+	assert.Equal(t, 1, extractor.words["interface"])
+}
+
+func TestVisit_OnSamuraiWithInterfaceTypeDeclNodeWithoutMethods_ShouldSplitTheName(t *testing.T) {
+	samurai := NewSamuraiExtractor()
+
+	fs := token.NewFileSet()
+	var src = `
+		package main
+
+		type myInterface interface {
+			myMethod(arg string) (out string)
+		}
+	`
+
+	node, _ := parser.ParseFile(fs, "", []byte(src), parser.AllErrors)
+	ast.Print(fs, node)
+	ast.Walk(samurai, node)
+
+	assert.NotNil(t, samurai)
+
+	extractor := samurai.(SamuraiExtractor)
+	assert.NotEmpty(t, extractor.words)
+	assert.Equal(t, 2, extractor.words["my"])
+	assert.Equal(t, 1, extractor.words["interface"])
+	assert.Equal(t, 1, extractor.words["method"])
+	assert.Equal(t, 1, extractor.words["out"])
+}
+
+// TODO: add tests for comments

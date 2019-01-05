@@ -63,7 +63,7 @@ func (e SamuraiExtractor) Visit(node ast.Node) ast.Visitor {
 							continue
 						}
 
-						tokens = append(tokens, name.Name)
+						tokens = append(tokens, name.String())
 					}
 
 					for _, value := range valSpec.Values {
@@ -83,6 +83,31 @@ func (e SamuraiExtractor) Visit(node ast.Node) ast.Visitor {
 						for _, field := range structType.Fields.List {
 							for _, fieldName := range field.Names {
 								tokens = append(tokens, fieldName.String())
+							}
+						}
+					}
+
+					if interfaceType, ok := typeSpec.Type.(*ast.InterfaceType); ok {
+						for _, method := range interfaceType.Methods.List {
+							for _, name := range method.Names {
+								tokens = append(tokens, name.String())
+							}
+
+							if funcType, ok := method.Type.(*ast.FuncType); ok {
+								for _, in := range funcType.Params.List {
+									for _, arg := range in.Names {
+										tokens = append(tokens, arg.String())
+									}
+								}
+
+								results := funcType.Results
+								if results != nil {
+									for _, out := range results.List {
+										for _, arg := range out.Names {
+											tokens = append(tokens, arg.String())
+										}
+									}
+								}
 							}
 						}
 					}
@@ -110,6 +135,13 @@ func (e SamuraiExtractor) Visit(node ast.Node) ast.Visitor {
 				}
 			}
 		}
+
+		/*case *ast.File:
+		for _, commentGroup := range elem.Comments {
+			for _, comment := range commentGroup.List {
+				comment.Text
+			}
+		}*/
 	}
 
 	for _, token := range tokens {
