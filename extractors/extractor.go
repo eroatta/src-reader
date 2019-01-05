@@ -54,27 +54,44 @@ func (e SamuraiExtractor) Visit(node ast.Node) ast.Visitor {
 
 	switch elem := node.(type) {
 	case *ast.GenDecl:
-		if elem.Tok != token.VAR && elem.Tok != token.CONST {
-			return e
-		}
+		switch elem.Tok {
+		case token.VAR, token.CONST:
+			for _, spec := range elem.Specs {
+				if valSpec, ok := spec.(*ast.ValueSpec); ok {
+					for _, name := range valSpec.Names {
+						if name.Name == "_" {
+							continue
+						}
 
-		for _, spec := range elem.Specs {
-			if valSpec, ok := spec.(*ast.ValueSpec); ok {
-				for _, name := range valSpec.Names {
-					if name.Name == "_" {
-						continue
+						tokens = append(tokens, name.Name)
 					}
 
-					tokens = append(tokens, name.Name)
-				}
-
-				for _, value := range valSpec.Values {
-					if val, ok := value.(*ast.BasicLit); ok && val.Kind == token.STRING {
-						tokens = append(tokens, strings.Replace(val.Value, "\"", "", -1))
+					for _, value := range valSpec.Values {
+						if val, ok := value.(*ast.BasicLit); ok && val.Kind == token.STRING {
+							tokens = append(tokens, strings.Replace(val.Value, "\"", "", -1))
+						}
 					}
 				}
 			}
+		case token.TYPE:
+			for _, spec := range elem.Specs {
+				if typeSpec, ok := spec.(*ast.TypeSpec); ok {
+					// TODO: review if we should use the String() function on every place
+					tokens = append(tokens, typeSpec.Name.String())
+
+					if structType, ok := typeSpec.Type.(*ast.StructType); ok {
+						for _, field := range structType.Fields.List {
+							for _, fieldName := range field.Names {
+								tokens = append(tokens, fieldName.String())
+							}
+						}
+					}
+				}
+			}
+		default:
+			return e
 		}
+
 	case *ast.FuncDecl:
 		tokens = append(tokens, elem.Name.Name)
 

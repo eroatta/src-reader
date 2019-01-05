@@ -287,11 +287,74 @@ func TestVisit_OnSamuraiWithFuncDeclNodeWithNamedResults_ShouldSplitAllTheNames(
 }
 
 func TestVisit_OnSamuraiWithTypeDeclNode_ShouldSplitTheName(t *testing.T) {
-	assert.Fail(t, "unimplemented test")
+	samurai := NewSamuraiExtractor()
+
+	fs := token.NewFileSet()
+	var src = `
+		package main
+
+		type myInt int
+	`
+
+	node, _ := parser.ParseFile(fs, "", []byte(src), parser.AllErrors)
+	ast.Print(fs, node)
+	ast.Walk(samurai, node)
+
+	assert.NotNil(t, samurai)
+
+	extractor := samurai.(SamuraiExtractor)
+	assert.NotEmpty(t, extractor.words)
+	assert.Equal(t, 1, extractor.words["my"])
+	assert.Equal(t, 1, extractor.words["int"])
 }
 
-func TestVisit_OnSamuraiWithTypeDeclNodeAndMultipleNames_ShouldSplitAllTheNames(t *testing.T) {
-	assert.Fail(t, "unimplemented test")
+func TestVisit_OnSamuraiWithStructTypeDeclNodeWithNoFields_ShouldSplitTheName(t *testing.T) {
+	samurai := NewSamuraiExtractor()
+
+	fs := token.NewFileSet()
+	var src = `
+		package main
+
+		type myStruct struct {}
+	`
+
+	node, _ := parser.ParseFile(fs, "", []byte(src), parser.AllErrors)
+	ast.Print(fs, node)
+	ast.Walk(samurai, node)
+
+	assert.NotNil(t, samurai)
+
+	extractor := samurai.(SamuraiExtractor)
+	assert.NotEmpty(t, extractor.words)
+	assert.Equal(t, 1, extractor.words["my"])
+	assert.Equal(t, 1, extractor.words["struct"])
 }
 
-// TODO: add tests for interfaces, package names and comments
+func TestVisit_OnSamuraiWithStructTypeDeclNodeWithTwoFields_ShouldSplitAllTheNames(t *testing.T) {
+	samurai := NewSamuraiExtractor()
+
+	fs := token.NewFileSet()
+	var src = `
+		package main
+
+		type myStruct struct {
+			first string,
+			second string
+		}
+	`
+
+	node, _ := parser.ParseFile(fs, "", []byte(src), parser.AllErrors)
+	ast.Print(fs, node)
+	ast.Walk(samurai, node)
+
+	assert.NotNil(t, samurai)
+
+	extractor := samurai.(SamuraiExtractor)
+	assert.NotEmpty(t, extractor.words)
+	assert.Equal(t, 1, extractor.words["my"])
+	assert.Equal(t, 1, extractor.words["struct"])
+	assert.Equal(t, 1, extractor.words["first"])
+	assert.Equal(t, 1, extractor.words["second"])
+}
+
+// TODO: add tests for interfaces and comments
