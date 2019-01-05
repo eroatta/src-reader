@@ -297,7 +297,7 @@ func TestVisit_OnSamuraiWithTypeDeclNode_ShouldSplitTheName(t *testing.T) {
 	`
 
 	node, _ := parser.ParseFile(fs, "", []byte(src), parser.AllErrors)
-	ast.Print(fs, node)
+	//ast.Print(fs, node)
 	ast.Walk(samurai, node)
 
 	assert.NotNil(t, samurai)
@@ -319,7 +319,7 @@ func TestVisit_OnSamuraiWithStructTypeDeclNodeWithNoFields_ShouldSplitTheName(t 
 	`
 
 	node, _ := parser.ParseFile(fs, "", []byte(src), parser.AllErrors)
-	ast.Print(fs, node)
+	//ast.Print(fs, node)
 	ast.Walk(samurai, node)
 
 	assert.NotNil(t, samurai)
@@ -425,7 +425,7 @@ func TestVisit_OnSamuraiWithCommentsOnFile_ShouldSplitTheComments(t *testing.T) 
 	`
 
 	node, _ := parser.ParseFile(fs, "", []byte(src), parser.ParseComments)
-	ast.Print(fs, node)
+	//ast.Print(fs, node)
 	ast.Walk(samurai, node)
 
 	assert.NotNil(t, samurai)
