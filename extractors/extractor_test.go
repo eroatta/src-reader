@@ -392,7 +392,7 @@ func TestVisit_OnSamuraiWithInterfaceTypeDeclNodeWithoutMethods_ShouldSplitTheNa
 	`
 
 	node, _ := parser.ParseFile(fs, "", []byte(src), parser.AllErrors)
-	ast.Print(fs, node)
+	//ast.Print(fs, node)
 	ast.Walk(samurai, node)
 
 	assert.NotNil(t, samurai)
@@ -405,4 +405,41 @@ func TestVisit_OnSamuraiWithInterfaceTypeDeclNodeWithoutMethods_ShouldSplitTheNa
 	assert.Equal(t, 1, extractor.words["out"])
 }
 
-// TODO: add tests for comments
+func TestVisit_OnSamuraiWithCommentsOnFile_ShouldSplitTheComments(t *testing.T) {
+	samurai := NewSamuraiExtractor()
+
+	fs := token.NewFileSet()
+	var src = `
+		// package comment
+		package main
+	
+		// regular comment
+		type MyInterface interface {
+			MyMethod(out string) // inline comment
+		}
+	
+		/* 
+		block comment
+		*/
+		type abc int
+	`
+
+	node, _ := parser.ParseFile(fs, "", []byte(src), parser.ParseComments)
+	ast.Print(fs, node)
+	ast.Walk(samurai, node)
+
+	assert.NotNil(t, samurai)
+
+	extractor := samurai.(SamuraiExtractor)
+	assert.NotEmpty(t, extractor.words)
+	assert.Equal(t, 2, extractor.words["my"])
+	assert.Equal(t, 1, extractor.words["interface"])
+	assert.Equal(t, 1, extractor.words["method"])
+	assert.Equal(t, 1, extractor.words["out"])
+	assert.Equal(t, 1, extractor.words["abc"])
+	assert.Equal(t, 1, extractor.words["package"])
+	assert.Equal(t, 1, extractor.words["regular"])
+	assert.Equal(t, 1, extractor.words["inline"])
+	assert.Equal(t, 1, extractor.words["block"])
+	assert.Equal(t, 4, extractor.words["comment"])
+}

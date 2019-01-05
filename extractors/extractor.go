@@ -29,6 +29,12 @@ type SamuraiExtractor struct {
 	splitter splitters.Splitter
 }
 
+var cleaner *strings.Replacer
+
+func init() {
+	cleaner = strings.NewReplacer("/*", "", "*/", "", "\n", "", "\t", "")
+}
+
 // NewSamuraiExtractor creates an instance capable of exploring the Abstract Systax Tree
 // and extracting the data related to the Samurai splitting algorithm.
 func NewSamuraiExtractor() Extractor {
@@ -136,12 +142,15 @@ func (e SamuraiExtractor) Visit(node ast.Node) ast.Visitor {
 			}
 		}
 
-		/*case *ast.File:
+	case *ast.File:
 		for _, commentGroup := range elem.Comments {
 			for _, comment := range commentGroup.List {
-				comment.Text
+				cleanComment := strings.Trim(cleaner.Replace(comment.Text), "")
+				for _, word := range strings.Split(cleanComment, " ") {
+					tokens = append(tokens, word)
+				}
 			}
-		}*/
+		}
 	}
 
 	for _, token := range tokens {
