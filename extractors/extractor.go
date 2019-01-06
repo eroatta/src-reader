@@ -32,7 +32,7 @@ type SamuraiExtractor struct {
 var cleaner *strings.Replacer
 
 func init() {
-	cleaner = strings.NewReplacer("/*", "", "*/", "", "\n", "", "\t", "")
+	cleaner = strings.NewReplacer("/*", "", "*/", "", "\n", "", "\t", "", "//", "")
 }
 
 // NewSamuraiExtractor creates an instance capable of exploring the Abstract Systax Tree
@@ -147,6 +147,10 @@ func (e SamuraiExtractor) Visit(node ast.Node) ast.Visitor {
 			for _, comment := range commentGroup.List {
 				cleanComment := strings.Trim(cleaner.Replace(comment.Text), "")
 				for _, word := range strings.Split(cleanComment, " ") {
+					if word == "" {
+						continue
+					}
+
 					tokens = append(tokens, word)
 				}
 			}

@@ -1,6 +1,7 @@
 package extractors
 
 import (
+	"fmt"
 	"go/ast"
 	"go/parser"
 	"go/token"
@@ -46,400 +47,299 @@ func TestVisit_OnSamuraiWithNotNilNode_ShouldReturnVisitor(t *testing.T) {
 	assert.NotNil(t, got)
 }
 
-func TestVisit_OnSamuraiWithVarDeclNode_ShouldSplitTheName(t *testing.T) {
-	samurai := NewSamuraiExtractor()
+func TestVisit_OnSamurai_ShouldSplitTheIdentifiers(t *testing.T) {
+	var tests = []struct {
+		name        string
+		src         string
+		uniqueWords int
+		expected    map[string]int
+	}{
+		{
+			name: "VarDeclNode",
+			src: `
+				package main
+				var testIden string
+			`,
+			uniqueWords: 2,
+			expected: map[string]int{
+				"test": 1,
+				"iden": 1,
+			},
+		},
+		{
+			name: "VarDelNode_MultipleNames",
+			src: `
+				package main
+				var testIden, testBar string
+			`,
+			uniqueWords: 3,
+			expected: map[string]int{
+				"test": 2,
+				"iden": 1,
+				"bar":  1,
+			},
+		},
+		{
+			name: "VarDelNode_BlockAndValues",
+			src: `
+				package main
+				var (
+					testIden = "boo"
+					foo = "bar"
+				)
+			`,
+			uniqueWords: 5,
+			expected: map[string]int{
+				"test": 1,
+				"iden": 1,
+				"boo":  1,
+				"foo":  1,
+				"bar":  1,
+			},
+		},
+		{
+			name: "ConstDeclNode",
+			src: `
+				package main
+				const testIden = "boo"
+			`,
+			uniqueWords: 3,
+			expected: map[string]int{
+				"test": 1,
+				"iden": 1,
+				"boo":  1,
+			},
+		},
+		{
+			name: "ConstDeclNode_MultipleNamesAndValues",
+			src: `
+				package main
+				const testIden, foo = "boo", "bar"
+			`,
+			uniqueWords: 5,
+			expected: map[string]int{
+				"test": 1,
+				"iden": 1,
+				"boo":  1,
+				"foo":  1,
+				"bar":  1,
+			},
+		},
+		{
+			name: "ConstDeclNode_BlockAndValues",
+			src: `
+				package main
+				const (
+					testIden = "boo"
+					foo = "bar"
+				)
+			`,
+			uniqueWords: 5,
+			expected: map[string]int{
+				"test": 1,
+				"iden": 1,
+				"boo":  1,
+				"foo":  1,
+				"bar":  1,
+			},
+		},
+		{
+			name: "FuncDeclNode",
+			src: `
+				package main
+				
+				import "fmt"
 
-	fs := token.NewFileSet()
-	var src = `
-		package main
-		var testIden string
-	`
+				func main() {
+					fmt.Println("Hello Samurai Extractor!")
+				}
+			`,
+			uniqueWords: 1,
+			expected: map[string]int{
+				"main": 1,
+			},
+		},
+		{
+			name: "FuncDeclNode_Parameters",
+			src: `
+				package main
 
-	node, _ := parser.ParseFile(fs, "", []byte(src), parser.AllErrors)
-	//ast.Print(fs, node)
-	ast.Walk(samurai, node)
-
-	assert.NotNil(t, samurai)
-
-	extractor := samurai.(SamuraiExtractor)
-	assert.NotEmpty(t, extractor.words)
-	assert.Equal(t, 1, extractor.words["test"])
-	assert.Equal(t, 1, extractor.words["iden"])
-}
-
-func TestVisit_OnSamuraiWithVarDeclAndMultipleNames_ShouldSplitAllTheNames(t *testing.T) {
-	samurai := NewSamuraiExtractor()
-
-	fs := token.NewFileSet()
-	var src = `
-		package main
-		var testIden, testBar string
-	`
-
-	node, _ := parser.ParseFile(fs, "", []byte(src), parser.AllErrors)
-	//ast.Print(fs, node)
-	ast.Walk(samurai, node)
-
-	assert.NotNil(t, samurai)
-
-	extractor := samurai.(SamuraiExtractor)
-	assert.NotEmpty(t, extractor.words)
-	assert.Equal(t, 2, extractor.words["test"])
-	assert.Equal(t, 1, extractor.words["iden"])
-	assert.Equal(t, 1, extractor.words["bar"])
-}
-
-func TestVisit_OnSamuraiWithVarDeclBlock_ShouldSplitAllTheNames(t *testing.T) {
-	samurai := NewSamuraiExtractor()
-
-	fs := token.NewFileSet()
-	var src = `
-		package main
-		var (
-			testIden = "boo"
-			foo = "bar"
-		)
-	`
-
-	node, _ := parser.ParseFile(fs, "", []byte(src), parser.AllErrors)
-	//ast.Print(fs, node)
-	ast.Walk(samurai, node)
-
-	assert.NotNil(t, samurai)
-
-	extractor := samurai.(SamuraiExtractor)
-	assert.NotEmpty(t, extractor.words)
-	assert.Equal(t, 1, extractor.words["test"])
-	assert.Equal(t, 1, extractor.words["iden"])
-	assert.Equal(t, 1, extractor.words["boo"])
-	assert.Equal(t, 1, extractor.words["foo"])
-	assert.Equal(t, 1, extractor.words["bar"])
-}
-
-func TestVisit_OnSamuraiWithConstDeclNode_ShouldSplitTheName(t *testing.T) {
-	samurai := NewSamuraiExtractor()
-
-	fs := token.NewFileSet()
-	var src = `
-		package main
-		const testIden = "boo"
-	`
-
-	node, _ := parser.ParseFile(fs, "", []byte(src), parser.AllErrors)
-	//ast.Print(fs, node)
-	ast.Walk(samurai, node)
-
-	assert.NotNil(t, samurai)
-
-	extractor := samurai.(SamuraiExtractor)
-	assert.NotEmpty(t, extractor.words)
-	assert.Equal(t, 1, extractor.words["test"])
-	assert.Equal(t, 1, extractor.words["iden"])
-	assert.Equal(t, 1, extractor.words["boo"])
-}
-
-func TestVisit_OnSamuraiWithConstDeclAndMultipleNamesAndValues_ShouldSplitAllTheNames(t *testing.T) {
-	samurai := NewSamuraiExtractor()
-
-	fs := token.NewFileSet()
-	var src = `
-		package main
-		const testIden, foo = "boo", "bar"
-	`
-
-	node, _ := parser.ParseFile(fs, "", []byte(src), parser.AllErrors)
-	//ast.Print(fs, node)
-	ast.Walk(samurai, node)
-
-	assert.NotNil(t, samurai)
-
-	extractor := samurai.(SamuraiExtractor)
-	assert.NotEmpty(t, extractor.words)
-	assert.Equal(t, 1, extractor.words["test"])
-	assert.Equal(t, 1, extractor.words["iden"])
-	assert.Equal(t, 1, extractor.words["boo"])
-	assert.Equal(t, 1, extractor.words["foo"])
-	assert.Equal(t, 1, extractor.words["bar"])
-}
-
-func TestVisit_OnSamuraiWithConstDeclBlock_ShouldSplitAllTheNames(t *testing.T) {
-	samurai := NewSamuraiExtractor()
-
-	fs := token.NewFileSet()
-	var src = `
-		package main
-		const (
-			testIden = "boo"
-			foo = "bar"
-		)
-	`
-
-	node, _ := parser.ParseFile(fs, "", []byte(src), parser.AllErrors)
-	//ast.Print(fs, node)
-	ast.Walk(samurai, node)
-
-	assert.NotNil(t, samurai)
-
-	extractor := samurai.(SamuraiExtractor)
-	assert.NotEmpty(t, extractor.words)
-	assert.Equal(t, 1, extractor.words["test"])
-	assert.Equal(t, 1, extractor.words["iden"])
-	assert.Equal(t, 1, extractor.words["boo"])
-	assert.Equal(t, 1, extractor.words["foo"])
-	assert.Equal(t, 1, extractor.words["bar"])
-}
-
-func TestVisit_OnSamuraiWithFuncDeclNode_ShouldSplitTheName(t *testing.T) {
-	samurai := NewSamuraiExtractor()
-
-	fs := token.NewFileSet()
-	var src = `
-		package main
-
-		import "fmt"
-
-		func main() {
-			fmt.Println("Hello Samurai Extractor!")
-		}
-	`
-
-	node, _ := parser.ParseFile(fs, "", []byte(src), parser.AllErrors)
-	//ast.Print(fs, node)
-	ast.Walk(samurai, node)
-
-	assert.NotNil(t, samurai)
-
-	extractor := samurai.(SamuraiExtractor)
-	assert.NotEmpty(t, extractor.words)
-	assert.Equal(t, 1, extractor.words["main"])
-}
-
-func TestVisit_OnSamuraiWithFuncDeclNodeWithArgs_ShouldSplitAllTheNames(t *testing.T) {
-	samurai := NewSamuraiExtractor()
-
-	fs := token.NewFileSet()
-	var src = `
-		package main
-
-		import (
-			"fmt"
-			"gin"
-		)
-
-		func main() {
-			engine := gin.New()
-			engine.Delims("first_argument", "second_argument")
-		}
-
-		func (engine *Engine) Delims(left, right string) *Engine {
-			engine.delims = render.Delims{Left: left, Right: right}
-			return engine
-		}
-	`
-
-	node, _ := parser.ParseFile(fs, "", []byte(src), parser.AllErrors)
-	//ast.Print(fs, node)
-	ast.Walk(samurai, node)
-
-	assert.NotNil(t, samurai)
-
-	extractor := samurai.(SamuraiExtractor)
-	assert.NotEmpty(t, extractor.words)
-	assert.Equal(t, 1, extractor.words["main"])
-	assert.Equal(t, 1, extractor.words["delims"])
-	assert.Equal(t, 1, extractor.words["left"])
-	assert.Equal(t, 1, extractor.words["right"])
-}
-
-func TestVisit_OnSamuraiWithFuncDeclNodeWithNamedResults_ShouldSplitAllTheNames(t *testing.T) {
-	samurai := NewSamuraiExtractor()
-
-	fs := token.NewFileSet()
-	var src = `
-		package main
-
-		import (
-			"fmt"
-		)
+				import (
+					"fmt"
+					"gin"
+				)
 		
-		func main() {
-			text, number := results()
-			fmt.Println(fmt.Sprintf("%s, %d", text, number))
-		}
+				func main() {
+					engine := gin.New()
+					engine.Delims("first_argument", "second_argument")
+				}
 		
-		func results() (text string, number int) {
-			return "text", 10
-		}
-	`
+				func (engine *Engine) Delims(left, right string) *Engine {
+					engine.delims = render.Delims{Left: left, Right: right}
+					return engine
+				}
+			`,
+			uniqueWords: 4,
+			expected: map[string]int{
+				"main":   1,
+				"delims": 1,
+				"left":   1,
+				"right":  1,
+			},
+		},
+		{
+			name: "FuncDeclNode_NamedResults",
+			src: `
+				package main
 
-	node, _ := parser.ParseFile(fs, "", []byte(src), parser.AllErrors)
-	//ast.Print(fs, node)
-	ast.Walk(samurai, node)
+				import (
+					"fmt"
+				)
+				
+				func main() {
+					text, number := results()
+					fmt.Println(fmt.Sprintf("%s, %d", text, number))
+				}
+				
+				func results() (text string, number int) {
+					return "text", 10
+				}
+			`,
+			uniqueWords: 4,
+			expected: map[string]int{
+				"main":    1,
+				"results": 1,
+				"text":    1,
+				"number":  1,
+			},
+		},
+		{
+			name: "TypeDeclNode",
+			src: `
+				package main
 
-	assert.NotNil(t, samurai)
+				type myInt int
+			`,
+			uniqueWords: 2,
+			expected: map[string]int{
+				"my":  1,
+				"int": 1,
+			},
+		},
+		{
+			name: "StructTypeDeclNode_NoFields",
+			src: `
+				package main
 
-	extractor := samurai.(SamuraiExtractor)
-	assert.NotEmpty(t, extractor.words)
-	assert.Equal(t, 1, extractor.words["main"])
-	assert.Equal(t, 1, extractor.words["results"])
-	assert.Equal(t, 1, extractor.words["text"])
-	assert.Equal(t, 1, extractor.words["number"])
-}
+				type myStruct struct {}
+			`,
+			uniqueWords: 2,
+			expected: map[string]int{
+				"my":     1,
+				"struct": 1,
+			},
+		},
+		{
+			name: "StructTypeDeclNode_TwoFields",
+			src: `
+				package main
 
-func TestVisit_OnSamuraiWithTypeDeclNode_ShouldSplitTheName(t *testing.T) {
-	samurai := NewSamuraiExtractor()
+				type myStruct struct {
+					first string,
+					second string
+				}
+			`,
+			uniqueWords: 4,
+			expected: map[string]int{
+				"my":     1,
+				"struct": 1,
+				"first":  1,
+				"second": 1,
+			},
+		},
+		{
+			name: "InterfaceTypeDeclNode",
+			src: `
+				package main
 
-	fs := token.NewFileSet()
-	var src = `
-		package main
+				type myInterface interface
+			`,
+			uniqueWords: 2,
+			expected: map[string]int{
+				"my":        1,
+				"interface": 1,
+			},
+		},
+		{
+			name: "InterfaceTypeDeclNode_TwoMethods",
+			src: `
+				package main
 
-		type myInt int
-	`
+				type myInterface interface {
+					myMethod(arg string) (out string)
+					anotherMethod(arg string) (out string)
+				}
+			`,
+			uniqueWords: 6,
+			expected: map[string]int{
+				"my":        2,
+				"interface": 1,
+				"method":    2,
+				"another":   1,
+				"arg":       2,
+				"out":       2,
+			},
+		},
+		{
+			name: "FileCommentsNode",
+			src: `
+				// package comment
+				package main
+			
+				// regular comment
+				type MyInterface interface {
+					MyMethod(out string) // inline comment
+				}
+			
+				/* 
+				block comment
+				*/
+				type abc int
+			`,
+			uniqueWords: 10,
+			expected: map[string]int{
+				"my":        2,
+				"interface": 1,
+				"method":    1,
+				"out":       1,
+				"abc":       1,
+				"package":   1,
+				"regular":   1,
+				"inline":    1,
+				"block":     1,
+				"comment":   4,
+			},
+		},
+	}
 
-	node, _ := parser.ParseFile(fs, "", []byte(src), parser.AllErrors)
-	//ast.Print(fs, node)
-	ast.Walk(samurai, node)
+	for _, fixture := range tests {
+		t.Run(fixture.name, func(t *testing.T) {
+			samurai := NewSamuraiExtractor()
 
-	assert.NotNil(t, samurai)
+			fs := token.NewFileSet()
+			node, _ := parser.ParseFile(fs, "", []byte(fixture.src), parser.ParseComments)
 
-	extractor := samurai.(SamuraiExtractor)
-	assert.NotEmpty(t, extractor.words)
-	assert.Equal(t, 1, extractor.words["my"])
-	assert.Equal(t, 1, extractor.words["int"])
-}
+			ast.Walk(samurai, node)
 
-func TestVisit_OnSamuraiWithStructTypeDeclNodeWithNoFields_ShouldSplitTheName(t *testing.T) {
-	samurai := NewSamuraiExtractor()
+			assert.NotNil(t, samurai)
 
-	fs := token.NewFileSet()
-	var src = `
-		package main
+			extractor := samurai.(SamuraiExtractor)
 
-		type myStruct struct {}
-	`
-
-	node, _ := parser.ParseFile(fs, "", []byte(src), parser.AllErrors)
-	//ast.Print(fs, node)
-	ast.Walk(samurai, node)
-
-	assert.NotNil(t, samurai)
-
-	extractor := samurai.(SamuraiExtractor)
-	assert.NotEmpty(t, extractor.words)
-	assert.Equal(t, 1, extractor.words["my"])
-	assert.Equal(t, 1, extractor.words["struct"])
-}
-
-func TestVisit_OnSamuraiWithStructTypeDeclNodeWithTwoFields_ShouldSplitAllTheNames(t *testing.T) {
-	samurai := NewSamuraiExtractor()
-
-	fs := token.NewFileSet()
-	var src = `
-		package main
-
-		type myStruct struct {
-			first string,
-			second string
-		}
-	`
-
-	node, _ := parser.ParseFile(fs, "", []byte(src), parser.AllErrors)
-	//ast.Print(fs, node)
-	ast.Walk(samurai, node)
-
-	assert.NotNil(t, samurai)
-
-	extractor := samurai.(SamuraiExtractor)
-	assert.NotEmpty(t, extractor.words)
-	assert.Equal(t, 1, extractor.words["my"])
-	assert.Equal(t, 1, extractor.words["struct"])
-	assert.Equal(t, 1, extractor.words["first"])
-	assert.Equal(t, 1, extractor.words["second"])
-}
-
-func TestVisit_OnSamuraiWithInterfaceTypeDeclNode_ShouldSplitTheName(t *testing.T) {
-	samurai := NewSamuraiExtractor()
-
-	fs := token.NewFileSet()
-	var src = `
-		package main
-
-		type myInterface interface
-	`
-
-	node, _ := parser.ParseFile(fs, "", []byte(src), parser.AllErrors)
-	//ast.Print(fs, node)
-	ast.Walk(samurai, node)
-
-	assert.NotNil(t, samurai)
-
-	extractor := samurai.(SamuraiExtractor)
-	assert.NotEmpty(t, extractor.words)
-	assert.Equal(t, 1, extractor.words["my"])
-	assert.Equal(t, 1, extractor.words["interface"])
-}
-
-func TestVisit_OnSamuraiWithInterfaceTypeDeclNodeWithoutMethods_ShouldSplitTheName(t *testing.T) {
-	samurai := NewSamuraiExtractor()
-
-	fs := token.NewFileSet()
-	var src = `
-		package main
-
-		type myInterface interface {
-			myMethod(arg string) (out string)
-		}
-	`
-
-	node, _ := parser.ParseFile(fs, "", []byte(src), parser.AllErrors)
-	//ast.Print(fs, node)
-	ast.Walk(samurai, node)
-
-	assert.NotNil(t, samurai)
-
-	extractor := samurai.(SamuraiExtractor)
-	assert.NotEmpty(t, extractor.words)
-	assert.Equal(t, 2, extractor.words["my"])
-	assert.Equal(t, 1, extractor.words["interface"])
-	assert.Equal(t, 1, extractor.words["method"])
-	assert.Equal(t, 1, extractor.words["out"])
-}
-
-func TestVisit_OnSamuraiWithCommentsOnFile_ShouldSplitTheComments(t *testing.T) {
-	samurai := NewSamuraiExtractor()
-
-	fs := token.NewFileSet()
-	var src = `
-		// package comment
-		package main
-	
-		// regular comment
-		type MyInterface interface {
-			MyMethod(out string) // inline comment
-		}
-	
-		/* 
-		block comment
-		*/
-		type abc int
-	`
-
-	node, _ := parser.ParseFile(fs, "", []byte(src), parser.ParseComments)
-	//ast.Print(fs, node)
-	ast.Walk(samurai, node)
-
-	assert.NotNil(t, samurai)
-
-	extractor := samurai.(SamuraiExtractor)
-	assert.NotEmpty(t, extractor.words)
-	assert.Equal(t, 2, extractor.words["my"])
-	assert.Equal(t, 1, extractor.words["interface"])
-	assert.Equal(t, 1, extractor.words["method"])
-	assert.Equal(t, 1, extractor.words["out"])
-	assert.Equal(t, 1, extractor.words["abc"])
-	assert.Equal(t, 1, extractor.words["package"])
-	assert.Equal(t, 1, extractor.words["regular"])
-	assert.Equal(t, 1, extractor.words["inline"])
-	assert.Equal(t, 1, extractor.words["block"])
-	assert.Equal(t, 4, extractor.words["comment"])
+			assert.NotEmpty(t, extractor.words)
+			assert.Equal(t, fixture.uniqueWords, len(extractor.words))
+			for key, value := range fixture.expected {
+				assert.Equal(t, value, extractor.words[key], fmt.Sprintf("invalid number of occurrencies for element: %s", key))
+			}
+		})
+	}
 }
