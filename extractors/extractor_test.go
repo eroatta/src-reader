@@ -301,12 +301,14 @@ func TestVisit_OnSamurai_ShouldSplitTheIdentifiers(t *testing.T) {
 					MyMethod(out string) // inline comment
 				}
 			
+				// tricky comment has code: var := obj.Call("/route/v1", "text")
+
 				/* 
 				block comment
 				*/
 				type abc int
 			`,
-			uniqueWords: 10,
+			uniqueWords: 20,
 			expected: map[string]int{
 				"my":        2,
 				"interface": 1,
@@ -317,7 +319,17 @@ func TestVisit_OnSamurai_ShouldSplitTheIdentifiers(t *testing.T) {
 				"regular":   1,
 				"inline":    1,
 				"block":     1,
-				"comment":   4,
+				"tricky":    1,
+				"has":       1,
+				"code":      1,
+				"var":       1,
+				"obj":       1,
+				"call":      1,
+				"route":     1,
+				"v":         1,
+				"1":         1,
+				"text":      1,
+				"comment":   5,
 			},
 		},
 	}

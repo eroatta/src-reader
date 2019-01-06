@@ -32,7 +32,19 @@ type SamuraiExtractor struct {
 var cleaner *strings.Replacer
 
 func init() {
-	cleaner = strings.NewReplacer("/*", "", "*/", "", "\n", "", "\t", "", "//", "")
+	cleaner = strings.NewReplacer("/*", "",
+		"*/", "",
+		"\n", "",
+		"\t", "",
+		"//", "",
+		".", " ",
+		",", " ",
+		":", " ",
+		"=", " ",
+		"(", " ",
+		")", " ",
+		"/", " ",
+		"\"", "")
 }
 
 // NewSamuraiExtractor creates an instance capable of exploring the Abstract Systax Tree
