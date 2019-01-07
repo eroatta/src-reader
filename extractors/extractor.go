@@ -83,7 +83,6 @@ func (e SamuraiExtractor) Visit(node ast.Node) ast.Visitor {
 		case token.TYPE:
 			for _, spec := range elem.Specs {
 				if typeSpec, ok := spec.(*ast.TypeSpec); ok {
-					// TODO: review if we should use the String() function on every place
 					tokens = append(tokens, typeSpec.Name.String())
 
 					if structType, ok := typeSpec.Type.(*ast.StructType); ok {
@@ -125,12 +124,11 @@ func (e SamuraiExtractor) Visit(node ast.Node) ast.Visitor {
 		}
 
 	case *ast.FuncDecl:
-		tokens = append(tokens, elem.Name.Name)
+		tokens = append(tokens, elem.Name.String())
 
-		// TODO: skip _
 		for _, in := range elem.Type.Params.List {
 			for _, arg := range in.Names {
-				tokens = append(tokens, arg.Name)
+				tokens = append(tokens, arg.String())
 			}
 		}
 
@@ -138,7 +136,7 @@ func (e SamuraiExtractor) Visit(node ast.Node) ast.Visitor {
 		if results != nil {
 			for _, out := range results.List {
 				for _, arg := range out.Names {
-					tokens = append(tokens, arg.Name)
+					tokens = append(tokens, arg.String())
 				}
 			}
 		}
