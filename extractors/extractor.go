@@ -166,7 +166,10 @@ func (e SamuraiExtractor) Visit(node ast.Node) ast.Visitor {
 					continue
 				}
 
-				tokens = append(tokens, identifier.String())
+				// only newly defined identifiers
+				if identifier.Obj != nil && identifier.Obj.Pos() == identifier.Pos() {
+					tokens = append(tokens, identifier.String())
+				}
 			}
 		}
 	}

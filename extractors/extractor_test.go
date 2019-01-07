@@ -327,8 +327,7 @@ func TestVisit_OnSamurai_ShouldSplitTheIdentifiers(t *testing.T) {
 				package main
 			
 				func main() {
-					text := "define text"
-					
+					text := "define text"					
 					text = "assign text"
 				}
 			`,
@@ -336,6 +335,39 @@ func TestVisit_OnSamurai_ShouldSplitTheIdentifiers(t *testing.T) {
 			expected: map[string]int{
 				"main": 1,
 				"text": 1,
+			},
+		},
+		{
+			name: "AssignStmt_IgnoredVar",
+			src: `
+				package main
+			
+				func main() {
+					_, err := check()
+				}
+			`,
+			uniqueWords: 2,
+			expected: map[string]int{
+				"main": 1,
+				"err":  1,
+			},
+		},
+		{
+			name: "AssignStmt_ReusedVar",
+			src: `
+				package main
+			
+				import "errors"
+
+				func main() {
+					var err errors.error
+					_, err := check()
+				}
+			`,
+			uniqueWords: 2,
+			expected: map[string]int{
+				"main": 1,
+				"err":  1,
 			},
 		},
 	}
