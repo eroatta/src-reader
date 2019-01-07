@@ -5,6 +5,7 @@ import (
 	"go/ast"
 	"go/token"
 	"log"
+	"regexp"
 	"strings"
 
 	"github.com/eroatta/token-splitex/splitters"
@@ -29,24 +30,10 @@ type SamuraiExtractor struct {
 	splitter splitters.Splitter
 }
 
-var cleaner *strings.Replacer
+var cleaner *regexp.Regexp
 
 func init() {
-	cleaner = strings.NewReplacer("/*", "",
-		"*/", "",
-		"\n", "",
-		"\t", "",
-		"//", "",
-		".", " ",
-		",", " ",
-		":", " ",
-		"=", " ",
-		"(", " ",
-		")", " ",
-		"/", " ",
-		"-", " ",
-		"'", " ",
-		"\"", "")
+	cleaner = regexp.MustCompile("[^a-zA-Z0-9]")
 }
 
 // NewSamuraiExtractor creates an instance capable of exploring the Abstract Systax Tree
@@ -159,7 +146,7 @@ func (e SamuraiExtractor) Visit(node ast.Node) ast.Visitor {
 	case *ast.File:
 		for _, commentGroup := range elem.Comments {
 			for _, comment := range commentGroup.List {
-				cleanComment := strings.Trim(cleaner.Replace(comment.Text), "")
+				cleanComment := strings.Trim(cleaner.ReplaceAllString(comment.Text, " "), "")
 				for _, word := range strings.Split(cleanComment, " ") {
 					if word == "" {
 						continue
