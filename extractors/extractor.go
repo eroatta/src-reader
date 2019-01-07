@@ -44,6 +44,8 @@ func init() {
 		"(", " ",
 		")", " ",
 		"/", " ",
+		"-", " ",
+		"'", " ",
 		"\"", "")
 }
 
@@ -165,6 +167,21 @@ func (e SamuraiExtractor) Visit(node ast.Node) ast.Visitor {
 
 					tokens = append(tokens, word)
 				}
+			}
+		}
+
+	case *ast.AssignStmt:
+		if elem.Tok != token.DEFINE {
+			return e
+		}
+
+		for _, expr := range elem.Lhs {
+			if identifier, ok := expr.(*ast.Ident); ok {
+				if identifier.String() == "_" {
+					continue
+				}
+
+				tokens = append(tokens, identifier.String())
 			}
 		}
 	}
