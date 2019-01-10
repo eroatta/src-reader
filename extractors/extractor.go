@@ -60,6 +60,36 @@ func (e SamuraiExtractor) Visit(node ast.Node) ast.Visitor {
 	var tokens []string
 
 	switch elem := node.(type) {
+	case *ast.AssignStmt:
+		if elem.Tok != token.DEFINE {
+			return e
+		}
+
+		for _, expr := range elem.Lhs {
+			if identifier, ok := expr.(*ast.Ident); ok {
+				if identifier.String() == "_" {
+					continue
+				}
+
+				// only newly defined identifiers
+				if identifier.Obj != nil && identifier.Obj.Pos() == identifier.Pos() {
+					tokens = append(tokens, identifier.String())
+				}
+			}
+		}
+
+	case *ast.RangeStmt:
+		if key, ok := elem.Key.(*ast.Ident); ok {
+			if key.String() != "_" {
+				tokens = append(tokens, key.String())
+			}
+		}
+		if value, ok := elem.Value.(*ast.Ident); ok {
+			if value.String() != "_" {
+				tokens = append(tokens, value.String())
+			}
+		}
+
 	case *ast.GenDecl:
 		switch elem.Tok {
 		case token.VAR, token.CONST:
@@ -151,24 +181,6 @@ func (e SamuraiExtractor) Visit(node ast.Node) ast.Visitor {
 					}
 
 					tokens = append(tokens, word)
-				}
-			}
-		}
-
-	case *ast.AssignStmt:
-		if elem.Tok != token.DEFINE {
-			return e
-		}
-
-		for _, expr := range elem.Lhs {
-			if identifier, ok := expr.(*ast.Ident); ok {
-				if identifier.String() == "_" {
-					continue
-				}
-
-				// only newly defined identifiers
-				if identifier.Obj != nil && identifier.Obj.Pos() == identifier.Pos() {
-					tokens = append(tokens, identifier.String())
 				}
 			}
 		}

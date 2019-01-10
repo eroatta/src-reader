@@ -370,6 +370,26 @@ func TestVisit_OnSamurai_ShouldSplitTheIdentifiers(t *testing.T) {
 				"err":  1,
 			},
 		},
+		{
+			name: "RangeStmt",
+			src: `
+				package main
+			
+				import "fmt"
+
+				func main() {
+					for index, value := range []string{"test"} {
+						fmt.Sprintf("%d, %s", index, value)
+					}
+				}
+			`,
+			uniqueWords: 3,
+			expected: map[string]int{
+				"main":  1,
+				"index": 1,
+				"value": 1,
+			},
+		},
 	}
 
 	for _, fixture := range tests {
