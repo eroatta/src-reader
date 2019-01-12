@@ -1,10 +1,13 @@
 package main
 
 import (
-	"go/ast"
+	"fmt"
 	"go/parser"
 	"go/token"
 	"log"
+	"strings"
+
+	"github.com/eroatta/src-reader/extractors"
 
 	"github.com/eroatta/src-reader/repositories"
 
@@ -30,41 +33,37 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	for _, name := range filenames {
-		log.Println(name)
-	}
+	log.Println(fmt.Sprintf("Files: %v", filenames))
 
-	rawFile, err := repositories.File(repository, "common.go")
-	if err != nil {
-		log.Fatal(err)
-	}
-
+	samurai := extractors.NewSamuraiExtractor()
 	fset := token.NewFileSet() // positions are relative to fset
-	f, err := parser.ParseFile(fset, "common.go", rawFile, 0)
-	if err != nil {
-		panic(err)
+	for _, name := range filenames {
+		if !strings.HasSuffix(name, ".go") {
+			continue
+		}
+
+		log.Println(fmt.Sprintf("Processing file: %s", name))
+
+		rawFile, err := repositories.File(repository, name)
+		if err != nil {
+			log.Fatal(err)
+			continue
+		}
+
+		node, err := parser.ParseFile(fset, name, rawFile, parser.ParseComments)
+		if err != nil {
+			log.Fatal(err)
+			continue
+		}
+
+		//ast.Print(fset, node)
+		extractors.Process(samurai, node)
+
+		log.Println(fmt.Sprintf("Elements: %d", len(samurai.FreqTable())))
 	}
 
-	// Print the AST.
-	ast.Print(fset, f)
-
-	visitor := visitor{}
-	ast.Walk(visitor, f)
-}
-
-type visitor struct {
-}
-
-func (v visitor) Visit(node ast.Node) ast.Visitor {
-	if node == nil {
-		return nil
+	log.Println(fmt.Sprintf("Elements: %d", len(samurai.FreqTable())))
+	for k, v := range samurai.FreqTable() {
+		log.Println(fmt.Sprintf("Token: %s - Occurrencies: %d", k, v))
 	}
-
-	switch stmt := node.(type) {
-	case *ast.FuncDecl:
-		ident := *stmt.Name
-		log.Println(ident.Name)
-	}
-
-	return v
 }
