@@ -60,14 +60,14 @@ func read(fs billy.Filesystem, rootDir string) ([]string, error) {
 	names := make([]string, 0)
 	for _, file := range files {
 		if file.IsDir() {
-			subDirFilenames, err := read(fs, file.Name())
+			subDirFilenames, err := read(fs, fs.Join(rootDir, file.Name()))
 			if err != nil {
 				return nil, err
 			}
 
 			names = append(names, subDirFilenames...)
 		} else {
-			names = append(names, rootDir+"/"+file.Name())
+			names = append(names, fs.Join(rootDir, file.Name()))
 		}
 	}
 

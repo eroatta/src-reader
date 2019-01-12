@@ -31,10 +31,10 @@ func TestClone_ClonerError_ShouldReturnAnError(t *testing.T) {
 
 // TODO add tests for GoGitClonerFunc
 
-func TestFilesInfo_RepositoryWith5Files_ShouldReturnAnArrayOfFileInfoWith5Elements(t *testing.T) {
+func TestFilenames_RepositoryWith5Files_ShouldReturn5Names(t *testing.T) {
 	// given a filesystem and a set of files on a repository
 	fs := memfs.New()
-	expected := []string{"/main.go", "/file.go", "/file_test.go", "/README.md", "/.gitignore"}
+	expected := []string{"main.go", "file.go", "file_test.go", "README.md", ".gitignore"}
 	for _, name := range expected {
 		fs.Create(name)
 	}
@@ -48,10 +48,10 @@ func TestFilesInfo_RepositoryWith5Files_ShouldReturnAnArrayOfFileInfoWith5Elemen
 	assert.ElementsMatch(t, expected, got, "filenames don't match")
 }
 
-func TestFilesInfo_RepositoryWith2Files1Folder_ShouldReturnAnArrayOfFileInfoWith2Elements(t *testing.T) {
+func TestFilenames_RepositoryWith2Files1Folder_ShouldReturn2Names(t *testing.T) {
 	// given a filesystem and a set of files on a repository
 	fs := memfs.New()
-	expected := []string{"/main.go", "/file.go"}
+	expected := []string{"main.go", "file.go"}
 	for _, name := range expected {
 		fs.Create(name)
 	}
@@ -66,7 +66,7 @@ func TestFilesInfo_RepositoryWith2Files1Folder_ShouldReturnAnArrayOfFileInfoWith
 	assert.ElementsMatch(t, expected, got, "filenames don't match")
 }
 
-func TestFilesInfo_RepositoryWith3FilesAnd2In1Folder_ShouldReturnAnArrayOfFileInfoWith3Elements(t *testing.T) {
+func TestFilenames_RepositoryWith3FilesAnd2In1Folder_ShouldReturn3Names(t *testing.T) {
 	// given a filesystem and a set of files on a repository
 	fs := memfs.New()
 
@@ -84,10 +84,32 @@ func TestFilesInfo_RepositoryWith3FilesAnd2In1Folder_ShouldReturnAnArrayOfFileIn
 
 	assert.Nil(t, err, "error while retrieving the files from the repository should be nil")
 	assert.Equal(t, 3, len(got), "number of files must be equal")
-	assert.ElementsMatch(t, []string{"/main.go", "included/file.go", "included/file_test.go"}, got, "filenames don't match")
+	assert.ElementsMatch(t, []string{"main.go", "included/file.go", "included/file_test.go"}, got, "filenames don't match")
 }
 
-func TestFilesInfo_RepositoryNoFiles_ShouldReturnAnEmptyArray(t *testing.T) {
+func TestFilenames_RepositoryWith1FileAnd2FilesOnSubSubFolder_ShouldReturn3Names(t *testing.T) {
+	// given a filesystem and a set of files on a repository
+	fs := memfs.New()
+
+	fs.Create("main.go")
+	fs.MkdirAll("sub/included", 0666)
+	inFolder := []string{"file.go", "file_test.go"}
+	for _, name := range inFolder {
+		fs.Create(fs.Join("sub/included", name))
+	}
+	fs.MkdirAll("ignored", 0666)
+
+	repository, err := git.Init(memory.NewStorage(), fs)
+
+	// when we retrieve all the files from the repository
+	got, err := Filenames(repository)
+
+	assert.Nil(t, err, "error while retrieving the files from the repository should be nil")
+	assert.Equal(t, 3, len(got), "number of files must be equal")
+	assert.ElementsMatch(t, []string{"main.go", "sub/included/file.go", "sub/included/file_test.go"}, got, "filenames don't match")
+}
+
+func TestFilesnames_RepositoryNoFiles_ShouldReturn0Names(t *testing.T) {
 	// given a filesystem but no files on a repository
 	repository, err := git.Init(memory.NewStorage(), memfs.New())
 
