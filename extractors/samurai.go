@@ -27,7 +27,7 @@ type SamuraiExtractor struct {
 
 // NewSamuraiExtractor creates an instance capable of exploring the Abstract Systax Tree
 // and extracting the data related to the Samurai splitting algorithm.
-func NewSamuraiExtractor() Extractor {
+func NewSamuraiExtractor() SamuraiExtractor {
 	return SamuraiExtractor{
 		name:     "samurai",
 		words:    map[string]int{},
@@ -188,4 +188,9 @@ func (e SamuraiExtractor) Visit(node ast.Node) ast.Visitor {
 	}
 
 	return e
+}
+
+// FreqTable returns the frequency table built with the words extracted by Samurai.
+func (e SamuraiExtractor) FreqTable() map[string]int {
+	return e.words
 }

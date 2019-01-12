@@ -4,7 +4,7 @@ import "go/ast"
 
 // Process traverses the Abstract Systax Tree node and applies the extraction method defined by the extractor.
 func Process(extractor Extractor, node ast.Node) {
-	extractor.Visit(node)
+	ast.Walk(extractor, node)
 }
 
 // Extractor defines TODO

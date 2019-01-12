@@ -391,14 +391,10 @@ func TestVisit_OnSamurai_ShouldSplitTheIdentifiers(t *testing.T) {
 			samurai := NewSamuraiExtractor()
 			ast.Walk(samurai, node)
 
-			assert.NotNil(t, samurai)
-
-			extractor := samurai.(SamuraiExtractor)
-
-			assert.NotEmpty(t, extractor.words)
-			assert.Equal(t, fixture.uniqueWords, len(extractor.words))
+			assert.NotEmpty(t, samurai.words)
+			assert.Equal(t, fixture.uniqueWords, len(samurai.words))
 			for key, value := range fixture.expected {
-				assert.Equal(t, value, extractor.words[key], fmt.Sprintf("invalid number of occurrencies for element: %s", key))
+				assert.Equal(t, value, samurai.words[key], fmt.Sprintf("invalid number of occurrencies for element: %s", key))
 			}
 		})
 	}
@@ -823,13 +819,36 @@ func TestVisit_OnSamuraiWithFullFile_ShouldSplitCommentsAndIdentifiers(t *testin
 	samurai := NewSamuraiExtractor()
 	ast.Walk(samurai, node)
 
-	assert.NotNil(t, samurai)
-
-	extractor := samurai.(SamuraiExtractor)
-
-	assert.NotEmpty(t, extractor.words)
-	assert.Equal(t, len(expectedWords), len(extractor.words))
+	assert.NotEmpty(t, samurai.words)
+	assert.Equal(t, len(expectedWords), len(samurai.words))
 	for key, value := range expectedWords {
-		assert.Equal(t, value, extractor.words[key], fmt.Sprintf("invalid number of occurrencies for element: %s", key))
+		assert.Equal(t, value, samurai.words[key], fmt.Sprintf("invalid number of occurrencies for element: %s", key))
 	}
+}
+
+func TestFreqTable_OnNewlyCreatedSamuraiExtractor_ShouldReturnEmptyFreqTable(t *testing.T) {
+	samurai := NewSamuraiExtractor()
+
+	got := samurai.FreqTable()
+	assert.Empty(t, got, fmt.Sprintf("frequency table should be empty: %v", got))
+}
+
+func TestFreqTable_OnSamuraiExtractorAfterExtraction_ShouldReturnFreqTableWithValues(t *testing.T) {
+	src := `
+		package main
+
+		func main() {}
+	`
+
+	fs := token.NewFileSet()
+	node, _ := parser.ParseFile(fs, "", []byte(src), parser.ParseComments)
+
+	samurai := NewSamuraiExtractor()
+	ast.Walk(samurai, node)
+
+	freqTable := samurai.FreqTable()
+	assert.NotEmpty(t, freqTable)
+	assert.Equal(t, 1, len(freqTable))
+
+	assert.Equal(t, 1, freqTable["main"], fmt.Sprintf("invalid number of occurrencies for element: main"))
 }
