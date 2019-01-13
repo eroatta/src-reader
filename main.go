@@ -108,6 +108,9 @@ func main() {
 	}
 
 	log.Println(fmt.Sprintf("Splits for token \"%s\": %v", "srccode", splits))
+	for _, split := range splits {
+		log.Println(fmt.Sprintf("Frequency for selected split %s: %f", split, freqTable.Frequency(split)))
+	}
 }
 
 func buildFrequencyTable(input map[string]int) *splitters.FrequencyTable {
