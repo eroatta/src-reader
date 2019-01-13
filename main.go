@@ -8,9 +8,10 @@ import (
 	"log"
 	"strings"
 
-	"github.com/eroatta/token-splitex/splitters"
+	"github.com/eroatta/src-reader/processors"
 
 	"github.com/eroatta/src-reader/extractors"
+	"github.com/eroatta/token-splitex/splitters"
 
 	"github.com/eroatta/src-reader/repositories"
 
@@ -101,6 +102,7 @@ func main() {
 		Input: a list of *ast.File nodes, and a list of Splitters.
 		Output: ?
 	*/
+	log.Println("Beginning Splitting Step...")
 	samuraiSplitter := splitters.NewSamurai(freqTable, freqTable, nil, nil)
 	splits, err := samuraiSplitter.Split("srccode")
 	if err != nil {
@@ -110,6 +112,10 @@ func main() {
 	log.Println(fmt.Sprintf("Splits for token \"%s\": %v", "srccode", splits))
 	for _, split := range splits {
 		log.Println(fmt.Sprintf("Frequency for selected split %s: %f", split, freqTable.Frequency(split)))
+	}
+
+	for _, ast := range asts {
+		processors.SplitOn(fset, ast, samuraiSplitter)
 	}
 }
 
