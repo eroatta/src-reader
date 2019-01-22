@@ -1,14 +1,14 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
 	"go/ast"
 	"go/parser"
 	"go/token"
 	"log"
-	"os"
 	"strings"
+
+	"github.com/eroatta/token-splitex/lists"
 
 	"github.com/eroatta/src-reader/processors"
 
@@ -117,11 +117,7 @@ func main() {
 	}*/
 
 	conservSplitter := splitters.NewConserv()
-
-	dicc := buildDicc()
-	knownAbbrs := buildKnownAbrrs()
-	stopList := buildStopList()
-	greedySplitter := splitters.NewGreedy(&dicc, &knownAbbrs, &stopList)
+	greedySplitter := splitters.NewGreedy(&lists.Dicctionary, &lists.KnownAbbreviations, &lists.StopList)
 
 	for _, ast := range asts {
 		processors.SplitOn(fset, ast, conservSplitter, samuraiSplitter, greedySplitter)
@@ -135,48 +131,4 @@ func buildFrequencyTable(input map[string]int) *splitters.FrequencyTable {
 	}
 
 	return freqTable
-}
-
-// built from aspell corpus
-func buildDicc() map[string]interface{} {
-	f, err := os.Open("dicc.txt")
-	if err != nil {
-		panic(fmt.Sprintf("Unable to open the dicc.txt file: %v", err))
-	}
-	defer f.Close()
-
-	dicc := make(map[string]interface{}, 10000)
-
-	scanner := bufio.NewScanner(f)
-	scanner.Split(bufio.ScanLines)
-	for scanner.Scan() {
-		dicc[scanner.Text()] = true
-	}
-
-	return dicc
-}
-
-func buildKnownAbrrs() map[string]interface{} {
-	// TODO: find it on Google!
-	return make(map[string]interface{}, 0)
-}
-
-func buildStopList() map[string]interface{} {
-	// keywords and data types
-	// standard libraries
-	f, err := os.Open("stoplist.txt")
-	if err != nil {
-		panic(fmt.Sprintf("Unable to open the dicc.txt file: %v", err))
-	}
-	defer f.Close()
-
-	stop := make(map[string]interface{}, 10000)
-
-	scanner := bufio.NewScanner(f)
-	scanner.Split(bufio.ScanLines)
-	for scanner.Scan() {
-		stop[scanner.Text()] = true
-	}
-
-	return stop
 }
