@@ -7,28 +7,26 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestGitRepositoryURLIsValid(t *testing.T) {
-	cases := []string{
-		"https://github.com/eroatta/dispersal",
-		"https://github.com/eroatta/dispersal.git",
-		"git@github.com:eroatta/dispersal.git",
+func TestIsValidGithubRepo_ShouldReturnTrueIfValidOrFalseOtherwise(t *testing.T) {
+	tests := []struct {
+		name string
+		url  string
+		want bool
+	}{
+		{"regular_http_url", "https://github.com/eroatta/dispersal", true},
+		{"regular_http_url_with_suffix", "https://github.com/eroatta/dispersal.git", true},
+		{"regular_git_url", "git@github.com:eroatta/dispersal.git", true},
+		{"missing_repository", "https://github.com/eroatta", false},
+		{"unsupported_tags", "https://github.com/eroatta/dispersal/releases/tag/v0.0.1", false},
+		{"git_url_without_suffix", "git@github.com:eroatta/dispersal", false},
+		{"missing_protocol", "github.com/eroatta/dispersal", false},
+		{"missing_repository_name", "git@github.com/eroatta/.git", false},
 	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := url.IsValidGithubRepo(tt.url)
 
-	for _, c := range cases {
-		assert.True(t, url.IsValidGithubRepoURL(c), "Given URL should be valid")
-	}
-}
-
-func TestGitRepoURLIsInvalid(t *testing.T) {
-	cases := []string{
-		"https://github.com/eroatta",
-		"https://github.com/eroatta/dispersal/releases/tag/v0.0.1",
-		"git@github.com:eroatta/dispersal",
-		"github.com/eroatta/dispersal",
-		"git@github.com/eroatta/.git",
-	}
-
-	for _, c := range cases {
-		assert.False(t, url.IsValidGithubRepoURL(c), "Given URL should be invalid")
+			assert.Equal(t, tt.want, got)
+		})
 	}
 }
