@@ -1,37 +1,29 @@
 package extractors
 
 import (
-	"fmt"
 	"go/ast"
 	"go/token"
-	"log"
 	"regexp"
 	"strings"
 
-	"github.com/eroatta/token-splitex/splitters"
+	"github.com/eroatta/token-splitex/conserv"
 )
 
-var cleaner *regexp.Regexp
-
-func init() {
-	cleaner = regexp.MustCompile("[^a-zA-Z0-9]")
-}
+var cleaner = regexp.MustCompile("[^a-zA-Z0-9]")
 
 // SamuraiExtractor represents an extractor that reads and stores the required data for the Samurai
 // splitting algorithm.
 type SamuraiExtractor struct {
-	name     string
-	words    map[string]int
-	splitter splitters.Splitter
+	name  string
+	words map[string]int
 }
 
 // NewSamuraiExtractor creates an instance capable of exploring the Abstract Systax Tree
 // and extracting the data related to the Samurai splitting algorithm.
 func NewSamuraiExtractor() SamuraiExtractor {
 	return SamuraiExtractor{
-		name:     "samurai",
-		words:    map[string]int{},
-		splitter: splitters.NewConserv(),
+		name:  "samurai",
+		words: map[string]int{},
 	}
 }
 
@@ -176,13 +168,7 @@ func (e SamuraiExtractor) Visit(node ast.Node) ast.Visitor {
 	}
 
 	for _, token := range tokens {
-		splittings, err := e.splitter.Split(token)
-		if err != nil {
-			log.Println(fmt.Sprintf("An error occurred while splitting %s: %v", token, err))
-			continue
-		}
-
-		for _, splitting := range splittings {
+		for _, splitting := range conserv.Split(token) {
 			e.words[strings.ToLower(splitting)]++
 		}
 	}

@@ -8,12 +8,13 @@ import (
 	"log"
 	"strings"
 
-	"github.com/eroatta/token-splitex/lists"
+	"github.com/eroatta/token-splitex/samurai"
+
+	"github.com/eroatta/token-splitex/conserv"
 
 	"github.com/eroatta/src-reader/processors"
 
 	"github.com/eroatta/src-reader/extractors"
-	"github.com/eroatta/token-splitex/splitters"
 
 	"github.com/eroatta/src-reader/repositories"
 
@@ -32,7 +33,7 @@ func main() {
 	*/
 	log.Println("Beginning Cloning Step...")
 	uri := "https://github.com/src-d/go-siva"
-	if !url.IsValidGithubRepoURL(uri) {
+	if !url.IsValidGithubRepo(uri) {
 		log.Fatal("Invalid Github repository URI.")
 	}
 
@@ -105,17 +106,17 @@ func main() {
 		Output: ?
 	*/
 	log.Println("Beginning Splitting Step...")
-	samuraiSplitter := splitters.NewSamurai(freqTable, freqTable, nil, nil)
-	conservSplitter := splitters.NewConserv()
-	greedySplitter := splitters.NewGreedy(&lists.Dicctionary, &lists.KnownAbbreviations, &lists.StopList)
+	//samuraiSplitter := splitters.NewSamurai(freqTable, freqTable, nil, nil)
+	conservSplitter := conserv.Split
+	//greedySplitter := splitters.NewGreedy(&lists.Dicctionary, &lists.KnownAbbreviations, &lists.StopList)
 
 	for _, ast := range asts {
-		processors.SplitOn(fset, ast, conservSplitter, samuraiSplitter, greedySplitter)
+		processors.SplitOn(fset, ast, conservSplitter)
 	}
 }
 
-func buildFrequencyTable(input map[string]int) *splitters.FrequencyTable {
-	freqTable := splitters.NewFrequencyTable()
+func buildFrequencyTable(input map[string]int) *samurai.FrequencyTable {
+	freqTable := samurai.NewFrequencyTable()
 	for token, count := range input {
 		freqTable.SetOccurrences(token, count)
 	}
