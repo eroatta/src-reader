@@ -6,7 +6,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/eroatta/token-splitex/conserv"
+	"github.com/eroatta/token/conserv"
 )
 
 var cleaner = regexp.MustCompile("[^a-zA-Z0-9]")

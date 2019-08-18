@@ -8,22 +8,109 @@ import (
 	"log"
 	"strings"
 
-	"github.com/eroatta/token-splitex/samurai"
+	"github.com/eroatta/token/amap"
+	"github.com/eroatta/token/greedy"
+	"github.com/eroatta/token/lists"
+	"github.com/eroatta/token/samurai"
+	"gopkg.in/src-d/go-git.v4"
 
-	"github.com/eroatta/token-splitex/conserv"
-
-	"github.com/eroatta/src-reader/processors"
+	"github.com/eroatta/token/conserv"
 
 	"github.com/eroatta/src-reader/extractors"
 
 	"github.com/eroatta/src-reader/repositories"
-
-	"github.com/eroatta/src-reader/url"
 )
 
 func main() {
-	log.Println("Starting src-reader...")
+	newGoodMain("https://github.com/src-d/go-siva")
+}
 
+func newGoodMain(url string) {
+	// stage: clone (and retrieve files)
+	files, err := clone(url)
+	if err != nil {
+		log.Fatalf("Error reading repository %s: %v", url, err)
+	}
+
+	// parse (generate ASTs)
+	trees := make([]*ast.File, 0)
+	astc := parse(files)
+	for ast := range astc {
+		trees = append(trees, ast)
+	}
+
+	// TODO: merge ASTs considering packages
+
+	// for each package
+	// apply the set of miners (preprocessors)
+	occurc, _ := mine(trees)
+	freqTable := samurai.NewFrequencyTable()
+	for input := range occurc {
+		for token, count := range input {
+			//TODO: review
+			if len(token) == 1 {
+				continue
+			}
+			freqTable.SetOccurrences(token, count)
+		}
+	}
+	fmt.Println(freqTable)
+
+	// for each package (AST)
+	// apply the set of splitters + expanders
+	//numberProcessors := 1
+	identc := make(chan identifier)
+	go func() {
+		for _, t := range trees {
+			ast.Inspect(t, func(n ast.Node) bool {
+				fn, ok := n.(*ast.FuncDecl)
+				if ok {
+					ident := identifier{
+						file:       "main.go",
+						position:   fn.Pos(),
+						name:       fn.Name.String(),
+						typ:        "FuncDecl",
+						splits:     make(map[string][]string),
+						expansions: make(map[string][]string),
+					}
+					identc <- ident
+				}
+
+				return true
+			})
+		}
+		close(identc)
+	}()
+
+	log.Println("Closed identc...")
+
+	tCtx := samurai.NewTokenContext(freqTable, freqTable)
+	splittedc := split(identc, tCtx)
+	expandedc := expand(splittedc)
+
+	for ident := range expandedc {
+		log.Println("Identifier received")
+		for alg, splits := range ident.splits {
+			log.Println(fmt.Sprintf("FuncDecl \"%s\" Splitted into: %v by %s", ident.name, splits, alg))
+		}
+
+		for alg, expans := range ident.expansions {
+			log.Println(fmt.Sprintf("FuncDecl \"%s\" Expanded into: %v by %s", ident.name, expans, alg))
+		}
+	}
+}
+
+type identifier struct {
+	file       string
+	position   token.Pos
+	name       string
+	typ        string
+	node       *ast.Node
+	splits     map[string][]string
+	expansions map[string][]string
+}
+
+func clone(url string) (<-chan file, error) {
 	/*
 		CLONING STEP: retrieves the source code from Github.
 		It validates the given Github URI, clones the repository, checks for errors
@@ -31,23 +118,60 @@ func main() {
 		Input: Github URI.
 		Output: a list of files and a filesystem so we can read them.
 	*/
-	log.Println("Beginning Cloning Step...")
-	uri := "https://github.com/src-d/go-siva"
-	if !url.IsValidGithubRepo(uri) {
-		log.Fatal("Invalid Github repository URI.")
-	}
 
-	repository, err := repositories.Clone(repositories.GoGitClonerFunc, uri)
+	// TODO: rename package to: "repository"
+	repository, err := repositories.Clone(repositories.GoGitClonerFunc, url)
 	if err != nil {
-		log.Fatalf("Error reading repository %s: %v", uri, err)
+		return nil, err
 	}
 
-	filenames, err := repositories.Filenames(repository)
+	files, err := repositories.Filenames(repository)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
-	log.Println(fmt.Sprintf("Repository %s includes the following files: %v", uri, filenames))
 
+	out := make(chan string)
+	go func() {
+		for _, f := range files {
+			if !strings.HasSuffix(f, ".go") {
+				continue
+			}
+			out <- f
+		}
+		close(out)
+	}()
+
+	return retrieve(repository, out), nil
+}
+
+type file struct {
+	name string
+	raw  []byte
+}
+
+func retrieve(repo *git.Repository, namesc <-chan string) chan file {
+	filesc := make(chan file)
+	go func() {
+		for n := range namesc {
+			rawFile, err := repositories.File(repo, n)
+			// TODO: review errors (do I need error channel?)
+			if err != nil {
+				continue
+			}
+
+			file := file{
+				name: n,
+				raw:  rawFile,
+			}
+			filesc <- file
+		}
+		close(filesc)
+	}()
+
+	return filesc
+}
+
+func parse(filesc <-chan file) chan *ast.File {
 	/*
 		PARSING STEP: parses a file and creates and AST so it can be explored lately.
 		It filters non-go files and skips them, so we can focus only on Go source code.
@@ -56,70 +180,88 @@ func main() {
 		Output: a list of ASTs, where each AST represents a file.
 		Improvement opportunity: we could merge the ASTs into one collection of ast.Package.
 	*/
-	log.Println("Beginning Parsing Step...")
+	fset := token.NewFileSet()
 
-	var asts []*ast.File
-	fset := token.NewFileSet() // positions are relative to fset
-	for _, name := range filenames {
-		if !strings.HasSuffix(name, ".go") {
-			continue
+	astc := make(chan *ast.File)
+	go func() {
+		for file := range filesc {
+			node, err := parser.ParseFile(fset, file.name, file.raw, parser.ParseComments)
+			if err != nil {
+				log.Fatal(err)
+				continue
+			}
+			astc <- node
 		}
+		close(astc)
+	}()
 
-		log.Println(fmt.Sprintf("Parsing file: %s", name))
+	return astc
+}
 
-		rawFile, err := repositories.File(repository, name)
-		if err != nil {
-			log.Fatal(err)
-			continue
-		}
-
-		node, err := parser.ParseFile(fset, name, rawFile, parser.ParseComments)
-		if err != nil {
-			log.Fatal(err)
-			continue
-		}
-
-		asts = append(asts, node)
-	}
-
+func mine(trees []*ast.File) (chan map[string]int, chan map[string]amap.TokenScope) {
 	/*
 		MINING STEP: extracts all the information required by each splitting and expanding algorithm.
 		It traverses each AST with every defined miner, so they can extract the required info.
 		Input: a list of *ast.File nodes, and a list of Miners (new interface?)
 		Output: ?
 	*/
-	log.Println("Beginning Mining Step...")
-	samurai := extractors.NewSamuraiExtractor()
-	for _, ast := range asts {
-		extractors.Process(samurai, ast)
+	occurc := make(chan map[string]int)
+	go func() {
+		for _, t := range trees {
+			ext := extractors.NewSamuraiExtractor()
+			ast.Walk(ext, t)
+			occurc <- ext.FreqTable()
+		}
+		close(occurc)
+	}()
 
-		log.Println(fmt.Sprintf("Elements after processing a new AST: %d", len(samurai.FreqTable())))
-	}
+	scopesc := make(chan map[string]amap.TokenScope)
+	go func() {
+		for _, t := range trees {
+			ext := extractors.NewAmap("main.go")
+			ast.Walk(ext, t)
+			scopesc <- ext.Scopes()
+		}
+		close(scopesc)
+	}()
 
-	freqTable := buildFrequencyTable(samurai.FreqTable())
-	log.Println(fmt.Sprintf("Program Frequency Table - Total Occurencies: %d", freqTable.TotalOccurrences()))
-	log.Println(fmt.Sprintf("Frequency for %s: %f", "index", freqTable.Frequency("index")))
+	return occurc, scopesc
+}
 
+func split(identc <-chan identifier, tCtx samurai.TokenContext) chan identifier {
 	/*
 		SPLITTING STEP: it splits all the identifiers in a AST, applying the given set of Splitters.
 		Input: a list of *ast.File nodes, and a list of Splitters.
 		Output: ?
 	*/
-	log.Println("Beginning Splitting Step...")
-	//samuraiSplitter := splitters.NewSamurai(freqTable, freqTable, nil, nil)
-	conservSplitter := conserv.Split
-	//greedySplitter := splitters.NewGreedy(&lists.Dicctionary, &lists.KnownAbbreviations, &lists.StopList)
+	splittedc := make(chan identifier)
+	go func() {
+		for ident := range identc {
+			log.Println("Splitting...")
+			ident.splits["conserv"] = conserv.Split(ident.name)
+			ident.splits["greedy"] = greedy.Split(ident.name, greedy.DefaultList)
+			ident.splits["samurai"] = samurai.Split(ident.name, tCtx, lists.Prefixes, lists.Suffixes)
 
-	for _, ast := range asts {
-		processors.SplitOn(fset, ast, conservSplitter)
-	}
+			splittedc <- ident
+		}
+		close(splittedc)
+	}()
+
+	return splittedc
 }
 
-func buildFrequencyTable(input map[string]int) *samurai.FrequencyTable {
-	freqTable := samurai.NewFrequencyTable()
-	for token, count := range input {
-		freqTable.SetOccurrences(token, count)
-	}
+func expand(identc <-chan identifier) chan identifier {
+	expandedc := make(chan identifier)
+	go func() {
+		for ident := range identc {
+			log.Println("Expanding...")
+			// TODO: add expansions
 
-	return freqTable
+			expandedc <- ident
+		}
+
+		close(expandedc)
+	}()
+
+	return expandedc
 }
