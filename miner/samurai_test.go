@@ -1,4 +1,4 @@
-package extractors
+package miner
 
 import (
 	"fmt"
@@ -829,7 +829,7 @@ func TestVisit_OnSamuraiWithFullFile_ShouldSplitCommentsAndIdentifiers(t *testin
 func TestFreqTable_OnNewlyCreatedSamuraiExtractor_ShouldReturnEmptyFreqTable(t *testing.T) {
 	samurai := NewSamuraiExtractor()
 
-	got := samurai.FreqTable()
+	got := samurai.Results()
 	assert.Empty(t, got, fmt.Sprintf("frequency table should be empty: %v", got))
 }
 
@@ -846,7 +846,7 @@ func TestFreqTable_OnSamuraiExtractorAfterExtraction_ShouldReturnFreqTableWithVa
 	samurai := NewSamuraiExtractor()
 	ast.Walk(samurai, node)
 
-	freqTable := samurai.FreqTable()
+	freqTable := samurai.Results()
 	assert.NotEmpty(t, freqTable)
 	assert.Equal(t, 1, len(freqTable))
 

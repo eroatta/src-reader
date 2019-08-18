@@ -1,4 +1,4 @@
-package extractors
+package miner
 
 import (
 	"go/ast"
@@ -176,7 +176,7 @@ func (e SamuraiExtractor) Visit(node ast.Node) ast.Visitor {
 	return e
 }
 
-// FreqTable returns the frequency table built with the words extracted by Samurai.
-func (e SamuraiExtractor) FreqTable() map[string]int {
+// Results returns the frequency count. TODO
+func (e SamuraiExtractor) Results() interface{} {
 	return e.words
 }
