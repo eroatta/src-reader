@@ -6,6 +6,10 @@ import (
 	"github.com/eroatta/src-reader/code"
 )
 
+// Expander TODO
+type Expander interface {
+}
+
 // Expand TODO
 func Expand(identc <-chan code.Identifier) chan code.Identifier {
 	expandedc := make(chan code.Identifier)

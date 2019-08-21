@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/eroatta/token/lists"
 	"github.com/eroatta/token/samurai"
 
 	"github.com/eroatta/src-reader/code"
@@ -50,11 +51,13 @@ func newGoodMain(url string) {
 
 	// for each package (AST)
 	// apply the set of splitters + expanders
-	//numberProcessors := 1
+
 	identc := step.Extract(parsedFiles)
 
 	tCtx := samurai.NewTokenContext(frequencyTable, frequencyTable)
-	splittedc := step.Split(identc, tCtx)
+	samuraiSplitter := newSamuraiSplitter(tCtx)
+
+	splittedc := step.Split(identc, samuraiSplitter)
 	expandedc := step.Expand(splittedc)
 
 	for ident := range expandedc {
@@ -66,5 +69,27 @@ func newGoodMain(url string) {
 		for alg, expans := range ident.Expansions {
 			log.Println(fmt.Sprintf("FuncDecl \"%s\" Expanded into: %v by %s", ident.Name, expans, alg))
 		}
+	}
+}
+
+type splitter struct {
+	name string
+	fn   func(string) []string
+}
+
+func (s splitter) Name() string {
+	return s.name
+}
+
+func (s splitter) Split(token string) []string {
+	return s.fn(token)
+}
+
+func newSamuraiSplitter(tokenContext samurai.TokenContext) splitter {
+	return splitter{
+		name: "samurai",
+		fn: func(t string) []string {
+			return samurai.Split(t, tokenContext, lists.Prefixes, lists.Suffixes)
+		},
 	}
 }

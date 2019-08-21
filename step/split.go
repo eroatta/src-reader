@@ -1,30 +1,24 @@
 package step
 
-import (
-	"log"
+import "github.com/eroatta/src-reader/code"
 
-	"github.com/eroatta/src-reader/code"
-	"github.com/eroatta/token/conserv"
-	"github.com/eroatta/token/greedy"
-	"github.com/eroatta/token/lists"
-	"github.com/eroatta/token/samurai"
-)
+// Splitter interface is used to define a custom splitter.
+type Splitter interface {
+	// Name returns the name of the custom splitter.
+	Name() string
+	// Split returns the split identifier.
+	Split(string) []string
+}
 
-// Split TODO
-func Split(identc <-chan code.Identifier, tCtx samurai.TokenContext) chan code.Identifier {
-	/*
-		SPLITTING STEP: it splits all the identifiers in a AST, applying the given set of Splitters.
-		Input: a list of *ast.File nodes, and a list of Splitters.
-		Output: ?
-	*/
+// Split returns a channel of code.Identifier where each element has been processed by
+// every provided Splitter.
+func Split(identc <-chan code.Identifier, splitters ...Splitter) chan code.Identifier {
 	splittedc := make(chan code.Identifier)
 	go func() {
 		for ident := range identc {
-			// TODO: remove logging
-			log.Println("Splitting...")
-			ident.Splits["conserv"] = conserv.Split(ident.Name)
-			ident.Splits["greedy"] = greedy.Split(ident.Name, greedy.DefaultList)
-			ident.Splits["samurai"] = samurai.Split(ident.Name, tCtx, lists.Prefixes, lists.Suffixes)
+			for _, splitter := range splitters {
+				ident.Splits[splitter.Name()] = splitter.Split(ident.Name)
+			}
 
 			splittedc <- ident
 		}
