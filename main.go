@@ -17,7 +17,7 @@ func main() {
 
 func newGoodMain(url string) {
 	// stage: clone (and retrieve files)
-	filesc, err := step.Clone(url)
+	_, filesc, err := step.Clone(url)
 	if err != nil {
 		log.Fatalf("Error reading repository %s: %v", url, err)
 	}

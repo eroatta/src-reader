@@ -11,15 +11,15 @@ import (
 // Clone retrieves the source code from GitHub, based on a given URL.
 // It access the repository, clones it, filters non-go files and returns
 // a channel of File elements.
-func Clone(url string) (<-chan code.File, error) {
+func Clone(url string) (*git.Repository, <-chan code.File, error) {
 	repo, err := repository.Clone(repository.GoGitClonerFunc, url)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	files, err := repository.Filenames(repo)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	out := make(chan string)
@@ -33,7 +33,7 @@ func Clone(url string) (<-chan code.File, error) {
 		close(out)
 	}()
 
-	return retrieve(repo, out), nil
+	return repo, retrieve(repo, out), nil
 }
 
 func retrieve(repo *git.Repository, namesc <-chan string) chan code.File {
