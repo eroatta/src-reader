@@ -38,6 +38,7 @@ func Clone(url string, cloner Cloner) (*code.Repository, <-chan code.File, error
 			}
 			namesc <- f
 		}
+
 		close(namesc)
 	}()
 
@@ -53,6 +54,7 @@ func Clone(url string, cloner Cloner) (*code.Repository, <-chan code.File, error
 			}
 			filesc <- file
 		}
+
 		close(filesc)
 	}()
 

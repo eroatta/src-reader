@@ -28,6 +28,7 @@ func Extract(files []code.File) chan code.Identifier {
 				return true
 			})
 		}
+
 		close(identc)
 	}()
 

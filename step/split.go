@@ -22,6 +22,7 @@ func Split(identc <-chan code.Identifier, splitters ...Splitter) chan code.Ident
 
 			splittedc <- ident
 		}
+
 		close(splittedc)
 	}()
 

@@ -3,7 +3,6 @@ package step
 import (
 	"go/parser"
 	"go/token"
-	"log"
 
 	"github.com/eroatta/src-reader/code"
 )
@@ -16,17 +15,13 @@ func Parse(filesc <-chan code.File) chan code.File {
 	go func() {
 		for file := range filesc {
 			node, err := parser.ParseFile(fset, file.Name, file.Raw, parser.ParseComments)
-			if err != nil {
-				// TODO: do we need error channel?
-				log.Fatal(err)
-				continue
-			}
 
 			file.AST = node
 			file.FileSet = fset
-
+			file.Error = err
 			parsedc <- file
 		}
+
 		close(parsedc)
 	}()
 
