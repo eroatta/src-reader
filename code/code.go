@@ -30,4 +30,5 @@ type Identifier struct {
 	Node       *ast.Node
 	Splits     map[string][]string
 	Expansions map[string][]string
+	Error      error
 }

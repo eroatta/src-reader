@@ -65,7 +65,10 @@ func newGoodMain(url string) {
 	// sink or consumer for the expanded identifiers
 	// results :=
 
-	step.Store(expandedc, mydb{})
+	errors := step.Store(expandedc, mydb{})
+	if len(errors) > 0 {
+		log.Fatal("Something failed")
+	}
 
 	// update process information
 }
