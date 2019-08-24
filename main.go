@@ -24,6 +24,9 @@ func newGoodMain(url string) {
 
 	parsedFiles := make([]code.File, 0)
 	parsedc := step.Parse(filesc)
+	/*
+		Improvement opportunity: we could merge the ASTs into one collection of ast.Package.
+	*/
 	for p := range parsedc {
 		parsedFiles = append(parsedFiles, p)
 	}
@@ -59,17 +62,12 @@ func newGoodMain(url string) {
 
 	splittedc := step.Split(identc, samuraiSplitter)
 	expandedc := step.Expand(splittedc)
+	// sink or consumer for the expanded identifiers
+	// results :=
 
-	for ident := range expandedc {
-		log.Println("Identifier received")
-		for alg, splits := range ident.Splits {
-			log.Println(fmt.Sprintf("FuncDecl \"%s\" Splitted into: %v by %s", ident.Name, splits, alg))
-		}
+	step.Store(expandedc, mydb{})
 
-		for alg, expans := range ident.Expansions {
-			log.Println(fmt.Sprintf("FuncDecl \"%s\" Expanded into: %v by %s", ident.Name, expans, alg))
-		}
-	}
+	// update process information
 }
 
 type splitter struct {
@@ -92,4 +90,20 @@ func newSamuraiSplitter(tokenContext samurai.TokenContext) splitter {
 			return samurai.Split(t, tokenContext, lists.Prefixes, lists.Suffixes)
 		},
 	}
+}
+
+type mydb struct {
+}
+
+func (m mydb) Save(ident code.Identifier) error {
+	log.Println("Storing identifier...")
+	for alg, splits := range ident.Splits {
+		log.Println(fmt.Sprintf("FuncDecl \"%s\" Splitted into: %v by %s", ident.Name, splits, alg))
+	}
+
+	for alg, expans := range ident.Expansions {
+		log.Println(fmt.Sprintf("FuncDecl \"%s\" Expanded into: %v by %s", ident.Name, expans, alg))
+	}
+
+	return nil
 }

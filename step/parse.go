@@ -10,9 +10,6 @@ import (
 
 // Parse parses a file and creates an Abstract Syntax Tree (AST)
 func Parse(filesc <-chan code.File) chan code.File {
-	/*
-		Improvement opportunity: we could merge the ASTs into one collection of ast.Package.
-	*/
 	fset := token.NewFileSet()
 
 	parsedc := make(chan code.File)

@@ -5,6 +5,14 @@ import (
 	"go/token"
 )
 
+// Repository holds information of a GitHub repository.
+type Repository struct {
+	Name        string
+	URL         string
+	Hash        string
+	DateCreated string
+}
+
 // File TODO
 type File struct {
 	Name    string
