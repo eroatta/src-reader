@@ -4,7 +4,7 @@ import (
 	"strings"
 
 	"github.com/eroatta/src-reader/code"
-	"github.com/eroatta/src-reader/repositories"
+	"github.com/eroatta/src-reader/repository"
 	"gopkg.in/src-d/go-git.v4"
 )
 
@@ -12,12 +12,12 @@ import (
 // It access the repository, clones it, filters non-go files and returns
 // a channel of File elements.
 func Clone(url string) (<-chan code.File, error) {
-	repository, err := repositories.Clone(repositories.GoGitClonerFunc, url)
+	repo, err := repository.Clone(repository.GoGitClonerFunc, url)
 	if err != nil {
 		return nil, err
 	}
 
-	files, err := repositories.Filenames(repository)
+	files, err := repository.Filenames(repo)
 	if err != nil {
 		return nil, err
 	}
@@ -33,14 +33,14 @@ func Clone(url string) (<-chan code.File, error) {
 		close(out)
 	}()
 
-	return retrieve(repository, out), nil
+	return retrieve(repo, out), nil
 }
 
 func retrieve(repo *git.Repository, namesc <-chan string) chan code.File {
 	filesc := make(chan code.File)
 	go func() {
 		for n := range namesc {
-			rawFile, err := repositories.File(repo, n)
+			rawFile, err := repository.File(repo, n)
 			// TODO: review errors (do I need error channel?)
 			if err != nil {
 				continue
