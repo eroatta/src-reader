@@ -39,25 +39,3 @@ func Mine(parsed []code.File, miners ...string) map[string]chan interface{} {
 
 	return results
 }
-
-/*
-occurc := make(chan map[string]int)
-	go func() {
-		for _, t := range trees {
-			ext := extractors.NewSamuraiExtractor()
-			ast.Walk(ext, t)
-			occurc <- ext.FreqTable()
-		}
-		close(occurc)
-	}()
-
-	scopesc := make(chan map[string]amap.TokenScope)
-	go func() {
-		for _, t := range trees {
-			ext := extractors.NewAmap("main.go")
-			ast.Walk(ext, t)
-			scopesc <- ext.Scopes()
-		}
-		close(scopesc)
-	}()
-*/
