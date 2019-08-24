@@ -11,6 +11,7 @@ type Repository struct {
 	URL         string
 	Hash        string
 	DateCreated string
+	Error       error
 }
 
 // File TODO
@@ -19,6 +20,7 @@ type File struct {
 	Raw     []byte
 	AST     *ast.File
 	FileSet *token.FileSet
+	Error   error
 }
 
 // Identifier TODO

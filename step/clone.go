@@ -4,56 +4,57 @@ import (
 	"strings"
 
 	"github.com/eroatta/src-reader/code"
-	"github.com/eroatta/src-reader/repository"
-	"gopkg.in/src-d/go-git.v4"
 )
+
+// Cloner interface is used to define a custom cloner.
+type Cloner interface {
+	// Clone accesses a repository and clones it.
+	Clone(string) (code.Repository, error)
+	// Filenames retrieves the list of file names existing on a repository.
+	Filenames() ([]string, error)
+	// File provides the bytes representation of a given file.
+	File(string) ([]byte, error)
+}
 
 // Clone retrieves the source code from GitHub, based on a given URL.
 // It access the repository, clones it, filters non-go files and returns
 // a channel of File elements.
-func Clone(url string) (*git.Repository, <-chan code.File, error) {
-	repo, err := repository.Clone(repository.GoGitClonerFunc, url)
+func Clone(url string, cloner Cloner) (*code.Repository, <-chan code.File, error) {
+	repo, err := cloner.Clone(url)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	files, err := repository.Filenames(repo)
+	files, err := cloner.Filenames()
 	if err != nil {
 		return nil, nil, err
 	}
 
-	out := make(chan string)
+	namesc := make(chan string)
 	go func() {
 		for _, f := range files {
 			if !strings.HasSuffix(f, ".go") {
 				continue
 			}
-			out <- f
+			namesc <- f
 		}
-		close(out)
+		close(namesc)
 	}()
 
-	return repo, retrieve(repo, out), nil
-}
-
-func retrieve(repo *git.Repository, namesc <-chan string) chan code.File {
 	filesc := make(chan code.File)
 	go func() {
 		for n := range namesc {
-			rawFile, err := repository.File(repo, n)
-			// TODO: review errors (do I need error channel?)
-			if err != nil {
-				continue
-			}
+			rawFile, err := cloner.File(n)
 
 			file := code.File{
-				Name: n,
-				Raw:  rawFile,
+				Name:  n,
+				Raw:   rawFile,
+				Error: err,
 			}
 			filesc <- file
 		}
 		close(filesc)
 	}()
 
-	return filesc
+	return &repo, filesc, nil
 }

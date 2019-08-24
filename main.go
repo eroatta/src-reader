@@ -6,8 +6,10 @@ import (
 
 	"github.com/eroatta/token/lists"
 	"github.com/eroatta/token/samurai"
+	"gopkg.in/src-d/go-git.v4"
 
 	"github.com/eroatta/src-reader/code"
+	"github.com/eroatta/src-reader/repository"
 	"github.com/eroatta/src-reader/step"
 )
 
@@ -17,7 +19,7 @@ func main() {
 
 func newGoodMain(url string) {
 	// stage: clone (and retrieve files)
-	_, filesc, err := step.Clone(url)
+	_, filesc, err := step.Clone(url, &cloner{})
 	if err != nil {
 		log.Fatalf("Error reading repository %s: %v", url, err)
 	}
@@ -71,6 +73,30 @@ func newGoodMain(url string) {
 	}
 
 	// update process information
+}
+
+type cloner struct {
+	repo *git.Repository
+}
+
+func (c *cloner) Clone(url string) (code.Repository, error) {
+	repo, err := repository.Clone(repository.GoGitClonerFunc, url)
+	if err != nil {
+		return code.Repository{}, err
+	}
+	c.repo = repo
+
+	return code.Repository{Name: url}, nil
+}
+
+// Filenames retrieves the list of file names existing on a repository.
+func (c *cloner) Filenames() ([]string, error) {
+	return repository.Filenames(c.repo)
+}
+
+// File provides the bytes representation of a given file.
+func (c *cloner) File(name string) ([]byte, error) {
+	return repository.File(c.repo, name)
 }
 
 type splitter struct {
