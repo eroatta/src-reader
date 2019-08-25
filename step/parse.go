@@ -27,3 +27,13 @@ func Parse(filesc <-chan code.File) chan code.File {
 
 	return parsedc
 }
+
+// Merge joins files when necessary.
+func Merge(parsedc <-chan code.File) []code.File {
+	files := make([]code.File, 0)
+	for file := range parsedc {
+		files = append(files, file)
+	}
+
+	return files
+}

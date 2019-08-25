@@ -18,27 +18,16 @@ func main() {
 }
 
 func newGoodMain(url string) {
-	// stage: clone (and retrieve files)
 	_, filesc, err := step.Clone(url, &cloner{})
 	if err != nil {
 		log.Fatalf("Error reading repository %s: %v", url, err)
 	}
 
-	parsedFiles := make([]code.File, 0)
 	parsedc := step.Parse(filesc)
-	/*
-		Improvement opportunity: we could merge the ASTs into one collection of ast.Package.
-	*/
-	for p := range parsedc {
-		parsedFiles = append(parsedFiles, p)
-	}
+	files := step.Merge(parsedc)
 
-	// TODO: merge ASTs considering packages
-
-	// for each package
-	// apply the set of miners (preprocessors)
 	frequencyMiner := "samurai"
-	miningResults := step.Mine(parsedFiles, frequencyMiner)
+	miningResults := step.Mine(files, frequencyMiner)
 
 	frequencyTable := samurai.NewFrequencyTable()
 	freqc := miningResults[frequencyMiner]
@@ -57,7 +46,7 @@ func newGoodMain(url string) {
 	// for each package (AST)
 	// apply the set of splitters + expanders
 
-	identc := step.Extract(parsedFiles)
+	identc := step.Extract(files)
 
 	tCtx := samurai.NewTokenContext(frequencyTable, frequencyTable)
 	samuraiSplitter := newSamuraiSplitter(tCtx)
