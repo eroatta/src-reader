@@ -9,6 +9,7 @@ import (
 	"gopkg.in/src-d/go-git.v4"
 
 	"github.com/eroatta/src-reader/code"
+	"github.com/eroatta/src-reader/miner"
 	"github.com/eroatta/src-reader/repository"
 	"github.com/eroatta/src-reader/step"
 )
@@ -26,21 +27,21 @@ func newGoodMain(url string) {
 	parsedc := step.Parse(filesc)
 	files := step.Merge(parsedc)
 
-	frequencyMiner := "samurai"
-	miningResults := step.Mine(files, frequencyMiner)
+	samuraiMiner := miner.NewSamuraiExtractor() // miner.New("samurai").(step.Miner)
+	miningResults := step.Mine(files, samuraiMiner)
 
 	frequencyTable := samurai.NewFrequencyTable()
-	freqc := miningResults[frequencyMiner]
-	for input := range freqc {
-		freq := input.(map[string]int)
-		for token, count := range freq {
-			//TODO: review
-			if len(token) == 1 {
-				continue
-			}
-			frequencyTable.SetOccurrences(token, count)
+
+	samuraiResults := miningResults[samuraiMiner.Name()].(miner.SamuraiExtractor)
+	freq := samuraiResults.Results().(map[string]int)
+	for token, count := range freq {
+		//TODO: review
+		if len(token) == 1 {
+			continue
 		}
+		frequencyTable.SetOccurrences(token, count)
 	}
+
 	log.Println(frequencyTable)
 
 	// for each package (AST)

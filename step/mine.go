@@ -2,9 +2,9 @@ package step
 
 import (
 	"go/ast"
+	"sync"
 
 	"github.com/eroatta/src-reader/code"
-	"github.com/eroatta/src-reader/miner"
 )
 
 // Miner interface is used to define a custom miner.
@@ -13,27 +13,35 @@ type Miner interface {
 	Name() string
 	// Visit applies the mining logic while traversing the Abstract Syntax Tree.
 	Visit(node ast.Node) ast.Visitor
-	// Results returns the results once the mining is completed.
-	Results() interface{}
 }
 
 // Mine traverses each Abstract Syntax Tree to apply every given miner to extract
 // the required pre-processing information.
-func Mine(parsed []code.File, miners ...string) map[string]chan interface{} {
-	results := make(map[string]chan interface{})
-	for _, minerName := range miners {
-		resc := make(chan interface{}, 0)
-		go func() {
+func Mine(parsed []code.File, miners ...Miner) map[string]Miner {
+	minersc := make(chan Miner, 0)
+
+	var wg sync.WaitGroup
+	wg.Add(len(miners))
+	for _, miner := range miners {
+		go func(miner Miner) {
+			defer wg.Done()
+
 			for _, f := range parsed {
-				miner := miner.New(minerName).(Miner)
 				ast.Walk(miner, f.AST)
-				resc <- miner.Results()
 			}
 
-			close(resc)
-		}()
+			minersc <- miner
+		}(miner)
+	}
 
-		results[minerName] = resc
+	go func() {
+		wg.Wait()
+		close(minersc)
+	}()
+
+	results := make(map[string]Miner)
+	for miner := range minersc {
+		results[miner.Name()] = miner
 	}
 
 	return results
