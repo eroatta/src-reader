@@ -7,7 +7,7 @@ type Splitter interface {
 	// Name returns the name of the custom splitter.
 	Name() string
 	// Split returns the split identifier.
-	Split(string) []string
+	Split(token string) []string
 }
 
 // Split returns a channel of code.Identifier where each element has been processed by

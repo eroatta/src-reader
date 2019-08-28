@@ -9,11 +9,11 @@ import (
 // Cloner interface is used to define a custom cloner.
 type Cloner interface {
 	// Clone accesses a repository and clones it.
-	Clone(string) (code.Repository, error)
+	Clone(url string) (code.Repository, error)
 	// Filenames retrieves the list of file names existing on a repository.
 	Filenames() ([]string, error)
 	// File provides the bytes representation of a given file.
-	File(string) ([]byte, error)
+	File(name string) ([]byte, error)
 }
 
 // Clone retrieves the source code from GitHub, based on a given URL.

@@ -6,7 +6,7 @@ import (
 
 // Storer TODO
 type Storer interface {
-	Save(code.Identifier) error
+	Save(ident code.Identifier) error
 }
 
 // Store receives a channel of Identifier and stores each element on the given storer.
