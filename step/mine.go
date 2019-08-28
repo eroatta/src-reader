@@ -27,6 +27,10 @@ func Mine(parsed []code.File, miners ...Miner) map[string]Miner {
 			defer wg.Done()
 
 			for _, f := range parsed {
+				if f.AST == nil {
+					continue
+				}
+
 				ast.Walk(miner, f.AST)
 			}
 
