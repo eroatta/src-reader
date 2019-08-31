@@ -15,7 +15,7 @@ type Miner interface {
 	Visit(node ast.Node) ast.Visitor
 }
 
-// Mine traverses each Abstract Syntax Tree to apply every given miner to extract
+// Mine traverses each Abstract Syntax Tree and applies every given miner to extract
 // the required pre-processing information.
 func Mine(parsed []code.File, miners ...Miner) map[string]Miner {
 	minersc := make(chan Miner, 0)
