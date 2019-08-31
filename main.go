@@ -9,6 +9,7 @@ import (
 	"gopkg.in/src-d/go-git.v4"
 
 	"github.com/eroatta/src-reader/code"
+	"github.com/eroatta/src-reader/extractor"
 	"github.com/eroatta/src-reader/miner"
 	"github.com/eroatta/src-reader/repository"
 	"github.com/eroatta/src-reader/step"
@@ -27,7 +28,7 @@ func newGoodMain(url string) {
 	parsedc := step.Parse(filesc)
 	files := step.Merge(parsedc)
 
-	samuraiMiner := miner.NewSamuraiExtractor() // miner.New("samurai").(step.Miner)
+	samuraiMiner := miner.NewSamuraiExtractor()
 	miningResults := step.Mine(files, samuraiMiner)
 
 	frequencyTable := samurai.NewFrequencyTable()
@@ -47,7 +48,7 @@ func newGoodMain(url string) {
 	// for each package (AST)
 	// apply the set of splitters + expanders
 
-	identc := step.Extract(files)
+	identc := step.Extract(files, extractor.FuncDecl{})
 
 	tCtx := samurai.NewTokenContext(frequencyTable, frequencyTable)
 	samuraiSplitter := newSamuraiSplitter(tCtx)
