@@ -11,29 +11,25 @@ import (
 
 var cleaner = regexp.MustCompile("[^a-zA-Z0-9]")
 
-// SamuraiExtractor represents an extractor that reads and stores the required data for the Samurai
-// splitting algorithm.
-type SamuraiExtractor struct {
-	name  string
+// Count handles the word count mining process.
+type Count struct {
 	words map[string]int
 }
 
-// NewSamuraiExtractor creates an instance capable of exploring the Abstract Systax Tree
-// and extracting the data related to the Samurai splitting algorithm.
-func NewSamuraiExtractor() SamuraiExtractor {
-	return SamuraiExtractor{
-		name:  "samurai",
+// NewCount creates a new Count miner.
+func NewCount() Count {
+	return Count{
 		words: map[string]int{},
 	}
 }
 
 // Name returns the specific name for the extractor.
-func (e SamuraiExtractor) Name() string {
-	return e.name
+func (m Count) Name() string {
+	return "count"
 }
 
 // Visit implements the ast.Visitor interface and handles the logic for the data extraction.
-func (e SamuraiExtractor) Visit(node ast.Node) ast.Visitor {
+func (m Count) Visit(node ast.Node) ast.Visitor {
 	if node == nil {
 		return nil
 	}
@@ -43,7 +39,7 @@ func (e SamuraiExtractor) Visit(node ast.Node) ast.Visitor {
 	switch elem := node.(type) {
 	case *ast.AssignStmt:
 		if elem.Tok != token.DEFINE {
-			return e
+			return m
 		}
 
 		for _, expr := range elem.Lhs {
@@ -131,7 +127,7 @@ func (e SamuraiExtractor) Visit(node ast.Node) ast.Visitor {
 				}
 			}
 		default:
-			return e
+			return m
 		}
 
 	case *ast.FuncDecl:
@@ -169,14 +165,14 @@ func (e SamuraiExtractor) Visit(node ast.Node) ast.Visitor {
 
 	for _, token := range tokens {
 		for _, splitting := range conserv.Split(token) {
-			e.words[strings.ToLower(splitting)]++
+			m.words[strings.ToLower(splitting)]++
 		}
 	}
 
-	return e
+	return m
 }
 
-// Results returns the frequency count. TODO
-func (e SamuraiExtractor) Results() interface{} {
-	return e.words
+// Results returns the word count.
+func (m Count) Results() interface{} {
+	return m.words
 }

@@ -4,8 +4,8 @@ package miner
 func New(name string) interface{} {
 	var miner interface{}
 	switch name {
-	case "samurai":
-		miner = NewSamuraiExtractor()
+	case "count":
+		miner = NewCount()
 	}
 
 	return miner

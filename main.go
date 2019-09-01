@@ -28,12 +28,12 @@ func newGoodMain(url string) {
 	parsedc := step.Parse(filesc)
 	files := step.Merge(parsedc)
 
-	samuraiMiner := miner.NewSamuraiExtractor()
-	miningResults := step.Mine(files, samuraiMiner)
+	countMiner := miner.NewCount()
+	miningResults := step.Mine(files, countMiner)
 
 	frequencyTable := samurai.NewFrequencyTable()
 
-	samuraiResults := miningResults[samuraiMiner.Name()].(miner.SamuraiExtractor)
+	samuraiResults := miningResults[countMiner.Name()].(miner.Count)
 	freq := samuraiResults.Results().(map[string]int)
 	for token, count := range freq {
 		//TODO: review

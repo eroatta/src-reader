@@ -10,35 +10,35 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestNewSamurai_ShouldReturnNewExtractor(t *testing.T) {
-	extractor := NewSamuraiExtractor()
+func TestNewCount_ShouldReturnNewCountMiner(t *testing.T) {
+	miner := NewCount()
 
-	assert.NotNil(t, extractor)
-	assert.IsType(t, SamuraiExtractor{}, extractor)
+	assert.NotNil(t, miner)
+	assert.IsType(t, Count{}, miner)
 }
 
-func TestGetName_OnSamurai_ShouldReturnSamurai(t *testing.T) {
-	extractor := NewSamuraiExtractor()
+func TestGetName_OnCount_ShouldReturnCount(t *testing.T) {
+	miner := NewCount()
 
-	assert.Equal(t, "samurai", extractor.Name())
+	assert.Equal(t, "count", miner.Name())
 }
 
-func TestVisit_OnSamuraiWithNilNode_ShouldReturnNil(t *testing.T) {
-	extractor := NewSamuraiExtractor()
+func TestVisit_OnCountWithNilNode_ShouldReturnNil(t *testing.T) {
+	miner := NewCount()
 
-	assert.Nil(t, extractor.Visit(nil))
+	assert.Nil(t, miner.Visit(nil))
 }
 
-func TestVisit_OnSamuraiWithNotNilNode_ShouldReturnVisitor(t *testing.T) {
-	extractor := NewSamuraiExtractor()
+func TestVisit_OnCountWithValidNode_ShouldReturnVisitor(t *testing.T) {
+	miner := NewCount()
 
 	node, _ := parser.ParseExpr("a + b")
-	got := extractor.Visit(node)
+	got := miner.Visit(node)
 
 	assert.NotNil(t, got)
 }
 
-func TestVisit_OnSamurai_ShouldSplitTheIdentifiers(t *testing.T) {
+func TestVisit_OnCount_ShouldSplitTheIdentifiers(t *testing.T) {
 	var tests = []struct {
 		name        string
 		src         string
@@ -388,19 +388,19 @@ func TestVisit_OnSamurai_ShouldSplitTheIdentifiers(t *testing.T) {
 			fs := token.NewFileSet()
 			node, _ := parser.ParseFile(fs, "", []byte(fixture.src), parser.ParseComments)
 
-			samurai := NewSamuraiExtractor()
-			ast.Walk(samurai, node)
+			count := NewCount()
+			ast.Walk(count, node)
 
-			assert.NotEmpty(t, samurai.words)
-			assert.Equal(t, fixture.uniqueWords, len(samurai.words))
+			assert.NotEmpty(t, count.words)
+			assert.Equal(t, fixture.uniqueWords, len(count.words))
 			for key, value := range fixture.expected {
-				assert.Equal(t, value, samurai.words[key], fmt.Sprintf("invalid number of occurrencies for element: %s", key))
+				assert.Equal(t, value, count.words[key], fmt.Sprintf("invalid number of occurrencies for element: %s", key))
 			}
 		})
 	}
 }
 
-func TestVisit_OnSamuraiWithFullFile_ShouldSplitCommentsAndIdentifiers(t *testing.T) {
+func TestVisit_OnCountWithFullFile_ShouldSplitCommentsAndIdentifiers(t *testing.T) {
 	src := `
 		// Copyright 2014 Manu Martinez-Almeida.  All rights reserved.
 		// Use of this source code is governed by a MIT style
@@ -816,24 +816,24 @@ func TestVisit_OnSamuraiWithFullFile_ShouldSplitCommentsAndIdentifiers(t *testin
 	fs := token.NewFileSet()
 	node, _ := parser.ParseFile(fs, "", []byte(src), parser.ParseComments)
 
-	samurai := NewSamuraiExtractor()
-	ast.Walk(samurai, node)
+	count := NewCount()
+	ast.Walk(count, node)
 
-	assert.NotEmpty(t, samurai.words)
-	assert.Equal(t, len(expectedWords), len(samurai.words))
+	assert.NotEmpty(t, count.words)
+	assert.Equal(t, len(expectedWords), len(count.words))
 	for key, value := range expectedWords {
-		assert.Equal(t, value, samurai.words[key], fmt.Sprintf("invalid number of occurrencies for element: %s", key))
+		assert.Equal(t, value, count.words[key], fmt.Sprintf("invalid number of occurrencies for element: %s", key))
 	}
 }
 
-func TestFreqTable_OnNewlyCreatedSamuraiExtractor_ShouldReturnEmptyFreqTable(t *testing.T) {
-	samurai := NewSamuraiExtractor()
+func TestResults_OnEmptyCount_ShouldReturnEmptyWordCount(t *testing.T) {
+	count := NewCount()
 
-	got := samurai.Results()
+	got := count.Results()
 	assert.Empty(t, got, fmt.Sprintf("frequency table should be empty: %v", got))
 }
 
-func TestFreqTable_OnSamuraiExtractorAfterExtraction_ShouldReturnFreqTableWithValues(t *testing.T) {
+func TestResults_OnCountExtractorAfterExtraction_ShouldReturnWordCount(t *testing.T) {
 	src := `
 		package main
 
@@ -843,12 +843,12 @@ func TestFreqTable_OnSamuraiExtractorAfterExtraction_ShouldReturnFreqTableWithVa
 	fs := token.NewFileSet()
 	node, _ := parser.ParseFile(fs, "", []byte(src), parser.ParseComments)
 
-	samurai := NewSamuraiExtractor()
-	ast.Walk(samurai, node)
+	count := NewCount()
+	ast.Walk(count, node)
 
-	freqTable := samurai.Results().(map[string]int)
-	assert.NotEmpty(t, freqTable)
-	assert.Equal(t, 1, len(freqTable))
+	wordCount := count.Results().(map[string]int)
+	assert.NotEmpty(t, wordCount)
+	assert.Equal(t, 1, len(wordCount))
 
-	assert.Equal(t, 1, freqTable["main"], fmt.Sprintf("invalid number of occurrencies for element: main"))
+	assert.Equal(t, 1, wordCount["main"], fmt.Sprintf("invalid number of occurrencies for element: main"))
 }
