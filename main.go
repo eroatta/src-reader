@@ -33,20 +33,14 @@ func newGoodMain(url string) {
 
 	frequencyTable := samurai.NewFrequencyTable()
 
-	samuraiResults := miningResults[countMiner.Name()].(miner.Count)
-	freq := samuraiResults.Results().(map[string]int)
+	countResults := miningResults[countMiner.Name()].(miner.Count)
+	freq := countResults.Results().(map[string]int)
 	for token, count := range freq {
-		//TODO: review
 		if len(token) == 1 {
 			continue
 		}
 		frequencyTable.SetOccurrences(token, count)
 	}
-
-	log.Println(frequencyTable)
-
-	// for each package (AST)
-	// apply the set of splitters + expanders
 
 	identc := step.Extract(files, extractor.FuncDecl{})
 
@@ -55,15 +49,10 @@ func newGoodMain(url string) {
 
 	splittedc := step.Split(identc, samuraiSplitter)
 	expandedc := step.Expand(splittedc)
-	// sink or consumer for the expanded identifiers
-	// results :=
-
 	errors := step.Store(expandedc, mydb{})
 	if len(errors) > 0 {
 		log.Fatal("Something failed")
 	}
-
-	// update process information
 }
 
 type cloner struct {
