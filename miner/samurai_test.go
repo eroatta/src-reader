@@ -846,7 +846,7 @@ func TestFreqTable_OnSamuraiExtractorAfterExtraction_ShouldReturnFreqTableWithVa
 	samurai := NewSamuraiExtractor()
 	ast.Walk(samurai, node)
 
-	freqTable := samurai.Results()
+	freqTable := samurai.Results().(map[string]int)
 	assert.NotEmpty(t, freqTable)
 	assert.Equal(t, 1, len(freqTable))
 
