@@ -7,7 +7,8 @@ import (
 	"github.com/eroatta/src-reader/code"
 )
 
-// Parse parses a file and creates an Abstract Syntax Tree (AST)
+// Parse parses a file and creates an Abstract Syntax Tree (AST) representation.
+// It handles and returns a channel of code.File elements.
 func Parse(filesc <-chan code.File) chan code.File {
 	fset := token.NewFileSet()
 

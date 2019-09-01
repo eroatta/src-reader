@@ -16,7 +16,7 @@ type Extractor interface {
 }
 
 // Extract traverses each Abstract Syntax Tree and applies a set of extractors
-// to retrieve identifiers that are of interest of us.
+// to retrieve the identifiers that are interest of us.
 func Extract(files []code.File, extractors ...Extractor) chan code.Identifier {
 	mappedExtractors := make(map[reflect.Type]Extractor)
 	for _, ext := range extractors {

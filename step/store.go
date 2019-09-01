@@ -21,8 +21,8 @@ func Store(identc <-chan code.Identifier, storer Storer) []code.Identifier {
 		if err != nil {
 			log.Println(fmt.Sprintf("Error saving identifier %s, from file %s and position %v",
 				ident.Name, ident.File, ident.Position))
-
 			ident.Error = err
+
 			failedIdent = append(failedIdent, ident)
 		}
 	}

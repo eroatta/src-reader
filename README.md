@@ -10,5 +10,5 @@ Responsibilities:
   * Extract tokens (identifiers)
   * Split those tokens
   * Expand those splittings
-* Generate a newly and modified AST.
+* ~~Generate a newly and modified AST.~~
 * Register metrics.

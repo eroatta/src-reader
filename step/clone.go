@@ -10,15 +10,14 @@ import (
 type Cloner interface {
 	// Clone accesses a repository and clones it.
 	Clone(url string) (code.Repository, error)
-	// Filenames retrieves the list of file names existing on a repository.
+	// Filenames retrieves the names of the existing files on a repository.
 	Filenames() ([]string, error)
 	// File provides the bytes representation of a given file.
 	File(name string) ([]byte, error)
 }
 
-// Clone retrieves the source code from GitHub, based on a given URL.
-// It access the repository, clones it, filters non-go files and returns
-// a channel of File elements.
+// Clone retrieves the source code from a given URL. It access the repository, clones it,
+// filters non-go files and returns a channel of code.File elements.
 func Clone(url string, cloner Cloner) (*code.Repository, <-chan code.File, error) {
 	repo, err := cloner.Clone(url)
 	if err != nil {
@@ -36,6 +35,7 @@ func Clone(url string, cloner Cloner) (*code.Repository, <-chan code.File, error
 			if !strings.HasSuffix(f, ".go") {
 				continue
 			}
+
 			namesc <- f
 		}
 
