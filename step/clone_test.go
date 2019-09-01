@@ -10,7 +10,7 @@ import (
 )
 
 func TestClone_OnErrorWhileCloning_ShouldReturnError(t *testing.T) {
-	cloner := testCloner{
+	cloner := cloner{
 		repoErr: errors.New("Error cloning remote repository git@github.com:test:repo"),
 	}
 
@@ -22,7 +22,7 @@ func TestClone_OnErrorWhileCloning_ShouldReturnError(t *testing.T) {
 }
 
 func TestClone_OnErrorWhileRetrievingFilenames_ShouldReturnError(t *testing.T) {
-	cloner := testCloner{
+	cloner := cloner{
 		repo:     code.Repository{Name: "github.com/test/repo"},
 		filesErr: errors.New("Error retriving list of file names for git@github.com:test:repo"),
 	}
@@ -35,7 +35,7 @@ func TestClone_OnErrorWhileRetrievingFilenames_ShouldReturnError(t *testing.T) {
 }
 
 func TestClone_OnErrorWhileRetrievingFile_ShouldReturnFileContainingError(t *testing.T) {
-	cloner := testCloner{
+	cloner := cloner{
 		repo:        code.Repository{Name: "github.com/test/repo"},
 		files:       []string{"main.go"},
 		rawFilesErr: errors.New("Error retriving file main.go for git@github.com:test:repo"),
@@ -53,7 +53,7 @@ func TestClone_OnErrorWhileRetrievingFile_ShouldReturnFileContainingError(t *tes
 }
 
 func TestClone_OnNonGolangRepository_ShouldReturnZeroFiles(t *testing.T) {
-	cloner := testCloner{
+	cloner := cloner{
 		repo:     code.Repository{Name: "github.com/test/repo"},
 		files:    []string{"README.md"},
 		rawFiles: map[string][]byte{},
@@ -73,7 +73,7 @@ func TestClone_OnNonGolangRepository_ShouldReturnZeroFiles(t *testing.T) {
 }
 
 func TestClone_OnGolangRepository_ShouldReturnAllGolangFiles(t *testing.T) {
-	cloner := testCloner{
+	cloner := cloner{
 		repo:  code.Repository{Name: "github.com/test/repo"},
 		files: []string{"main.go", "test.go"},
 		rawFiles: map[string][]byte{
@@ -98,8 +98,7 @@ func TestClone_OnGolangRepository_ShouldReturnAllGolangFiles(t *testing.T) {
 	assert.Equal(t, []byte("package test"), files["test.go"].Raw)
 }
 
-// testCloner is a helper cloner
-type testCloner struct {
+type cloner struct {
 	repo        code.Repository
 	repoErr     error
 	files       []string
@@ -108,26 +107,26 @@ type testCloner struct {
 	rawFilesErr error
 }
 
-func (tc testCloner) Clone(url string) (code.Repository, error) {
-	if tc.repoErr != nil {
-		return code.Repository{}, tc.repoErr
+func (c cloner) Clone(url string) (code.Repository, error) {
+	if c.repoErr != nil {
+		return code.Repository{}, c.repoErr
 	}
 
-	return tc.repo, nil
+	return c.repo, nil
 }
 
-func (tc testCloner) Filenames() ([]string, error) {
-	if tc.filesErr != nil {
-		return []string{}, tc.filesErr
+func (c cloner) Filenames() ([]string, error) {
+	if c.filesErr != nil {
+		return []string{}, c.filesErr
 	}
 
-	return tc.files, nil
+	return c.files, nil
 }
 
-func (tc testCloner) File(name string) ([]byte, error) {
-	if tc.rawFilesErr != nil {
-		return []byte{}, tc.rawFilesErr
+func (c cloner) File(name string) ([]byte, error) {
+	if c.rawFilesErr != nil {
+		return []byte{}, c.rawFilesErr
 	}
 
-	return tc.rawFiles[name], nil
+	return c.rawFiles[name], nil
 }
