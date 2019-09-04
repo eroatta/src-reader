@@ -23,7 +23,7 @@ func NewCount() Count {
 	}
 }
 
-// Name returns the specific name for the extractor.
+// Name returns the specific name for the miner.
 func (m Count) Name() string {
 	return "count"
 }
