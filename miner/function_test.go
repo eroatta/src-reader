@@ -1,6 +1,9 @@
 package miner_test
 
 import (
+	"go/ast"
+	"go/parser"
+	"go/token"
 	"testing"
 
 	"github.com/eroatta/src-reader/miner"
@@ -20,5 +23,26 @@ func TestGetName_OnFunction_ShouldReturnFunction(t *testing.T) {
 }
 
 func TestVisit_OnFunction_ShouldReturnFunctionsWordsAndPhrases(t *testing.T) {
-	assert.Fail(t, "not yet implemented")
+	tests := []struct {
+		name     string
+		src      string
+		expected map[string]miner.Text
+	}{
+		{"no_functions", "package main", make(map[string]miner.Text)},
+		// TODO complete with other test cases
+	}
+
+	for _, fixture := range tests {
+		t.Run(fixture.name, func(t *testing.T) {
+			fs := token.NewFileSet()
+			node, _ := parser.ParseFile(fs, "", []byte(fixture.src), parser.ParseComments)
+
+			function := miner.NewFunction()
+			ast.Walk(function, node)
+
+			functions := function.FunctionsText()
+			assert.Equal(t, len(fixture.expected), len(functions))
+			assert.Equal(t, fixture.expected, functions)
+		})
+	}
 }

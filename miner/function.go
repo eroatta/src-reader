@@ -2,22 +2,21 @@ package miner
 
 import "go/ast"
 
-// FunctionData contains the mined function data.
-type FunctionData struct {
-	ID      string
-	words   map[string]struct{}
-	phrases map[string]string
+// Text contains the mined text extracted from a function.
+type Text struct {
+	Words   map[string]struct{}
+	Phrases map[string]string
 }
 
 // Function TODO
 type Function struct {
-	funcs map[string]FunctionData
+	funcs map[string]Text
 }
 
 // NewFunction TODO
 func NewFunction() Function {
 	return Function{
-		funcs: make(map[string]FunctionData),
+		funcs: make(map[string]Text),
 	}
 }
 
@@ -29,4 +28,9 @@ func (m Function) Name() string {
 // Visit implements the ast.Visitor interface and handles the logic for the data extraction.
 func (m Function) Visit(node ast.Node) ast.Visitor {
 	return m
+}
+
+// FunctionsText returns a map of function names and the mined text for each function.
+func (m Function) FunctionsText() map[string]Text {
+	return m.funcs
 }
