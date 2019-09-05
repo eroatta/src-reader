@@ -27,6 +27,9 @@ func (m Function) Name() string {
 
 // Visit implements the ast.Visitor interface and handles the logic for the data extraction.
 func (m Function) Visit(node ast.Node) ast.Visitor {
+	// on a FuncDecl, get comments + identifiers + body text
+	// and extract words (stemming + stopping)
+	// and also extract phrases
 	return m
 }
 
