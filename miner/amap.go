@@ -3,7 +3,6 @@ package miner
 import (
 	"fmt"
 	"go/ast"
-	"strings"
 
 	"github.com/eroatta/token/amap"
 )
@@ -48,11 +47,7 @@ func (m Amap) Visit(node ast.Node) ast.Visitor {
 	case *ast.File:
 		for _, commentGroup := range elem.Comments {
 			for _, comment := range commentGroup.List {
-				cleanComment := strings.ReplaceAll(comment.Text, "//", "")
-				cleanComment = strings.ReplaceAll(cleanComment, "\\n", " ")
-				cleanComment = strings.ReplaceAll(cleanComment, "\\t", " ")
-
-				m.fileComments = append(m.fileComments, cleanComment)
+				m.fileComments = append(m.fileComments, cleanComment(comment.Text))
 			}
 		}
 
@@ -62,11 +57,7 @@ func (m Amap) Visit(node ast.Node) ast.Visitor {
 		funcComments := make([]string, 0)
 		if elem.Doc != nil {
 			for _, comment := range elem.Doc.List {
-				cleanComment := strings.ReplaceAll(comment.Text, "//", "")
-				cleanComment = strings.ReplaceAll(cleanComment, "\\n", " ")
-				cleanComment = strings.ReplaceAll(cleanComment, "\\t", " ")
-
-				funcComments = append(funcComments, cleanComment)
+				funcComments = append(funcComments, cleanComment(comment.Text))
 			}
 		}
 
