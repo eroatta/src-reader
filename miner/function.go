@@ -94,7 +94,7 @@ func (m Function) Visit(node ast.Node) ast.Visitor {
 
 	case *ast.GenDecl:
 		// TODO improve this code
-		if elem.Tok != token.VAR {
+		if elem.Tok != token.VAR && elem.Tok != token.CONST {
 			return m
 		}
 
@@ -112,51 +112,46 @@ func (m Function) Visit(node ast.Node) ast.Visitor {
 
 		// names (in case of multiple specs)
 		var decls []Text
-		var start int // TODO review
 		for _, spec := range elem.Specs {
 			if valSpec, ok := spec.(*ast.ValueSpec); ok {
-				for _, name := range valSpec.Names {
+				for j, name := range valSpec.Names {
 					if name.Name == "_" {
 						continue
 					}
 
-					declText := newText(createFunctionID(m.pkg, token.VAR, name.String()), token.VAR)
+					declText := newText(createFunctionID(m.pkg, elem.Tok, name.String()), elem.Tok)
 					// TODO add name if valid
 					if word := strings.ToLower(name.String()); m.dict.Contains(word) {
 						declText.Words[word] = struct{}{}
 					}
 
-					decls = append(decls, declText)
-					start++
-				}
+					if valSpec.Values != nil {
+						if val, ok := valSpec.Values[j].(*ast.BasicLit); ok && val.Kind == token.STRING {
+							// extract text from value
+							valStr := strings.Replace(val.Value, "\"", "", -1)
+							// TODO delete commas
+							for _, word := range strings.Split(valStr, " ") {
+								word = cleaner.ReplaceAllString(word, "")
+								if m.dict.Contains(strings.ToLower(word)) {
+									declText.Words[strings.ToLower(word)] = struct{}{}
+								}
+							}
 
-				fmt.Println(start)
-				for i, value := range valSpec.Values {
-					if val, ok := value.(*ast.BasicLit); ok && val.Kind == token.STRING {
-						// extract text from value
-						valStr := strings.Replace(val.Value, "\"", "", -1)
-						// TODO delete commas
-						for _, word := range strings.Split(valStr, " ") {
-							word = cleaner.ReplaceAllString(word, "")
-							if m.dict.Contains(strings.ToLower(word)) {
-								fmt.Println(fmt.Sprintf("Start %d, i %d, word: %s", start, i, word))
-								fmt.Println(len(decls))
-								decls[start+i-1].Words[strings.ToLower(word)] = struct{}{}
+							// get phrases
+							phrases, _ := nounphrases.Find(cleanComment(valStr))
+							for _, phr := range phrases {
+								declText.Phrases[phr] = struct{}{}
 							}
 						}
-
-						// get phrases
-						phrases, _ := nounphrases.Find(cleanComment(valStr))
-						for _, phr := range phrases {
-							decls[start+i-1].Phrases[phr] = struct{}{} // TODO: review index
-						}
 					}
+
+					decls = append(decls, declText)
 				}
 			}
 		}
 
 		// decl doc
-		dummyCommentText := newText("", token.VAR)
+		dummyCommentText := newText("", elem.Tok)
 		if elem.Doc != nil {
 			for _, comment := range elem.Doc.List {
 				dummyCommentText = extractWordAndPhrasesFromComment(dummyCommentText, comment.Text, m.dict)

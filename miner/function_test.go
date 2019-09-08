@@ -275,6 +275,167 @@ func TestVisit_OnFunctionWithVarDecl_ShouldReturnWordsAndPhrases(t *testing.T) {
 	}
 }
 
+func TestVisit_OnFunctionWithConstDecl_ShouldReturnWordsAndPhrases(t *testing.T) {
+	srcConstWithoutComments := `
+		package main
+
+		const Common string = "valid"
+	`
+
+	srcConstWithDocComments := `
+		package main
+
+		// outer comment
+		const Common string = "valid"
+	`
+	srcConstWithDocAndLineComments := `
+		package main
+
+		// outer comment
+		const Common string = "valid" // inner comment
+	`
+
+	srcMultipleConstSpecs := `
+		package main
+
+		// outer comment
+		const common,regular string = "valid", "invalid"
+	`
+
+	srcConstBlock := `
+		package main
+
+		// outer comment
+		const (
+			common string = "common value"
+			regular string = "valid"
+			nrXX int = 32
+		)
+	`
+
+	tests := []struct {
+		name     string
+		src      string
+		expected map[string]miner.Text
+	}{
+		{"constant_without_comments", srcConstWithoutComments, map[string]miner.Text{
+			"main++const::Common": miner.Text{
+				ID:       "main++const::Common",
+				DeclType: token.CONST,
+				Words: map[string]struct{}{
+					"common": struct{}{},
+					"valid":  struct{}{},
+				},
+				Phrases: make(map[string]struct{}),
+			}}},
+		{"constant_with_doc_comments", srcConstWithDocComments, map[string]miner.Text{
+			"main++const::Common": miner.Text{
+				ID:       "main++const::Common",
+				DeclType: token.CONST,
+				Words: map[string]struct{}{
+					"comment": struct{}{},
+					"common":  struct{}{},
+					"outer":   struct{}{},
+					"valid":   struct{}{},
+				},
+				Phrases: map[string]struct{}{
+					"outer comment": struct{}{},
+				},
+			}}},
+		{"constant_with_doc_and_ignored_line_comments", srcConstWithDocAndLineComments, map[string]miner.Text{
+			"main++const::Common": miner.Text{
+				ID:       "main++const::Common",
+				DeclType: token.CONST,
+				Words: map[string]struct{}{
+					"comment": struct{}{},
+					"common":  struct{}{},
+					"outer":   struct{}{},
+					"valid":   struct{}{},
+				},
+				Phrases: map[string]struct{}{
+					"outer comment": struct{}{},
+				},
+			}}},
+		{"multiple_constants_same_line", srcMultipleConstSpecs, map[string]miner.Text{
+			"main++const::common": miner.Text{
+				ID:       "main++const::common",
+				DeclType: token.CONST,
+				Words: map[string]struct{}{
+					"comment": struct{}{},
+					"common":  struct{}{},
+					"outer":   struct{}{},
+					"valid":   struct{}{},
+				},
+				Phrases: map[string]struct{}{
+					"outer comment": struct{}{},
+				}},
+			"main++const::regular": miner.Text{
+				ID:       "main++const::regular",
+				DeclType: token.CONST,
+				Words: map[string]struct{}{
+					"comment": struct{}{},
+					"invalid": struct{}{},
+					"regular": struct{}{},
+					"outer":   struct{}{},
+				},
+				Phrases: map[string]struct{}{
+					"outer comment": struct{}{},
+				},
+			}}},
+		{"const_block", srcConstBlock, map[string]miner.Text{
+			"main++const::common": miner.Text{
+				ID:       "main++const::common",
+				DeclType: token.CONST,
+				Words: map[string]struct{}{
+					"comment": struct{}{},
+					"common":  struct{}{},
+					"outer":   struct{}{},
+					"value":   struct{}{},
+				},
+				Phrases: map[string]struct{}{
+					"common value":  struct{}{},
+					"outer comment": struct{}{},
+				}},
+			"main++const::regular": miner.Text{
+				ID:       "main++const::regular",
+				DeclType: token.CONST,
+				Words: map[string]struct{}{
+					"comment": struct{}{},
+					"regular": struct{}{},
+					"outer":   struct{}{},
+					"valid":   struct{}{},
+				},
+				Phrases: map[string]struct{}{
+					"outer comment": struct{}{},
+				}},
+			"main++const::nrXX": miner.Text{
+				ID:       "main++const::nrXX",
+				DeclType: token.CONST,
+				Words: map[string]struct{}{
+					"comment": struct{}{},
+					"outer":   struct{}{},
+				},
+				Phrases: map[string]struct{}{
+					"outer comment": struct{}{},
+				},
+			}}},
+	}
+
+	for _, fixture := range tests {
+		t.Run(fixture.name, func(t *testing.T) {
+			fs := token.NewFileSet()
+			node, _ := parser.ParseFile(fs, "", []byte(fixture.src), parser.ParseComments)
+
+			function := miner.NewFunction(lists.Dicctionary)
+			ast.Walk(function, node)
+
+			functions := function.FunctionsText()
+			assert.Equal(t, len(fixture.expected), len(functions))
+			assert.Equal(t, fixture.expected, functions)
+		})
+	}
+}
+
 /*func TestVisit_OnFunctionWithRealLifeFile_ShouldReturnFunctionsWordsAndPhrases(t *testing.T) {
 	src := `
 	`
