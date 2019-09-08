@@ -110,8 +110,15 @@ func (m Function) Visit(node ast.Node) ast.Visitor {
 			return m
 		}
 
+		// decl doc
+		commonCommentText := newText("common", elem.Tok)
+		if elem.Doc != nil {
+			for _, comment := range elem.Doc.List {
+				commonCommentText = extractWordAndPhrasesFromComment(commonCommentText, comment.Text, m.dict)
+			}
+		}
+
 		// names (in case of multiple specs)
-		var decls []Text
 		for _, spec := range elem.Specs {
 			if valSpec, ok := spec.(*ast.ValueSpec); ok {
 				for j, name := range valSpec.Names {
@@ -145,32 +152,19 @@ func (m Function) Visit(node ast.Node) ast.Visitor {
 						}
 					}
 
-					decls = append(decls, declText)
+					for k, v := range commonCommentText.Words {
+						declText.Words[k] = v
+					}
+
+					for k, v := range commonCommentText.Phrases {
+						declText.Phrases[k] = v
+					}
+
+					m.functions[declText.ID] = declText
 				}
 			}
 		}
 
-		// decl doc
-		dummyCommentText := newText("", elem.Tok)
-		if elem.Doc != nil {
-			for _, comment := range elem.Doc.List {
-				dummyCommentText = extractWordAndPhrasesFromComment(dummyCommentText, comment.Text, m.dict)
-			}
-		}
-
-		// merge decl doc
-		for i := range decls {
-			for k, v := range dummyCommentText.Words {
-				decls[i].Words[k] = v
-			}
-
-			for k, v := range dummyCommentText.Phrases {
-				decls[i].Phrases[k] = v
-			}
-
-			// add them to the map
-			m.functions[decls[i].ID] = decls[i]
-		}
 	}
 
 	return m
