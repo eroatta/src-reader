@@ -436,6 +436,185 @@ func TestVisit_OnFunctionWithConstDecl_ShouldReturnWordsAndPhrases(t *testing.T)
 	}
 }
 
+func TestVisit_OnFunctionWithTypeDecl_ShouldReturnWordsAndPhrases(t *testing.T) {
+	srcTypeWithoutFields := `
+		package main
+
+		type selector struct{}
+	`
+
+	srcTypeWithComments := `
+		package main
+
+		// type comment
+		type selector struct{}
+	`
+
+	srcTypeWithFields := `
+		package main
+
+		// type comment
+		type selector struct {
+			pick string
+		}
+	`
+
+	srcTypeWithFieldsAndComments := `
+		package main
+
+		// type comment
+		type selector struct {
+			// field comment
+			pick string
+		}
+	`
+
+	srcTypeBlock := `
+		package main
+
+		// global comment
+		type (
+			// local comment
+			selector struct {
+				// field comment
+				pick string
+			}
+
+			// inner comment
+			picker struct {
+				pick string
+			}
+		)
+	`
+
+	srcTypeWithHardwords := `
+		package main
+
+		type httpClient struct {
+			protocolPicker string
+			url string
+		}
+	`
+
+	tests := []struct {
+		name     string
+		src      string
+		expected map[string]miner.Text
+	}{
+		{"empty_type", srcTypeWithoutFields, map[string]miner.Text{
+			"main++type::selector": miner.Text{
+				ID:       "main++type::selector",
+				DeclType: token.TYPE,
+				Words: map[string]struct{}{
+					"selector": struct{}{},
+				},
+				Phrases: map[string]struct{}{}},
+		}},
+		{"type_with_comments", srcTypeWithComments, map[string]miner.Text{
+			"main++type::selector": miner.Text{
+				ID:       "main++type::selector",
+				DeclType: token.TYPE,
+				Words: map[string]struct{}{
+					"comment":  struct{}{},
+					"selector": struct{}{},
+					"type":     struct{}{},
+				},
+				Phrases: map[string]struct{}{
+					"type comment": struct{}{},
+				}},
+		}},
+		{"type_with_fields", srcTypeWithFields, map[string]miner.Text{
+			"main++type::selector": miner.Text{
+				ID:       "main++type::selector",
+				DeclType: token.TYPE,
+				Words: map[string]struct{}{
+					"comment":  struct{}{},
+					"pick":     struct{}{},
+					"selector": struct{}{},
+					"type":     struct{}{},
+				},
+				Phrases: map[string]struct{}{
+					"type comment": struct{}{},
+				}},
+		}},
+		{"type_with_fields_and_comments", srcTypeWithFieldsAndComments, map[string]miner.Text{
+			"main++type::selector": miner.Text{
+				ID:       "main++type::selector",
+				DeclType: token.TYPE,
+				Words: map[string]struct{}{
+					"comment":  struct{}{},
+					"field":    struct{}{},
+					"pick":     struct{}{},
+					"selector": struct{}{},
+					"type":     struct{}{},
+				},
+				Phrases: map[string]struct{}{
+					"field comment": struct{}{},
+					"type comment":  struct{}{},
+				}},
+		}},
+		{"type_block_decl", srcTypeBlock, map[string]miner.Text{
+			"main++type::selector": miner.Text{
+				ID:       "main++type::selector",
+				DeclType: token.TYPE,
+				Words: map[string]struct{}{
+					"comment":  struct{}{},
+					"field":    struct{}{},
+					"global":   struct{}{},
+					"local":    struct{}{},
+					"pick":     struct{}{},
+					"selector": struct{}{},
+				},
+				Phrases: map[string]struct{}{
+					"field comment":  struct{}{},
+					"global comment": struct{}{},
+					"local comment":  struct{}{},
+				}},
+			"main++type::picker": miner.Text{
+				ID:       "main++type::picker",
+				DeclType: token.TYPE,
+				Words: map[string]struct{}{
+					"inner":   struct{}{},
+					"comment": struct{}{},
+					"global":  struct{}{},
+					"pick":    struct{}{},
+					"picker":  struct{}{},
+				},
+				Phrases: map[string]struct{}{
+					"inner comment":  struct{}{},
+					"global comment": struct{}{},
+				}},
+		}},
+		{"type_with_hardwords", srcTypeWithHardwords, map[string]miner.Text{
+			"main++type::httpClient": miner.Text{
+				ID:       "main++type::httpClient",
+				DeclType: token.TYPE,
+				Words: map[string]struct{}{
+					"client":   struct{}{},
+					"http":     struct{}{},
+					"picker":   struct{}{},
+					"protocol": struct{}{},
+					"url":      struct{}{},
+				},
+				Phrases: map[string]struct{}{}},
+		}},
+	}
+
+	for _, fixture := range tests {
+		t.Run(fixture.name, func(t *testing.T) {
+			fs := token.NewFileSet()
+			node, _ := parser.ParseFile(fs, "", []byte(fixture.src), parser.ParseComments)
+
+			function := miner.NewFunction(lists.Dicctionary)
+			ast.Walk(function, node)
+
+			functions := function.FunctionsText()
+			assert.Equal(t, len(fixture.expected), len(functions))
+			assert.Equal(t, fixture.expected, functions)
+		})
+	}
+}
+
 /*func TestVisit_OnFunctionWithRealLifeFile_ShouldReturnFunctionsWordsAndPhrases(t *testing.T) {
 	src := `
 	`

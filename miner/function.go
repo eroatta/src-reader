@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/eroatta/nounphrases"
+	"github.com/eroatta/token/conserv"
 	"github.com/eroatta/token/lists"
 )
 
@@ -68,33 +69,12 @@ func (m Function) Visit(node ast.Node) ast.Visitor {
 		m.pkgComments = append(m.pkgComments, elem.Comments...)
 
 	case *ast.FuncDecl:
-		name := elem.Name.String()
-		functionText := newText(createFunctionID(m.pkg, token.FUNC, name), token.FUNC)
-
-		if m.dict.Contains(name) {
-			functionText.Words[strings.ToLower(name)] = struct{}{}
-		}
-
-		if elem.Doc != nil {
-			for _, comment := range elem.Doc.List {
-				functionText = extractWordAndPhrasesFromComment(functionText, comment.Text, m.dict)
-			}
-		}
-
-		start, end := elem.Pos(), elem.End()
-		for _, group := range m.pkgComments {
-			for _, comment := range group.List {
-				if comment.Slash > start && comment.Slash < end {
-					functionText = extractWordAndPhrasesFromComment(functionText, comment.Text, m.dict)
-				}
-			}
-		}
-
+		functionText := getFunctionTextFromFuncDecl(elem, m)
 		m.functions[functionText.ID] = functionText
 
 	case *ast.GenDecl:
 		// TODO improve this code
-		if elem.Tok != token.VAR && elem.Tok != token.CONST {
+		if elem.Tok != token.VAR && elem.Tok != token.CONST && elem.Tok != token.TYPE {
 			return m
 		}
 
@@ -127,7 +107,7 @@ func (m Function) Visit(node ast.Node) ast.Visitor {
 					}
 
 					declText := newText(createFunctionID(m.pkg, elem.Tok, name.String()), elem.Tok)
-					// TODO add name if valid
+					// TODO add name if valid / split name
 					if word := strings.ToLower(name.String()); m.dict.Contains(word) {
 						declText.Words[word] = struct{}{}
 					}
@@ -152,6 +132,7 @@ func (m Function) Visit(node ast.Node) ast.Visitor {
 						}
 					}
 
+					// merge with common comments text
 					for k, v := range commonCommentText.Words {
 						declText.Words[k] = v
 					}
@@ -163,11 +144,93 @@ func (m Function) Visit(node ast.Node) ast.Visitor {
 					m.functions[declText.ID] = declText
 				}
 			}
-		}
 
+			// TODO review spec doc comments!
+			if typeSpec, ok := spec.(*ast.TypeSpec); ok {
+				name := typeSpec.Name.String()
+				declText := newText(createFunctionID(m.pkg, token.TYPE, name), token.TYPE)
+
+				// TODO split name
+				for _, part := range conserv.Split(name) {
+					if m.dict.Contains(part) {
+						declText.Words[strings.ToLower(part)] = struct{}{}
+					}
+				}
+
+				// TODO extract field comment
+				if typeSpec.Doc != nil {
+					for _, comment := range typeSpec.Doc.List {
+						declText = extractWordAndPhrasesFromComment(declText, comment.Text, m.dict)
+					}
+				}
+
+				// TODO extract comments
+				if structType, ok := typeSpec.Type.(*ast.StructType); ok {
+					if structType.Fields != nil && structType.Fields.List != nil {
+						for _, field := range structType.Fields.List {
+							for _, fname := range field.Names {
+								fmt.Println(fname.Name)
+								for _, part := range conserv.Split(fname.Name) {
+									fmt.Println(part)
+									if m.dict.Contains(part) {
+										declText.Words[strings.ToLower(part)] = struct{}{}
+									}
+								}
+							}
+
+							// TODO extract field comment
+							if field.Doc != nil {
+								for _, comment := range field.Doc.List {
+									declText = extractWordAndPhrasesFromComment(declText, comment.Text, m.dict)
+								}
+							}
+						}
+					}
+				}
+
+				// merge with common comments text
+				for k, v := range commonCommentText.Words {
+					declText.Words[k] = v
+				}
+
+				for k, v := range commonCommentText.Phrases {
+					declText.Phrases[k] = v
+				}
+
+				m.functions[declText.ID] = declText
+			}
+		}
 	}
 
 	return m
+}
+
+func getFunctionTextFromFuncDecl(elem *ast.FuncDecl, m Function) Text {
+	name := elem.Name.String()
+	functionText := newText(createFunctionID(m.pkg, token.FUNC, name), token.FUNC)
+
+	for _, part := range conserv.Split(name) {
+		if m.dict.Contains(part) {
+			functionText.Words[strings.ToLower(part)] = struct{}{}
+		}
+	}
+
+	if elem.Doc != nil {
+		for _, comment := range elem.Doc.List {
+			functionText = extractWordAndPhrasesFromComment(functionText, comment.Text, m.dict)
+		}
+	}
+
+	start, end := elem.Pos(), elem.End()
+	for _, group := range m.pkgComments {
+		for _, comment := range group.List {
+			if comment.Slash > start && comment.Slash < end {
+				functionText = extractWordAndPhrasesFromComment(functionText, comment.Text, m.dict)
+			}
+		}
+	}
+
+	return functionText
 }
 
 func cleanComment(text string) string {
