@@ -11,16 +11,16 @@ import (
 	"github.com/eroatta/token/lists"
 )
 
-// Text contains the mined text extracted from a function.
-type Text struct {
+// Decl contains the mined text (words and phrases) related to a declaration.
+type Decl struct {
 	ID       string
 	DeclType token.Token
 	Words    map[string]struct{}
 	Phrases  map[string]struct{}
 }
 
-func newText(ID string, declType token.Token) Text {
-	return Text{
+func newDecl(ID string, declType token.Token) Decl {
+	return Decl{
 		ID:       ID,
 		DeclType: declType,
 		Words:    make(map[string]struct{}),
@@ -28,31 +28,31 @@ func newText(ID string, declType token.Token) Text {
 	}
 }
 
-// Function represents the functions miner, which extracts information about
-// words and phrases for each function declaration.
-type Function struct {
+// Declaration represents the declarations miner, which extracts information about
+// words and phrases for each function/variable/struct/interface declaration.
+type Declaration struct {
 	dict        lists.List
 	pkg         string
 	pkgComments []*ast.CommentGroup
-	decls       []ast.Decl
-	functions   map[string]Text
+	included    []ast.Decl
+	decls       map[string]Decl
 }
 
-// NewFunction initializes a new functions miner.
-func NewFunction(dict lists.List) Function {
-	return Function{
-		dict:      dict,
-		functions: make(map[string]Text),
+// NewDeclaration initializes a new declarations miner.
+func NewDeclaration(dict lists.List) Declaration {
+	return Declaration{
+		dict:  dict,
+		decls: make(map[string]Decl),
 	}
 }
 
 // Name returns the specific name for the miner.
-func (m Function) Name() string {
-	return "function"
+func (m Declaration) Name() string {
+	return "declaration"
 }
 
 // Visit implements the ast.Visitor interface and handles the logic for the data extraction.
-func (m Function) Visit(node ast.Node) ast.Visitor {
+func (m Declaration) Visit(node ast.Node) ast.Visitor {
 	// on a FuncDecl, get comments + identifiers + body text
 	// and extract words (stemming + stopping)
 	// and also extract phrases
@@ -63,14 +63,14 @@ func (m Function) Visit(node ast.Node) ast.Visitor {
 	switch elem := node.(type) {
 	case *ast.File:
 		m.pkg = elem.Name.String()
-		m.decls = elem.Decls
+		m.included = elem.Decls
 
 		// collect inner comment to use on their proper function
 		m.pkgComments = append(m.pkgComments, elem.Comments...)
 
 	case *ast.FuncDecl:
 		functionText := getFunctionTextFromFuncDecl(elem, m)
-		m.functions[functionText.ID] = functionText
+		m.decls[functionText.ID] = functionText
 
 	case *ast.GenDecl:
 		// TODO improve this code
@@ -79,7 +79,7 @@ func (m Function) Visit(node ast.Node) ast.Visitor {
 		}
 
 		var weCare bool
-		for _, d := range m.decls {
+		for _, d := range m.included {
 			if d.Pos() == elem.Pos() {
 				weCare = true
 				break
@@ -91,7 +91,7 @@ func (m Function) Visit(node ast.Node) ast.Visitor {
 		}
 
 		// decl doc
-		commonCommentText := newText("common", elem.Tok)
+		commonCommentText := newDecl("common", elem.Tok)
 		if elem.Doc != nil {
 			for _, comment := range elem.Doc.List {
 				commonCommentText = extractWordAndPhrasesFromComment(commonCommentText, comment.Text, m.dict)
@@ -106,7 +106,7 @@ func (m Function) Visit(node ast.Node) ast.Visitor {
 						continue
 					}
 
-					declText := newText(createFunctionID(m.pkg, elem.Tok, name.String()), elem.Tok)
+					declText := newDecl(getDeclID(m.pkg, elem.Tok, name.String()), elem.Tok)
 					// TODO add name if valid / split name
 					if word := strings.ToLower(name.String()); m.dict.Contains(word) {
 						declText.Words[word] = struct{}{}
@@ -141,14 +141,14 @@ func (m Function) Visit(node ast.Node) ast.Visitor {
 						declText.Phrases[k] = v
 					}
 
-					m.functions[declText.ID] = declText
+					m.decls[declText.ID] = declText
 				}
 			}
 
 			// TODO review spec doc comments!
 			if typeSpec, ok := spec.(*ast.TypeSpec); ok {
 				name := typeSpec.Name.String()
-				declText := newText("", token.TYPE)
+				declText := newDecl("", token.TYPE)
 
 				//declText := newText(createFunctionID(m.pkg, token.STRUCT, name), token.TYPE)
 
@@ -167,7 +167,7 @@ func (m Function) Visit(node ast.Node) ast.Visitor {
 
 				// TODO extract comments
 				if structType, ok := typeSpec.Type.(*ast.StructType); ok {
-					declText.ID = createFunctionID(m.pkg, token.STRUCT, name)
+					declText.ID = getDeclID(m.pkg, token.STRUCT, name)
 					declText.DeclType = token.STRUCT
 
 					if structType.Fields != nil && structType.Fields.List != nil {
@@ -191,7 +191,7 @@ func (m Function) Visit(node ast.Node) ast.Visitor {
 				}
 
 				if interfaceType, ok := typeSpec.Type.(*ast.InterfaceType); ok {
-					declText.ID = createFunctionID(m.pkg, token.INTERFACE, name)
+					declText.ID = getDeclID(m.pkg, token.INTERFACE, name)
 					declText.DeclType = token.INTERFACE
 
 					if interfaceType.Methods != nil && interfaceType.Methods.List != nil {
@@ -223,7 +223,7 @@ func (m Function) Visit(node ast.Node) ast.Visitor {
 					declText.Phrases[k] = v
 				}
 
-				m.functions[declText.ID] = declText
+				m.decls[declText.ID] = declText
 			}
 		}
 	}
@@ -231,9 +231,9 @@ func (m Function) Visit(node ast.Node) ast.Visitor {
 	return m
 }
 
-func getFunctionTextFromFuncDecl(elem *ast.FuncDecl, m Function) Text {
+func getFunctionTextFromFuncDecl(elem *ast.FuncDecl, m Declaration) Decl {
 	name := elem.Name.String()
-	functionText := newText(createFunctionID(m.pkg, token.FUNC, name), token.FUNC)
+	functionText := newDecl(getDeclID(m.pkg, token.FUNC, name), token.FUNC)
 
 	for _, part := range conserv.Split(name) {
 		if m.dict.Contains(part) {
@@ -265,7 +265,7 @@ func cleanComment(text string) string {
 	return strings.ReplaceAll(cleanComment, "\\t", " ")
 }
 
-func extractWordAndPhrasesFromComment(functionText Text, comment string, list lists.List) Text {
+func extractWordAndPhrasesFromComment(functionText Decl, comment string, list lists.List) Decl {
 	cleanComment := cleanComment(comment)
 	for _, word := range strings.Split(cleanComment, " ") {
 		word = cleaner.ReplaceAllString(word, "")
@@ -285,11 +285,11 @@ func extractWordAndPhrasesFromComment(functionText Text, comment string, list li
 	return functionText
 }
 
-func createFunctionID(pkg string, declType token.Token, name string) string {
+func getDeclID(pkg string, declType token.Token, name string) string {
 	return fmt.Sprintf("%s++%s::%s", pkg, declType, name)
 }
 
-// FunctionsText returns a map of function names and the mined text for each function.
-func (m Function) FunctionsText() map[string]Text {
-	return m.functions
+// Decls returns a map of declaration IDs and the mined text for each declaration.
+func (m Declaration) Decls() map[string]Decl {
+	return m.decls
 }

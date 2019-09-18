@@ -11,19 +11,19 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestNewFunction_ShouldReturnFunctionMiner(t *testing.T) {
-	miner := miner.NewFunction(nil)
+func TestNewDeclaration_ShouldReturnDeclarationMiner(t *testing.T) {
+	miner := miner.NewDeclaration(nil)
 
 	assert.NotNil(t, miner)
 }
 
-func TestGetName_OnFunction_ShouldReturnFunction(t *testing.T) {
-	miner := miner.NewFunction(nil)
+func TestGetName_OnDeclaration_ShouldReturnDeclaration(t *testing.T) {
+	miner := miner.NewDeclaration(nil)
 
-	assert.Equal(t, "function", miner.Name())
+	assert.Equal(t, "declaration", miner.Name())
 }
 
-func TestVisit_OnFunction_ShouldReturnFunctionsWordsAndPhrases(t *testing.T) {
+func TestVisit_OnDeclarationWithFunctions_ShouldReturnDecls(t *testing.T) {
 	srcWithoutTextOrComments := `
 		package main
 
@@ -56,19 +56,19 @@ func TestVisit_OnFunction_ShouldReturnFunctionsWordsAndPhrases(t *testing.T) {
 	tests := []struct {
 		name     string
 		src      string
-		expected map[string]miner.Text
+		expected map[string]miner.Decl
 	}{
-		{"no_functions", "package main", make(map[string]miner.Text)},
-		{"functions_without_text_or_comments", srcWithoutTextOrComments, map[string]miner.Text{
-			"main++func::main": miner.Text{
+		{"no_functions", "package main", make(map[string]miner.Decl)},
+		{"functions_without_text_or_comments", srcWithoutTextOrComments, map[string]miner.Decl{
+			"main++func::main": miner.Decl{
 				ID:       "main++func::main",
 				DeclType: token.FUNC,
 				Words:    map[string]struct{}{"main": struct{}{}},
 				Phrases:  make(map[string]struct{}),
 			},
 		}},
-		{"functions_with_text_and_comments", srcWithTextAndComments, map[string]miner.Text{
-			"main++func::main": miner.Text{
+		{"functions_with_text_and_comments", srcWithTextAndComments, map[string]miner.Decl{
+			"main++func::main": miner.Decl{
 				ID:       "main++func::main",
 				DeclType: token.FUNC,
 				Words: map[string]struct{}{
@@ -88,14 +88,14 @@ func TestVisit_OnFunction_ShouldReturnFunctionsWordsAndPhrases(t *testing.T) {
 				},
 			},
 		}},
-		{"functions_with_multiple_functions", srcWithMultipleFunctions, map[string]miner.Text{
-			"main++func::main": miner.Text{
+		{"functions_with_multiple_functions", srcWithMultipleFunctions, map[string]miner.Decl{
+			"main++func::main": miner.Decl{
 				ID:       "main++func::main",
 				DeclType: token.FUNC,
 				Words:    map[string]struct{}{"main": struct{}{}},
 				Phrases:  make(map[string]struct{}),
 			},
-			"main++func::another": miner.Text{
+			"main++func::another": miner.Decl{
 				ID:       "main++func::another",
 				DeclType: token.FUNC,
 				Words: map[string]struct{}{
@@ -113,17 +113,17 @@ func TestVisit_OnFunction_ShouldReturnFunctionsWordsAndPhrases(t *testing.T) {
 			fs := token.NewFileSet()
 			node, _ := parser.ParseFile(fs, "", []byte(fixture.src), parser.ParseComments)
 
-			function := miner.NewFunction(lists.Dicctionary)
-			ast.Walk(function, node)
+			m := miner.NewDeclaration(lists.Dicctionary)
+			ast.Walk(m, node)
 
-			functions := function.FunctionsText()
-			assert.Equal(t, len(fixture.expected), len(functions))
-			assert.Equal(t, fixture.expected, functions)
+			decls := m.Decls()
+			assert.Equal(t, len(fixture.expected), len(decls))
+			assert.Equal(t, fixture.expected, decls)
 		})
 	}
 }
 
-func TestVisit_OnFunctionWithVarDecl_ShouldReturnWordsAndPhrases(t *testing.T) {
+func TestVisit_OnDeclarationWithVarDecl_ShouldReturnWordsAndPhrases(t *testing.T) {
 	srcVarWithoutComments := `
 		package main
 		
@@ -164,17 +164,17 @@ func TestVisit_OnFunctionWithVarDecl_ShouldReturnWordsAndPhrases(t *testing.T) {
 	tests := []struct {
 		name     string
 		src      string
-		expected map[string]miner.Text
+		expected map[string]miner.Decl
 	}{
-		{"variable_without_comments", srcVarWithoutComments, map[string]miner.Text{
-			"main++var::Common": miner.Text{
+		{"variable_without_comments", srcVarWithoutComments, map[string]miner.Decl{
+			"main++var::Common": miner.Decl{
 				ID:       "main++var::Common",
 				DeclType: token.VAR,
 				Words:    map[string]struct{}{"common": struct{}{}},
 				Phrases:  make(map[string]struct{}),
 			}}},
-		{"variable_with_doc_comments", srcVarWithDocComments, map[string]miner.Text{
-			"main++var::Common": miner.Text{
+		{"variable_with_doc_comments", srcVarWithDocComments, map[string]miner.Decl{
+			"main++var::Common": miner.Decl{
 				ID:       "main++var::Common",
 				DeclType: token.VAR,
 				Words: map[string]struct{}{
@@ -186,8 +186,8 @@ func TestVisit_OnFunctionWithVarDecl_ShouldReturnWordsAndPhrases(t *testing.T) {
 					"outer comment": struct{}{},
 				},
 			}}},
-		{"variable_with_doc_and_ignored_line_comments", srcVarWithDocAndLineComments, map[string]miner.Text{
-			"main++var::Common": miner.Text{
+		{"variable_with_doc_and_ignored_line_comments", srcVarWithDocAndLineComments, map[string]miner.Decl{
+			"main++var::Common": miner.Decl{
 				ID:       "main++var::Common",
 				DeclType: token.VAR,
 				Words: map[string]struct{}{
@@ -199,8 +199,8 @@ func TestVisit_OnFunctionWithVarDecl_ShouldReturnWordsAndPhrases(t *testing.T) {
 					"outer comment": struct{}{},
 				},
 			}}},
-		{"multiple_variables_same_line", srcMultipleVarSpecs, map[string]miner.Text{
-			"main++var::common": miner.Text{
+		{"multiple_variables_same_line", srcMultipleVarSpecs, map[string]miner.Decl{
+			"main++var::common": miner.Decl{
 				ID:       "main++var::common",
 				DeclType: token.VAR,
 				Words: map[string]struct{}{
@@ -211,7 +211,7 @@ func TestVisit_OnFunctionWithVarDecl_ShouldReturnWordsAndPhrases(t *testing.T) {
 				Phrases: map[string]struct{}{
 					"outer comment": struct{}{},
 				}},
-			"main++var::regular": miner.Text{
+			"main++var::regular": miner.Decl{
 				ID:       "main++var::regular",
 				DeclType: token.VAR,
 				Words: map[string]struct{}{
@@ -223,8 +223,8 @@ func TestVisit_OnFunctionWithVarDecl_ShouldReturnWordsAndPhrases(t *testing.T) {
 					"outer comment": struct{}{},
 				},
 			}}},
-		{"var_block", srcVarBlock, map[string]miner.Text{
-			"main++var::common": miner.Text{
+		{"var_block", srcVarBlock, map[string]miner.Decl{
+			"main++var::common": miner.Decl{
 				ID:       "main++var::common",
 				DeclType: token.VAR,
 				Words: map[string]struct{}{
@@ -235,7 +235,7 @@ func TestVisit_OnFunctionWithVarDecl_ShouldReturnWordsAndPhrases(t *testing.T) {
 				Phrases: map[string]struct{}{
 					"outer comment": struct{}{},
 				}},
-			"main++var::regular": miner.Text{
+			"main++var::regular": miner.Decl{
 				ID:       "main++var::regular",
 				DeclType: token.VAR,
 				Words: map[string]struct{}{
@@ -247,7 +247,7 @@ func TestVisit_OnFunctionWithVarDecl_ShouldReturnWordsAndPhrases(t *testing.T) {
 				Phrases: map[string]struct{}{
 					"outer comment": struct{}{},
 				}},
-			"main++var::nrXX": miner.Text{
+			"main++var::nrXX": miner.Decl{
 				ID:       "main++var::nrXX",
 				DeclType: token.VAR,
 				Words: map[string]struct{}{
@@ -265,17 +265,17 @@ func TestVisit_OnFunctionWithVarDecl_ShouldReturnWordsAndPhrases(t *testing.T) {
 			fs := token.NewFileSet()
 			node, _ := parser.ParseFile(fs, "", []byte(fixture.src), parser.ParseComments)
 
-			function := miner.NewFunction(lists.Dicctionary)
-			ast.Walk(function, node)
+			m := miner.NewDeclaration(lists.Dicctionary)
+			ast.Walk(m, node)
 
-			functions := function.FunctionsText()
-			assert.Equal(t, len(fixture.expected), len(functions))
-			assert.Equal(t, fixture.expected, functions)
+			decls := m.Decls()
+			assert.Equal(t, len(fixture.expected), len(decls))
+			assert.Equal(t, fixture.expected, decls)
 		})
 	}
 }
 
-func TestVisit_OnFunctionWithConstDecl_ShouldReturnWordsAndPhrases(t *testing.T) {
+func TestVisit_OnDeclarationWithConstDecl_ShouldReturnWordsAndPhrases(t *testing.T) {
 	srcConstWithoutComments := `
 		package main
 
@@ -316,10 +316,10 @@ func TestVisit_OnFunctionWithConstDecl_ShouldReturnWordsAndPhrases(t *testing.T)
 	tests := []struct {
 		name     string
 		src      string
-		expected map[string]miner.Text
+		expected map[string]miner.Decl
 	}{
-		{"constant_without_comments", srcConstWithoutComments, map[string]miner.Text{
-			"main++const::Common": miner.Text{
+		{"constant_without_comments", srcConstWithoutComments, map[string]miner.Decl{
+			"main++const::Common": miner.Decl{
 				ID:       "main++const::Common",
 				DeclType: token.CONST,
 				Words: map[string]struct{}{
@@ -328,8 +328,8 @@ func TestVisit_OnFunctionWithConstDecl_ShouldReturnWordsAndPhrases(t *testing.T)
 				},
 				Phrases: make(map[string]struct{}),
 			}}},
-		{"constant_with_doc_comments", srcConstWithDocComments, map[string]miner.Text{
-			"main++const::Common": miner.Text{
+		{"constant_with_doc_comments", srcConstWithDocComments, map[string]miner.Decl{
+			"main++const::Common": miner.Decl{
 				ID:       "main++const::Common",
 				DeclType: token.CONST,
 				Words: map[string]struct{}{
@@ -342,8 +342,8 @@ func TestVisit_OnFunctionWithConstDecl_ShouldReturnWordsAndPhrases(t *testing.T)
 					"outer comment": struct{}{},
 				},
 			}}},
-		{"constant_with_doc_and_ignored_line_comments", srcConstWithDocAndLineComments, map[string]miner.Text{
-			"main++const::Common": miner.Text{
+		{"constant_with_doc_and_ignored_line_comments", srcConstWithDocAndLineComments, map[string]miner.Decl{
+			"main++const::Common": miner.Decl{
 				ID:       "main++const::Common",
 				DeclType: token.CONST,
 				Words: map[string]struct{}{
@@ -356,8 +356,8 @@ func TestVisit_OnFunctionWithConstDecl_ShouldReturnWordsAndPhrases(t *testing.T)
 					"outer comment": struct{}{},
 				},
 			}}},
-		{"multiple_constants_same_line", srcMultipleConstSpecs, map[string]miner.Text{
-			"main++const::common": miner.Text{
+		{"multiple_constants_same_line", srcMultipleConstSpecs, map[string]miner.Decl{
+			"main++const::common": miner.Decl{
 				ID:       "main++const::common",
 				DeclType: token.CONST,
 				Words: map[string]struct{}{
@@ -369,7 +369,7 @@ func TestVisit_OnFunctionWithConstDecl_ShouldReturnWordsAndPhrases(t *testing.T)
 				Phrases: map[string]struct{}{
 					"outer comment": struct{}{},
 				}},
-			"main++const::regular": miner.Text{
+			"main++const::regular": miner.Decl{
 				ID:       "main++const::regular",
 				DeclType: token.CONST,
 				Words: map[string]struct{}{
@@ -382,8 +382,8 @@ func TestVisit_OnFunctionWithConstDecl_ShouldReturnWordsAndPhrases(t *testing.T)
 					"outer comment": struct{}{},
 				},
 			}}},
-		{"const_block", srcConstBlock, map[string]miner.Text{
-			"main++const::common": miner.Text{
+		{"const_block", srcConstBlock, map[string]miner.Decl{
+			"main++const::common": miner.Decl{
 				ID:       "main++const::common",
 				DeclType: token.CONST,
 				Words: map[string]struct{}{
@@ -396,7 +396,7 @@ func TestVisit_OnFunctionWithConstDecl_ShouldReturnWordsAndPhrases(t *testing.T)
 					"common value":  struct{}{},
 					"outer comment": struct{}{},
 				}},
-			"main++const::regular": miner.Text{
+			"main++const::regular": miner.Decl{
 				ID:       "main++const::regular",
 				DeclType: token.CONST,
 				Words: map[string]struct{}{
@@ -408,7 +408,7 @@ func TestVisit_OnFunctionWithConstDecl_ShouldReturnWordsAndPhrases(t *testing.T)
 				Phrases: map[string]struct{}{
 					"outer comment": struct{}{},
 				}},
-			"main++const::nrXX": miner.Text{
+			"main++const::nrXX": miner.Decl{
 				ID:       "main++const::nrXX",
 				DeclType: token.CONST,
 				Words: map[string]struct{}{
@@ -426,17 +426,17 @@ func TestVisit_OnFunctionWithConstDecl_ShouldReturnWordsAndPhrases(t *testing.T)
 			fs := token.NewFileSet()
 			node, _ := parser.ParseFile(fs, "", []byte(fixture.src), parser.ParseComments)
 
-			function := miner.NewFunction(lists.Dicctionary)
-			ast.Walk(function, node)
+			m := miner.NewDeclaration(lists.Dicctionary)
+			ast.Walk(m, node)
 
-			functions := function.FunctionsText()
-			assert.Equal(t, len(fixture.expected), len(functions))
-			assert.Equal(t, fixture.expected, functions)
+			decls := m.Decls()
+			assert.Equal(t, len(fixture.expected), len(decls))
+			assert.Equal(t, fixture.expected, decls)
 		})
 	}
 }
 
-func TestVisit_OnFunctionWithTypeDecl_ShouldReturnWordsAndPhrases(t *testing.T) {
+func TestVisit_OnDeclarationWithTypeDecl_ShouldReturnWordsAndPhrases(t *testing.T) {
 	srcStructWithoutFields := `
 		package main
 
@@ -499,10 +499,10 @@ func TestVisit_OnFunctionWithTypeDecl_ShouldReturnWordsAndPhrases(t *testing.T) 
 	tests := []struct {
 		name     string
 		src      string
-		expected map[string]miner.Text
+		expected map[string]miner.Decl
 	}{
-		{"empty_struct", srcStructWithoutFields, map[string]miner.Text{
-			"main++struct::selector": miner.Text{
+		{"empty_struct", srcStructWithoutFields, map[string]miner.Decl{
+			"main++struct::selector": miner.Decl{
 				ID:       "main++struct::selector",
 				DeclType: token.STRUCT,
 				Words: map[string]struct{}{
@@ -510,8 +510,8 @@ func TestVisit_OnFunctionWithTypeDecl_ShouldReturnWordsAndPhrases(t *testing.T) 
 				},
 				Phrases: map[string]struct{}{}},
 		}},
-		{"struct_with_comments", srcStructWithComments, map[string]miner.Text{
-			"main++struct::selector": miner.Text{
+		{"struct_with_comments", srcStructWithComments, map[string]miner.Decl{
+			"main++struct::selector": miner.Decl{
 				ID:       "main++struct::selector",
 				DeclType: token.STRUCT,
 				Words: map[string]struct{}{
@@ -523,8 +523,8 @@ func TestVisit_OnFunctionWithTypeDecl_ShouldReturnWordsAndPhrases(t *testing.T) 
 					"type comment": struct{}{},
 				}},
 		}},
-		{"struct_with_fields", srcStructWithFields, map[string]miner.Text{
-			"main++struct::selector": miner.Text{
+		{"struct_with_fields", srcStructWithFields, map[string]miner.Decl{
+			"main++struct::selector": miner.Decl{
 				ID:       "main++struct::selector",
 				DeclType: token.STRUCT,
 				Words: map[string]struct{}{
@@ -537,8 +537,8 @@ func TestVisit_OnFunctionWithTypeDecl_ShouldReturnWordsAndPhrases(t *testing.T) 
 					"type comment": struct{}{},
 				}},
 		}},
-		{"struct_with_fields_and_comments", srcStructWithFieldsAndComments, map[string]miner.Text{
-			"main++struct::selector": miner.Text{
+		{"struct_with_fields_and_comments", srcStructWithFieldsAndComments, map[string]miner.Decl{
+			"main++struct::selector": miner.Decl{
 				ID:       "main++struct::selector",
 				DeclType: token.STRUCT,
 				Words: map[string]struct{}{
@@ -553,8 +553,8 @@ func TestVisit_OnFunctionWithTypeDecl_ShouldReturnWordsAndPhrases(t *testing.T) 
 					"type comment":  struct{}{},
 				}},
 		}},
-		{"struct_block_decl", srcStructBlock, map[string]miner.Text{
-			"main++struct::selector": miner.Text{
+		{"struct_block_decl", srcStructBlock, map[string]miner.Decl{
+			"main++struct::selector": miner.Decl{
 				ID:       "main++struct::selector",
 				DeclType: token.STRUCT,
 				Words: map[string]struct{}{
@@ -570,7 +570,7 @@ func TestVisit_OnFunctionWithTypeDecl_ShouldReturnWordsAndPhrases(t *testing.T) 
 					"global comment": struct{}{},
 					"local comment":  struct{}{},
 				}},
-			"main++struct::picker": miner.Text{
+			"main++struct::picker": miner.Decl{
 				ID:       "main++struct::picker",
 				DeclType: token.STRUCT,
 				Words: map[string]struct{}{
@@ -585,8 +585,8 @@ func TestVisit_OnFunctionWithTypeDecl_ShouldReturnWordsAndPhrases(t *testing.T) 
 					"global comment": struct{}{},
 				}},
 		}},
-		{"struct_with_hardwords", srcStructWithHardwords, map[string]miner.Text{
-			"main++struct::httpClient": miner.Text{
+		{"struct_with_hardwords", srcStructWithHardwords, map[string]miner.Decl{
+			"main++struct::httpClient": miner.Decl{
 				ID:       "main++struct::httpClient",
 				DeclType: token.STRUCT,
 				Words: map[string]struct{}{
@@ -605,17 +605,17 @@ func TestVisit_OnFunctionWithTypeDecl_ShouldReturnWordsAndPhrases(t *testing.T) 
 			fs := token.NewFileSet()
 			node, _ := parser.ParseFile(fs, "", []byte(fixture.src), parser.ParseComments)
 
-			function := miner.NewFunction(lists.Dicctionary)
-			ast.Walk(function, node)
+			m := miner.NewDeclaration(lists.Dicctionary)
+			ast.Walk(m, node)
 
-			functions := function.FunctionsText()
-			assert.Equal(t, len(fixture.expected), len(functions))
-			assert.Equal(t, fixture.expected, functions)
+			decls := m.Decls()
+			assert.Equal(t, len(fixture.expected), len(decls))
+			assert.Equal(t, fixture.expected, decls)
 		})
 	}
 }
 
-func TestVisit_OnFunctionWithInterfaceDecl_ShouldReturnWordsAndPhrases(t *testing.T) {
+func TestVisit_OnDeclarationWithInterfaceDecl_ShouldReturnWordsAndPhrases(t *testing.T) {
 	srcInterfaceWithoutMethods := `
 		package main
 
@@ -678,10 +678,10 @@ func TestVisit_OnFunctionWithInterfaceDecl_ShouldReturnWordsAndPhrases(t *testin
 	tests := []struct {
 		name     string
 		src      string
-		expected map[string]miner.Text
+		expected map[string]miner.Decl
 	}{
-		{"empty_interface", srcInterfaceWithoutMethods, map[string]miner.Text{
-			"main++interface::selector": miner.Text{
+		{"empty_interface", srcInterfaceWithoutMethods, map[string]miner.Decl{
+			"main++interface::selector": miner.Decl{
 				ID:       "main++interface::selector",
 				DeclType: token.INTERFACE,
 				Words: map[string]struct{}{
@@ -689,8 +689,8 @@ func TestVisit_OnFunctionWithInterfaceDecl_ShouldReturnWordsAndPhrases(t *testin
 				},
 				Phrases: map[string]struct{}{}},
 		}},
-		{"interface_with_comments", srcInterfaceWithComments, map[string]miner.Text{
-			"main++interface::selector": miner.Text{
+		{"interface_with_comments", srcInterfaceWithComments, map[string]miner.Decl{
+			"main++interface::selector": miner.Decl{
 				ID:       "main++interface::selector",
 				DeclType: token.INTERFACE,
 				Words: map[string]struct{}{
@@ -702,8 +702,8 @@ func TestVisit_OnFunctionWithInterfaceDecl_ShouldReturnWordsAndPhrases(t *testin
 					"interface comment": struct{}{},
 				}},
 		}},
-		{"interface_with_methods", srcInterfaceWithMethods, map[string]miner.Text{
-			"main++interface::selector": miner.Text{
+		{"interface_with_methods", srcInterfaceWithMethods, map[string]miner.Decl{
+			"main++interface::selector": miner.Decl{
 				ID:       "main++interface::selector",
 				DeclType: token.INTERFACE,
 				Words: map[string]struct{}{
@@ -716,8 +716,8 @@ func TestVisit_OnFunctionWithInterfaceDecl_ShouldReturnWordsAndPhrases(t *testin
 					"interface comment": struct{}{},
 				}},
 		}},
-		{"interface_with_methods_and_comments", srcInterfaceWithMethodsAndComments, map[string]miner.Text{
-			"main++interface::selector": miner.Text{
+		{"interface_with_methods_and_comments", srcInterfaceWithMethodsAndComments, map[string]miner.Decl{
+			"main++interface::selector": miner.Decl{
 				ID:       "main++interface::selector",
 				DeclType: token.INTERFACE,
 				Words: map[string]struct{}{
@@ -732,8 +732,8 @@ func TestVisit_OnFunctionWithInterfaceDecl_ShouldReturnWordsAndPhrases(t *testin
 					"interface comment": struct{}{},
 				}},
 		}},
-		{"interface_block_decl", srcInterfaceBlock, map[string]miner.Text{
-			"main++interface::selector": miner.Text{
+		{"interface_block_decl", srcInterfaceBlock, map[string]miner.Decl{
+			"main++interface::selector": miner.Decl{
 				ID:       "main++interface::selector",
 				DeclType: token.INTERFACE,
 				Words: map[string]struct{}{
@@ -749,7 +749,7 @@ func TestVisit_OnFunctionWithInterfaceDecl_ShouldReturnWordsAndPhrases(t *testin
 					"global comment":    struct{}{},
 					"interface comment": struct{}{},
 				}},
-			"main++interface::picker": miner.Text{
+			"main++interface::picker": miner.Decl{
 				ID:       "main++interface::picker",
 				DeclType: token.INTERFACE,
 				Words: map[string]struct{}{
@@ -764,8 +764,8 @@ func TestVisit_OnFunctionWithInterfaceDecl_ShouldReturnWordsAndPhrases(t *testin
 					"global comment": struct{}{},
 				}},
 		}},
-		{"interface_with_hardwords", srcInterfaceWithHardwords, map[string]miner.Text{
-			"main++interface::httpClient": miner.Text{
+		{"interface_with_hardwords", srcInterfaceWithHardwords, map[string]miner.Decl{
+			"main++interface::httpClient": miner.Decl{
 				ID:       "main++interface::httpClient",
 				DeclType: token.INTERFACE,
 				Words: map[string]struct{}{
@@ -784,26 +784,12 @@ func TestVisit_OnFunctionWithInterfaceDecl_ShouldReturnWordsAndPhrases(t *testin
 			fs := token.NewFileSet()
 			node, _ := parser.ParseFile(fs, "", []byte(fixture.src), parser.ParseComments)
 
-			function := miner.NewFunction(lists.Dicctionary)
-			ast.Walk(function, node)
+			m := miner.NewDeclaration(lists.Dicctionary)
+			ast.Walk(m, node)
 
-			functions := function.FunctionsText()
-			assert.Equal(t, len(fixture.expected), len(functions))
-			assert.Equal(t, fixture.expected, functions)
+			decls := m.Decls()
+			assert.Equal(t, len(fixture.expected), len(decls))
+			assert.Equal(t, fixture.expected, decls)
 		})
 	}
 }
-
-/*func TestVisit_OnFunctionWithRealLifeFile_ShouldReturnFunctionsWordsAndPhrases(t *testing.T) {
-	src := `
-	`
-	fs := token.NewFileSet()
-	node, _ := parser.ParseFile(fs, "", []byte(src), parser.ParseComments)
-
-	function := miner.NewFunction(lists.Dicctionary)
-	ast.Walk(function, node)
-
-	functions := function.FunctionsText()
-	assert.Equal(t, 3, len(functions))
-	// assert.Equal(t, fixture.expected, functions)
-}*/
