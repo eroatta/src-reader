@@ -437,20 +437,20 @@ func TestVisit_OnFunctionWithConstDecl_ShouldReturnWordsAndPhrases(t *testing.T)
 }
 
 func TestVisit_OnFunctionWithTypeDecl_ShouldReturnWordsAndPhrases(t *testing.T) {
-	srcTypeWithoutFields := `
+	srcStructWithoutFields := `
 		package main
 
 		type selector struct{}
 	`
 
-	srcTypeWithComments := `
+	srcStructWithComments := `
 		package main
 
 		// type comment
 		type selector struct{}
 	`
 
-	srcTypeWithFields := `
+	srcStructWithFields := `
 		package main
 
 		// type comment
@@ -459,7 +459,7 @@ func TestVisit_OnFunctionWithTypeDecl_ShouldReturnWordsAndPhrases(t *testing.T) 
 		}
 	`
 
-	srcTypeWithFieldsAndComments := `
+	srcStructWithFieldsAndComments := `
 		package main
 
 		// type comment
@@ -469,7 +469,7 @@ func TestVisit_OnFunctionWithTypeDecl_ShouldReturnWordsAndPhrases(t *testing.T) 
 		}
 	`
 
-	srcTypeBlock := `
+	srcStructBlock := `
 		package main
 
 		// global comment
@@ -487,7 +487,7 @@ func TestVisit_OnFunctionWithTypeDecl_ShouldReturnWordsAndPhrases(t *testing.T) 
 		)
 	`
 
-	srcTypeWithHardwords := `
+	srcStructWithHardwords := `
 		package main
 
 		type httpClient struct {
@@ -501,19 +501,19 @@ func TestVisit_OnFunctionWithTypeDecl_ShouldReturnWordsAndPhrases(t *testing.T) 
 		src      string
 		expected map[string]miner.Text
 	}{
-		{"empty_type", srcTypeWithoutFields, map[string]miner.Text{
-			"main++type::selector": miner.Text{
-				ID:       "main++type::selector",
-				DeclType: token.TYPE,
+		{"empty_struct", srcStructWithoutFields, map[string]miner.Text{
+			"main++struct::selector": miner.Text{
+				ID:       "main++struct::selector",
+				DeclType: token.STRUCT,
 				Words: map[string]struct{}{
 					"selector": struct{}{},
 				},
 				Phrases: map[string]struct{}{}},
 		}},
-		{"type_with_comments", srcTypeWithComments, map[string]miner.Text{
-			"main++type::selector": miner.Text{
-				ID:       "main++type::selector",
-				DeclType: token.TYPE,
+		{"struct_with_comments", srcStructWithComments, map[string]miner.Text{
+			"main++struct::selector": miner.Text{
+				ID:       "main++struct::selector",
+				DeclType: token.STRUCT,
 				Words: map[string]struct{}{
 					"comment":  struct{}{},
 					"selector": struct{}{},
@@ -523,10 +523,10 @@ func TestVisit_OnFunctionWithTypeDecl_ShouldReturnWordsAndPhrases(t *testing.T) 
 					"type comment": struct{}{},
 				}},
 		}},
-		{"type_with_fields", srcTypeWithFields, map[string]miner.Text{
-			"main++type::selector": miner.Text{
-				ID:       "main++type::selector",
-				DeclType: token.TYPE,
+		{"struct_with_fields", srcStructWithFields, map[string]miner.Text{
+			"main++struct::selector": miner.Text{
+				ID:       "main++struct::selector",
+				DeclType: token.STRUCT,
 				Words: map[string]struct{}{
 					"comment":  struct{}{},
 					"pick":     struct{}{},
@@ -537,10 +537,10 @@ func TestVisit_OnFunctionWithTypeDecl_ShouldReturnWordsAndPhrases(t *testing.T) 
 					"type comment": struct{}{},
 				}},
 		}},
-		{"type_with_fields_and_comments", srcTypeWithFieldsAndComments, map[string]miner.Text{
-			"main++type::selector": miner.Text{
-				ID:       "main++type::selector",
-				DeclType: token.TYPE,
+		{"struct_with_fields_and_comments", srcStructWithFieldsAndComments, map[string]miner.Text{
+			"main++struct::selector": miner.Text{
+				ID:       "main++struct::selector",
+				DeclType: token.STRUCT,
 				Words: map[string]struct{}{
 					"comment":  struct{}{},
 					"field":    struct{}{},
@@ -553,10 +553,10 @@ func TestVisit_OnFunctionWithTypeDecl_ShouldReturnWordsAndPhrases(t *testing.T) 
 					"type comment":  struct{}{},
 				}},
 		}},
-		{"type_block_decl", srcTypeBlock, map[string]miner.Text{
-			"main++type::selector": miner.Text{
-				ID:       "main++type::selector",
-				DeclType: token.TYPE,
+		{"struct_block_decl", srcStructBlock, map[string]miner.Text{
+			"main++struct::selector": miner.Text{
+				ID:       "main++struct::selector",
+				DeclType: token.STRUCT,
 				Words: map[string]struct{}{
 					"comment":  struct{}{},
 					"field":    struct{}{},
@@ -570,9 +570,9 @@ func TestVisit_OnFunctionWithTypeDecl_ShouldReturnWordsAndPhrases(t *testing.T) 
 					"global comment": struct{}{},
 					"local comment":  struct{}{},
 				}},
-			"main++type::picker": miner.Text{
-				ID:       "main++type::picker",
-				DeclType: token.TYPE,
+			"main++struct::picker": miner.Text{
+				ID:       "main++struct::picker",
+				DeclType: token.STRUCT,
 				Words: map[string]struct{}{
 					"inner":   struct{}{},
 					"comment": struct{}{},
@@ -585,10 +585,189 @@ func TestVisit_OnFunctionWithTypeDecl_ShouldReturnWordsAndPhrases(t *testing.T) 
 					"global comment": struct{}{},
 				}},
 		}},
-		{"type_with_hardwords", srcTypeWithHardwords, map[string]miner.Text{
-			"main++type::httpClient": miner.Text{
-				ID:       "main++type::httpClient",
-				DeclType: token.TYPE,
+		{"struct_with_hardwords", srcStructWithHardwords, map[string]miner.Text{
+			"main++struct::httpClient": miner.Text{
+				ID:       "main++struct::httpClient",
+				DeclType: token.STRUCT,
+				Words: map[string]struct{}{
+					"client":   struct{}{},
+					"http":     struct{}{},
+					"picker":   struct{}{},
+					"protocol": struct{}{},
+					"url":      struct{}{},
+				},
+				Phrases: map[string]struct{}{}},
+		}},
+	}
+
+	for _, fixture := range tests {
+		t.Run(fixture.name, func(t *testing.T) {
+			fs := token.NewFileSet()
+			node, _ := parser.ParseFile(fs, "", []byte(fixture.src), parser.ParseComments)
+
+			function := miner.NewFunction(lists.Dicctionary)
+			ast.Walk(function, node)
+
+			functions := function.FunctionsText()
+			assert.Equal(t, len(fixture.expected), len(functions))
+			assert.Equal(t, fixture.expected, functions)
+		})
+	}
+}
+
+func TestVisit_OnFunctionWithInterfaceDecl_ShouldReturnWordsAndPhrases(t *testing.T) {
+	srcInterfaceWithoutMethods := `
+		package main
+
+		type selector interface{}
+	`
+
+	srcInterfaceWithComments := `
+		package main
+
+		// interface comment
+		type selector interface{}
+	`
+
+	srcInterfaceWithMethods := `
+		package main
+
+		// interface comment
+		type selector interface {
+			pick() string
+		}
+	`
+
+	srcInterfaceWithMethodsAndComments := `
+		package main
+
+		// interface comment
+		type selector interface {
+			// function comment
+			pick() string
+		}
+	`
+
+	srcInterfaceBlock := `
+		package main
+
+		// global comment
+		type (
+			// interface comment
+			selector interface {
+				// function comment
+				pick() string
+			}
+
+			// inner comment
+			picker interface {
+				pick() string
+			}
+		)
+	`
+
+	srcInterfaceWithHardwords := `
+		package main
+
+		type httpClient interface {
+			protocolPicker() string
+			url() string
+		}
+	`
+
+	tests := []struct {
+		name     string
+		src      string
+		expected map[string]miner.Text
+	}{
+		{"empty_interface", srcInterfaceWithoutMethods, map[string]miner.Text{
+			"main++interface::selector": miner.Text{
+				ID:       "main++interface::selector",
+				DeclType: token.INTERFACE,
+				Words: map[string]struct{}{
+					"selector": struct{}{},
+				},
+				Phrases: map[string]struct{}{}},
+		}},
+		{"interface_with_comments", srcInterfaceWithComments, map[string]miner.Text{
+			"main++interface::selector": miner.Text{
+				ID:       "main++interface::selector",
+				DeclType: token.INTERFACE,
+				Words: map[string]struct{}{
+					"comment":   struct{}{},
+					"interface": struct{}{},
+					"selector":  struct{}{},
+				},
+				Phrases: map[string]struct{}{
+					"interface comment": struct{}{},
+				}},
+		}},
+		{"interface_with_methods", srcInterfaceWithMethods, map[string]miner.Text{
+			"main++interface::selector": miner.Text{
+				ID:       "main++interface::selector",
+				DeclType: token.INTERFACE,
+				Words: map[string]struct{}{
+					"comment":   struct{}{},
+					"interface": struct{}{},
+					"pick":      struct{}{},
+					"selector":  struct{}{},
+				},
+				Phrases: map[string]struct{}{
+					"interface comment": struct{}{},
+				}},
+		}},
+		{"interface_with_methods_and_comments", srcInterfaceWithMethodsAndComments, map[string]miner.Text{
+			"main++interface::selector": miner.Text{
+				ID:       "main++interface::selector",
+				DeclType: token.INTERFACE,
+				Words: map[string]struct{}{
+					"comment":   struct{}{},
+					"function":  struct{}{},
+					"interface": struct{}{},
+					"pick":      struct{}{},
+					"selector":  struct{}{},
+				},
+				Phrases: map[string]struct{}{
+					"function comment":  struct{}{},
+					"interface comment": struct{}{},
+				}},
+		}},
+		{"interface_block_decl", srcInterfaceBlock, map[string]miner.Text{
+			"main++interface::selector": miner.Text{
+				ID:       "main++interface::selector",
+				DeclType: token.INTERFACE,
+				Words: map[string]struct{}{
+					"comment":   struct{}{},
+					"function":  struct{}{},
+					"global":    struct{}{},
+					"interface": struct{}{},
+					"pick":      struct{}{},
+					"selector":  struct{}{},
+				},
+				Phrases: map[string]struct{}{
+					"function comment":  struct{}{},
+					"global comment":    struct{}{},
+					"interface comment": struct{}{},
+				}},
+			"main++interface::picker": miner.Text{
+				ID:       "main++interface::picker",
+				DeclType: token.INTERFACE,
+				Words: map[string]struct{}{
+					"inner":   struct{}{},
+					"comment": struct{}{},
+					"global":  struct{}{},
+					"pick":    struct{}{},
+					"picker":  struct{}{},
+				},
+				Phrases: map[string]struct{}{
+					"inner comment":  struct{}{},
+					"global comment": struct{}{},
+				}},
+		}},
+		{"interface_with_hardwords", srcInterfaceWithHardwords, map[string]miner.Text{
+			"main++interface::httpClient": miner.Text{
+				ID:       "main++interface::httpClient",
+				DeclType: token.INTERFACE,
 				Words: map[string]struct{}{
 					"client":   struct{}{},
 					"http":     struct{}{},

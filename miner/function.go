@@ -148,9 +148,10 @@ func (m Function) Visit(node ast.Node) ast.Visitor {
 			// TODO review spec doc comments!
 			if typeSpec, ok := spec.(*ast.TypeSpec); ok {
 				name := typeSpec.Name.String()
-				declText := newText(createFunctionID(m.pkg, token.TYPE, name), token.TYPE)
+				declText := newText("", token.TYPE)
 
-				// TODO split name
+				//declText := newText(createFunctionID(m.pkg, token.STRUCT, name), token.TYPE)
+
 				for _, part := range conserv.Split(name) {
 					if m.dict.Contains(part) {
 						declText.Words[strings.ToLower(part)] = struct{}{}
@@ -166,12 +167,13 @@ func (m Function) Visit(node ast.Node) ast.Visitor {
 
 				// TODO extract comments
 				if structType, ok := typeSpec.Type.(*ast.StructType); ok {
+					declText.ID = createFunctionID(m.pkg, token.STRUCT, name)
+					declText.DeclType = token.STRUCT
+
 					if structType.Fields != nil && structType.Fields.List != nil {
 						for _, field := range structType.Fields.List {
 							for _, fname := range field.Names {
-								fmt.Println(fname.Name)
 								for _, part := range conserv.Split(fname.Name) {
-									fmt.Println(part)
 									if m.dict.Contains(part) {
 										declText.Words[strings.ToLower(part)] = struct{}{}
 									}
@@ -181,6 +183,30 @@ func (m Function) Visit(node ast.Node) ast.Visitor {
 							// TODO extract field comment
 							if field.Doc != nil {
 								for _, comment := range field.Doc.List {
+									declText = extractWordAndPhrasesFromComment(declText, comment.Text, m.dict)
+								}
+							}
+						}
+					}
+				}
+
+				if interfaceType, ok := typeSpec.Type.(*ast.InterfaceType); ok {
+					declText.ID = createFunctionID(m.pkg, token.INTERFACE, name)
+					declText.DeclType = token.INTERFACE
+
+					if interfaceType.Methods != nil && interfaceType.Methods.List != nil {
+						for _, method := range interfaceType.Methods.List {
+							for _, mname := range method.Names {
+								for _, part := range conserv.Split(mname.Name) {
+									if m.dict.Contains(part) {
+										declText.Words[strings.ToLower(part)] = struct{}{}
+									}
+								}
+							}
+
+							// TODO extract method comment
+							if method.Doc != nil {
+								for _, comment := range method.Doc.List {
 									declText = extractWordAndPhrasesFromComment(declText, comment.Text, m.dict)
 								}
 							}
