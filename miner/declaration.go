@@ -32,8 +32,8 @@ func newDecl(ID string, declType token.Token) Decl {
 // words and phrases for each function/variable/struct/interface declaration.
 type Declaration struct {
 	dict        lists.List
-	pkg         string
-	pkgComments []*ast.CommentGroup
+	packageName string
+	comments    []*ast.CommentGroup
 	included    []ast.Decl
 	decls       map[string]Decl
 }
@@ -62,11 +62,11 @@ func (m Declaration) Visit(node ast.Node) ast.Visitor {
 
 	switch elem := node.(type) {
 	case *ast.File:
-		m.pkg = elem.Name.String()
+		m.packageName = elem.Name.String()
 		m.included = elem.Decls
 
 		// collect inner comment to use on their proper function
-		m.pkgComments = append(m.pkgComments, elem.Comments...)
+		m.comments = append(m.comments, elem.Comments...)
 
 	case *ast.FuncDecl:
 		functionText := getFunctionTextFromFuncDecl(elem, m)
@@ -106,7 +106,7 @@ func (m Declaration) Visit(node ast.Node) ast.Visitor {
 						continue
 					}
 
-					declText := newDecl(getDeclID(m.pkg, elem.Tok, name.String()), elem.Tok)
+					declText := newDecl(getDeclID(m.packageName, elem.Tok, name.String()), elem.Tok)
 					// TODO add name if valid / split name
 					if word := strings.ToLower(name.String()); m.dict.Contains(word) {
 						declText.Words[word] = struct{}{}
@@ -167,7 +167,7 @@ func (m Declaration) Visit(node ast.Node) ast.Visitor {
 
 				// TODO extract comments
 				if structType, ok := typeSpec.Type.(*ast.StructType); ok {
-					declText.ID = getDeclID(m.pkg, token.STRUCT, name)
+					declText.ID = getDeclID(m.packageName, token.STRUCT, name)
 					declText.DeclType = token.STRUCT
 
 					if structType.Fields != nil && structType.Fields.List != nil {
@@ -191,7 +191,7 @@ func (m Declaration) Visit(node ast.Node) ast.Visitor {
 				}
 
 				if interfaceType, ok := typeSpec.Type.(*ast.InterfaceType); ok {
-					declText.ID = getDeclID(m.pkg, token.INTERFACE, name)
+					declText.ID = getDeclID(m.packageName, token.INTERFACE, name)
 					declText.DeclType = token.INTERFACE
 
 					if interfaceType.Methods != nil && interfaceType.Methods.List != nil {
@@ -233,7 +233,7 @@ func (m Declaration) Visit(node ast.Node) ast.Visitor {
 
 func getFunctionTextFromFuncDecl(elem *ast.FuncDecl, m Declaration) Decl {
 	name := elem.Name.String()
-	functionText := newDecl(getDeclID(m.pkg, token.FUNC, name), token.FUNC)
+	functionText := newDecl(getDeclID(m.packageName, token.FUNC, name), token.FUNC)
 
 	for _, part := range conserv.Split(name) {
 		if m.dict.Contains(part) {
@@ -248,7 +248,7 @@ func getFunctionTextFromFuncDecl(elem *ast.FuncDecl, m Declaration) Decl {
 	}
 
 	start, end := elem.Pos(), elem.End()
-	for _, group := range m.pkgComments {
+	for _, group := range m.comments {
 		for _, comment := range group.List {
 			if comment.Slash > start && comment.Slash < end {
 				functionText = extractWordAndPhrasesFromComment(functionText, comment.Text, m.dict)
