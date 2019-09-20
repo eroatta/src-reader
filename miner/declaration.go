@@ -64,93 +64,53 @@ func (m Declaration) Visit(node ast.Node) ast.Visitor {
 	case *ast.File:
 		m.packageName = elem.Name.String()
 		m.included = elem.Decls
-
-		// collect inner comment to use on their proper function
 		m.comments = append(m.comments, elem.Comments...)
 
 	case *ast.FuncDecl:
-		functionText := getFunctionTextFromFuncDecl(elem, m)
+		functionText := extractDeclFromFunction(elem, m)
 		m.decls[functionText.ID] = functionText
 
 	case *ast.GenDecl:
-		// TODO improve this code
 		if elem.Tok != token.VAR && elem.Tok != token.CONST && elem.Tok != token.TYPE {
 			return m
 		}
 
-		var weCare bool
-		for _, d := range m.included {
-			if d.Pos() == elem.Pos() {
-				weCare = true
-				break
-			}
-		}
-
-		if !weCare {
+		if !m.shouldMine(elem) {
 			return m
 		}
 
-		// decl doc
-		commonCommentText := newDecl("common", elem.Tok)
+		genDeclComments := newDecl("common", elem.Tok)
 		if elem.Doc != nil {
 			for _, comment := range elem.Doc.List {
-				commonCommentText = extractWordAndPhrasesFromComment(commonCommentText, comment.Text, m.dict)
+				genDeclComments = extractWordAndPhrasesFromComment(genDeclComments, comment.Text, m.dict)
 			}
 		}
 
-		// names (in case of multiple specs)
 		for _, spec := range elem.Specs {
 			if valSpec, ok := spec.(*ast.ValueSpec); ok {
+				valDeclComments := newDecl("val", elem.Tok)
+				if valSpec.Doc != nil {
+					for _, comment := range valSpec.Doc.List {
+						valDeclComments = extractWordAndPhrasesFromComment(valDeclComments, comment.Text, m.dict)
+					}
+				}
+
 				for j, name := range valSpec.Names {
 					if name.Name == "_" {
 						continue
 					}
 
-					declText := newDecl(getDeclID(m.packageName, elem.Tok, name.String()), elem.Tok)
-					// TODO add name if valid / split name
-					if word := strings.ToLower(name.String()); m.dict.Contains(word) {
-						declText.Words[word] = struct{}{}
-					}
-
-					if valSpec.Values != nil {
-						if val, ok := valSpec.Values[j].(*ast.BasicLit); ok && val.Kind == token.STRING {
-							// extract text from value
-							valStr := strings.Replace(val.Value, "\"", "", -1)
-							// TODO delete commas
-							for _, word := range strings.Split(valStr, " ") {
-								word = cleaner.ReplaceAllString(word, "")
-								if m.dict.Contains(strings.ToLower(word)) {
-									declText.Words[strings.ToLower(word)] = struct{}{}
-								}
-							}
-
-							// get phrases
-							phrases, _ := nounphrases.Find(cleanComment(valStr))
-							for _, phr := range phrases {
-								declText.Phrases[phr] = struct{}{}
-							}
-						}
-					}
-
-					// merge with common comments text
-					for k, v := range commonCommentText.Words {
-						declText.Words[k] = v
-					}
-
-					for k, v := range commonCommentText.Phrases {
-						declText.Phrases[k] = v
-					}
+					declText := newDecl(declID(m.packageName, elem.Tok, name.String()), elem.Tok)
+					declText = extractDeclFromValue(declText, valSpec, name.Name, j, m.dict)
+					declText = merge(merge(declText, genDeclComments), valDeclComments)
 
 					m.decls[declText.ID] = declText
 				}
 			}
 
-			// TODO review spec doc comments!
 			if typeSpec, ok := spec.(*ast.TypeSpec); ok {
 				name := typeSpec.Name.String()
 				declText := newDecl("", token.TYPE)
-
-				//declText := newText(createFunctionID(m.pkg, token.STRUCT, name), token.TYPE)
 
 				for _, part := range conserv.Split(name) {
 					if m.dict.Contains(part) {
@@ -158,70 +118,25 @@ func (m Declaration) Visit(node ast.Node) ast.Visitor {
 					}
 				}
 
-				// TODO extract field comment
 				if typeSpec.Doc != nil {
 					for _, comment := range typeSpec.Doc.List {
 						declText = extractWordAndPhrasesFromComment(declText, comment.Text, m.dict)
 					}
 				}
 
-				// TODO extract comments
 				if structType, ok := typeSpec.Type.(*ast.StructType); ok {
-					declText.ID = getDeclID(m.packageName, token.STRUCT, name)
+					declText.ID = declID(m.packageName, token.STRUCT, name)
 					declText.DeclType = token.STRUCT
-
-					if structType.Fields != nil && structType.Fields.List != nil {
-						for _, field := range structType.Fields.List {
-							for _, fname := range field.Names {
-								for _, part := range conserv.Split(fname.Name) {
-									if m.dict.Contains(part) {
-										declText.Words[strings.ToLower(part)] = struct{}{}
-									}
-								}
-							}
-
-							// TODO extract field comment
-							if field.Doc != nil {
-								for _, comment := range field.Doc.List {
-									declText = extractWordAndPhrasesFromComment(declText, comment.Text, m.dict)
-								}
-							}
-						}
-					}
+					declText = extractDeclFromStruct(declText, structType, m.dict)
 				}
 
 				if interfaceType, ok := typeSpec.Type.(*ast.InterfaceType); ok {
-					declText.ID = getDeclID(m.packageName, token.INTERFACE, name)
+					declText.ID = declID(m.packageName, token.INTERFACE, name)
 					declText.DeclType = token.INTERFACE
-
-					if interfaceType.Methods != nil && interfaceType.Methods.List != nil {
-						for _, method := range interfaceType.Methods.List {
-							for _, mname := range method.Names {
-								for _, part := range conserv.Split(mname.Name) {
-									if m.dict.Contains(part) {
-										declText.Words[strings.ToLower(part)] = struct{}{}
-									}
-								}
-							}
-
-							// TODO extract method comment
-							if method.Doc != nil {
-								for _, comment := range method.Doc.List {
-									declText = extractWordAndPhrasesFromComment(declText, comment.Text, m.dict)
-								}
-							}
-						}
-					}
+					declText = extractDeclFromInterface(declText, interfaceType, m.dict)
 				}
 
-				// merge with common comments text
-				for k, v := range commonCommentText.Words {
-					declText.Words[k] = v
-				}
-
-				for k, v := range commonCommentText.Phrases {
-					declText.Phrases[k] = v
-				}
+				declText = merge(declText, genDeclComments)
 
 				m.decls[declText.ID] = declText
 			}
@@ -231,9 +146,21 @@ func (m Declaration) Visit(node ast.Node) ast.Visitor {
 	return m
 }
 
-func getFunctionTextFromFuncDecl(elem *ast.FuncDecl, m Declaration) Decl {
+func (m Declaration) shouldMine(elem *ast.GenDecl) bool {
+	var shouldMine bool
+	for _, d := range m.included {
+		if d.Pos() == elem.Pos() {
+			shouldMine = true
+			break
+		}
+	}
+
+	return shouldMine
+}
+
+func extractDeclFromFunction(elem *ast.FuncDecl, m Declaration) Decl {
 	name := elem.Name.String()
-	functionText := newDecl(getDeclID(m.packageName, token.FUNC, name), token.FUNC)
+	functionText := newDecl(declID(m.packageName, token.FUNC, name), token.FUNC)
 
 	for _, part := range conserv.Split(name) {
 		if m.dict.Contains(part) {
@@ -259,6 +186,89 @@ func getFunctionTextFromFuncDecl(elem *ast.FuncDecl, m Declaration) Decl {
 	return functionText
 }
 
+func extractDeclFromValue(declText Decl, valSpec *ast.ValueSpec, name string, index int, list lists.List) Decl {
+	for _, part := range conserv.Split(name) {
+		if list.Contains(part) {
+			declText.Words[strings.ToLower(part)] = struct{}{}
+		}
+	}
+
+	if valSpec.Values != nil {
+		if val, ok := valSpec.Values[index].(*ast.BasicLit); ok && val.Kind == token.STRING {
+			valStr := strings.Replace(val.Value, "\"", "", -1)
+			for _, word := range strings.Split(valStr, " ") {
+				word = cleaner.ReplaceAllString(word, "")
+				if list.Contains(strings.ToLower(word)) {
+					declText.Words[strings.ToLower(word)] = struct{}{}
+				}
+			}
+
+			phrases, _ := nounphrases.Find(cleanComment(valStr))
+			for _, phr := range phrases {
+				declText.Phrases[phr] = struct{}{}
+			}
+		}
+	}
+
+	return declText
+}
+
+func extractDeclFromStruct(declText Decl, structType *ast.StructType, list lists.List) Decl {
+	if structType.Fields != nil && structType.Fields.List != nil {
+		for _, field := range structType.Fields.List {
+			for _, fname := range field.Names {
+				for _, part := range conserv.Split(fname.Name) {
+					if list.Contains(part) {
+						declText.Words[strings.ToLower(part)] = struct{}{}
+					}
+				}
+			}
+
+			if field.Doc != nil {
+				for _, comment := range field.Doc.List {
+					declText = extractWordAndPhrasesFromComment(declText, comment.Text, list)
+				}
+			}
+		}
+	}
+
+	return declText
+}
+
+func extractDeclFromInterface(declText Decl, interfaceType *ast.InterfaceType, list lists.List) Decl {
+	if interfaceType.Methods != nil && interfaceType.Methods.List != nil {
+		for _, method := range interfaceType.Methods.List {
+			for _, mname := range method.Names {
+				for _, part := range conserv.Split(mname.Name) {
+					if list.Contains(part) {
+						declText.Words[strings.ToLower(part)] = struct{}{}
+					}
+				}
+			}
+
+			if method.Doc != nil {
+				for _, comment := range method.Doc.List {
+					declText = extractWordAndPhrasesFromComment(declText, comment.Text, list)
+				}
+			}
+		}
+	}
+
+	return declText
+}
+
+func merge(a Decl, b Decl) Decl {
+	for k, v := range b.Words {
+		a.Words[k] = v
+	}
+
+	for k, v := range b.Phrases {
+		a.Phrases[k] = v
+	}
+
+	return a
+}
+
 func cleanComment(text string) string {
 	cleanComment := strings.ReplaceAll(text, "//", "")
 	cleanComment = strings.ReplaceAll(cleanComment, "\\n", " ")
@@ -279,13 +289,14 @@ func extractWordAndPhrasesFromComment(functionText Decl, comment string, list li
 			functionText.Phrases[phr] = struct{}{}
 		}
 	} else {
-		// TODO print log error
+		// TODO: improve logging
+		fmt.Println(err)
 	}
 
 	return functionText
 }
 
-func getDeclID(pkg string, declType token.Token, name string) string {
+func declID(pkg string, declType token.Token, name string) string {
 	return fmt.Sprintf("%s++%s::%s", pkg, declType, name)
 }
 

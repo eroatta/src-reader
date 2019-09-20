@@ -157,7 +157,7 @@ func TestVisit_OnDeclarationWithVarDecl_ShouldReturnWordsAndPhrases(t *testing.T
 		var (
 			common string
 			regular string = "valid"
-			nrXX int = 32
+			nrzXXZ int = 32
 		)
 	`
 
@@ -247,8 +247,8 @@ func TestVisit_OnDeclarationWithVarDecl_ShouldReturnWordsAndPhrases(t *testing.T
 				Phrases: map[string]struct{}{
 					"outer comment": struct{}{},
 				}},
-			"main++var::nrXX": miner.Decl{
-				ID:       "main++var::nrXX",
+			"main++var::nrzXXZ": miner.Decl{
+				ID:       "main++var::nrzXXZ",
 				DeclType: token.VAR,
 				Words: map[string]struct{}{
 					"comment": struct{}{},
@@ -309,7 +309,7 @@ func TestVisit_OnDeclarationWithConstDecl_ShouldReturnWordsAndPhrases(t *testing
 		const (
 			common string = "common value"
 			regular string = "valid"
-			nrXX int = 32
+			nrzXXZ int = 32
 		)
 	`
 
@@ -408,8 +408,8 @@ func TestVisit_OnDeclarationWithConstDecl_ShouldReturnWordsAndPhrases(t *testing
 				Phrases: map[string]struct{}{
 					"outer comment": struct{}{},
 				}},
-			"main++const::nrXX": miner.Decl{
-				ID:       "main++const::nrXX",
+			"main++const::nrzXXZ": miner.Decl{
+				ID:       "main++const::nrzXXZ",
 				DeclType: token.CONST,
 				Words: map[string]struct{}{
 					"comment": struct{}{},
