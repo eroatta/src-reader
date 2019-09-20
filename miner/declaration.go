@@ -53,9 +53,7 @@ func (m Declaration) Name() string {
 
 // Visit implements the ast.Visitor interface and handles the logic for the data extraction.
 func (m Declaration) Visit(node ast.Node) ast.Visitor {
-	// on a FuncDecl, get comments + identifiers + body text
-	// and extract words (stemming + stopping)
-	// and also extract phrases
+	// TODO: (stemming + stopping)
 	if node == nil {
 		return nil
 	}
