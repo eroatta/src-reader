@@ -28,30 +28,79 @@ func TestScopedDeclarations_OnScope_ShouldReturnScopes(t *testing.T) {
 	assert.Equal(t, 0, len(miner.ScopedDeclarations()))
 }
 
-func TestVisit_OnScopeWithFuncDecl_ShouldReturnDeclarationScopesForFuncs(t *testing.T) {
-	tests := []struct {
-		name     string
-		src      string
-		expected map[string]miner.ScopedDecl
-	}{}
+func TestVisit_OnScopeWithPlainFuncDecl_ShouldReturnScopedDeclaration(t *testing.T) {
+	src := `
+		package main
 
-	for _, fixture := range tests {
-		t.Run(fixture.name, func(t *testing.T) {
-			fs := token.NewFileSet()
-			node, _ := parser.ParseFile(fs, "testfile", []byte(fixture.src), parser.ParseComments)
+		func main() {
 
-			m := miner.NewScope("testfile")
-			ast.Walk(m, node)
+		}
+	`
 
-			scopedDecls := m.ScopedDeclarations()
-			assert.Equal(t, fixture.expected, scopedDecls)
-		})
+	expected := map[string]miner.ScopedDecl{
+		"main++func::main": miner.ScopedDecl{
+			ID:              "main++func::main",
+			DeclType:        token.FUNC,
+			Name:            "main",
+			VariableDecls:   make([]string, 0),
+			Statements:      make([]string, 0),
+			BodyText:        make([]string, 0),
+			Comments:        make([]string, 0),
+			PackageComments: make([]string, 0),
+		},
 	}
 
-	assert.FailNow(t, "not yet implemented")
+	fs := token.NewFileSet()
+	node, _ := parser.ParseFile(fs, "testfile", []byte(src), parser.ParseComments)
+
+	m := miner.NewScope("testfile")
+	ast.Walk(m, node)
+
+	scopedDecls := m.ScopedDeclarations()
+	assert.Equal(t, expected, scopedDecls)
 }
 
-func TestVisit_OnScopeWithVarDecl_ShouldReturnDeclarationScopesForVars(t *testing.T) {
+func TestVisit_OnScopeWithFuncDeclWithComments_ShouldReturnScopedDeclaration(t *testing.T) {
+	src := `
+		// package comment line 1
+		// package comment line 2
+		package main
+
+		// function comment
+		func main() {
+			// inner comment
+		}
+	`
+
+	expected := map[string]miner.ScopedDecl{
+		"main++func::main": miner.ScopedDecl{
+			ID:            "main++func::main",
+			DeclType:      token.FUNC,
+			Name:          "main",
+			VariableDecls: make([]string, 0),
+			Statements:    make([]string, 0),
+			BodyText:      make([]string, 0),
+			Comments: []string{
+				"function comment",
+			},
+			PackageComments: []string{
+				"package comment line 1",
+				"package comment line 2",
+			},
+		},
+	}
+
+	fs := token.NewFileSet()
+	node, _ := parser.ParseFile(fs, "testfile", []byte(src), parser.ParseComments)
+
+	m := miner.NewScope("testfile")
+	ast.Walk(m, node)
+
+	scopedDecls := m.ScopedDeclarations()
+	assert.Equal(t, expected, scopedDecls)
+}
+
+/*func TestVisit_OnScopeWithVarDecl_ShouldReturnDeclarationScopesForVars(t *testing.T) {
 	assert.FailNow(t, "not yet implemented")
 }
 
@@ -65,4 +114,4 @@ func TestVisit_OnScopeWithStructDecl_ShouldReturnDeclarationScopesForStructs(t *
 
 func TestVisit_OnScopeWithInterfaceDecl_ShouldReturnDeclarationScopesForInterfaces(t *testing.T) {
 	assert.FailNow(t, "not yet implemented")
-}
+}*/

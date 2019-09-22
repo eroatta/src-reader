@@ -270,7 +270,9 @@ func merge(a Decl, b Decl) Decl {
 func cleanComment(text string) string {
 	cleanComment := strings.ReplaceAll(text, "//", "")
 	cleanComment = strings.ReplaceAll(cleanComment, "\\n", " ")
-	return strings.ReplaceAll(cleanComment, "\\t", " ")
+	cleanComment = strings.ReplaceAll(cleanComment, "\\t", " ")
+
+	return strings.TrimSpace(cleanComment)
 }
 
 func extractWordAndPhrasesFromComment(functionText Decl, comment string, list lists.List) Decl {
