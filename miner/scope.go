@@ -3,9 +3,48 @@ package miner
 import (
 	"fmt"
 	"go/ast"
+	"go/token"
 
 	"github.com/eroatta/token/amap"
 )
+
+// Scope represents a scopes miner, which extracts information about
+// the scope for each function/variable/struct/interface declaration.
+type Scope struct {
+	filename    string
+	packageName string
+	comments    []*ast.CommentGroup
+	included    []ast.Decl
+	scopes      map[string]ScopedDecl
+}
+
+// ScopedDecl represents the related scope for a declaration.
+type ScopedDecl struct {
+	ID              string
+	DeclType        token.Token
+	Name            string
+	VariableDecls   []string
+	BodyText        []string
+	Comments        []string
+	PackageComments []string
+}
+
+// NewScope initializes a new scopes miner.
+func NewScope(filename string) Scope {
+	return Scope{
+		filename: filename,
+		scopes:   make(map[string]ScopedDecl),
+	}
+}
+
+// Name returns the specific name for the miner.
+func (m Scope) Name() string {
+	return "scope"
+}
+
+func (m Scope) Visit(node ast.Node) ast.Visitor {
+	return m
+}
 
 // Amap represents an AMAP miner, which extracts the scopes from a file.
 type Amap struct {
@@ -23,16 +62,6 @@ func NewAmap(file string) Amap {
 		fileComments: make([]string, 0),
 		scopes:       make(map[string]amap.TokenScope),
 	}
-}
-
-// Scopes a
-func (m Amap) Scopes() map[string]amap.TokenScope {
-	return m.scopes
-}
-
-// Name returns the specific name for the miner.
-func (m Amap) Name() string {
-	return m.name
 }
 
 // Visit implements the ast.Visitor interface and handles the logic the node mining.
@@ -96,4 +125,9 @@ func (m Amap) Visit(node ast.Node) ast.Visitor {
 	}
 
 	return m
+}
+
+// ScopedDeclarations returns a map of declaration IDs and the mined scope for each declaration.
+func (m Scope) ScopedDeclarations() map[string]ScopedDecl {
+	return m.scopes
 }
