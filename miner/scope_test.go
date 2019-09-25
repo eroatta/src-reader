@@ -68,7 +68,7 @@ func TestVisit_OnScopeWithFuncDeclWithComments_ShouldReturnScopedDeclaration(t *
 
 		// function comment
 		func main() {
-			// inner comment
+
 		}
 	`
 
@@ -82,6 +82,126 @@ func TestVisit_OnScopeWithFuncDeclWithComments_ShouldReturnScopedDeclaration(t *
 			BodyText:      make([]string, 0),
 			Comments: []string{
 				"function comment",
+			},
+			PackageComments: []string{
+				"package comment line 1",
+				"package comment line 2",
+			},
+		},
+	}
+
+	fs := token.NewFileSet()
+	node, _ := parser.ParseFile(fs, "testfile", []byte(src), parser.ParseComments)
+
+	m := miner.NewScope("testfile")
+	ast.Walk(m, node)
+
+	scopedDecls := m.ScopedDeclarations()
+	assert.Equal(t, expected, scopedDecls)
+}
+
+func TestVisit_OnScopeWithMultipleFuncDeclWithComments_ShouldReturnScopedDeclaration(t *testing.T) {
+	src := `
+		// package comment line 1
+		// package comment line 2
+		package main
+
+		// function comment
+		func main() {
+
+		}
+
+		// another comment
+		func another() {
+
+		}
+	`
+
+	expected := map[string]miner.ScopedDecl{
+		"main++func::main": miner.ScopedDecl{
+			ID:            "main++func::main",
+			DeclType:      token.FUNC,
+			Name:          "main",
+			VariableDecls: make([]string, 0),
+			Statements:    make([]string, 0),
+			BodyText:      make([]string, 0),
+			Comments: []string{
+				"function comment",
+			},
+			PackageComments: []string{
+				"package comment line 1",
+				"package comment line 2",
+			},
+		},
+		"main++func::another": miner.ScopedDecl{
+			ID:            "main++func::another",
+			DeclType:      token.FUNC,
+			Name:          "another",
+			VariableDecls: make([]string, 0),
+			Statements:    make([]string, 0),
+			BodyText:      make([]string, 0),
+			Comments: []string{
+				"another comment",
+			},
+			PackageComments: []string{
+				"package comment line 1",
+				"package comment line 2",
+			},
+		},
+	}
+
+	fs := token.NewFileSet()
+	node, _ := parser.ParseFile(fs, "testfile", []byte(src), parser.ParseComments)
+
+	m := miner.NewScope("testfile")
+	ast.Walk(m, node)
+
+	scopedDecls := m.ScopedDeclarations()
+	assert.Equal(t, expected, scopedDecls)
+}
+
+func TestVisit_OnScopeWithMultipleFuncDeclWithFullBody_ShouldReturnScopedDeclaration(t *testing.T) {
+	src := `
+		// package comment line 1
+		// package comment line 2
+		package main
+
+		// function comment
+		func main() {
+
+		}
+
+		// another comment
+		func another() {
+
+		}
+	`
+
+	expected := map[string]miner.ScopedDecl{
+		"main++func::main": miner.ScopedDecl{
+			ID:            "main++func::main",
+			DeclType:      token.FUNC,
+			Name:          "main",
+			VariableDecls: make([]string, 0),
+			Statements:    make([]string, 0),
+			BodyText:      make([]string, 0),
+			Comments: []string{
+				"function comment",
+			},
+			PackageComments: []string{
+				"package comment line 1",
+				"package comment line 2",
+			},
+		},
+		"main++func::another": miner.ScopedDecl{
+			ID:            "main++func::another",
+			DeclType:      token.FUNC,
+			Name:          "another",
+			VariableDecls: make([]string, 0),
+			Statements:    make([]string, 0),
+			BodyText:      make([]string, 0),
+			Comments: []string{
+				"another comment",
 			},
 			PackageComments: []string{
 				"package comment line 1",
