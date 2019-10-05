@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"go/ast"
 	"go/token"
+	"strings"
 
 	"github.com/eroatta/token/amap"
 )
@@ -91,11 +92,74 @@ func (m Scope) Visit(node ast.Node) ast.Visitor {
 		funcScopedDecl.PackageComments = m.packageComments
 		m.scopes[funcScopedDecl.ID] = funcScopedDecl
 
+		// TODO add variable declarations...
+
 	case *ast.GenDecl:
-		fmt.Println(elem)
+		if !(elem.Tok == token.VAR || elem.Tok == token.CONST || elem.Tok == token.TYPE) {
+			return m
+		}
+
+		if !m.shouldMine(elem) {
+			return m
+		}
+
+		comments := make([]string, 0)
+		if elem.Doc != nil {
+			for _, comment := range elem.Doc.List {
+				comments = append(comments, cleanComment(comment.Text))
+			}
+		}
+
+		for _, spec := range elem.Specs {
+			if valSpec, ok := spec.(*ast.ValueSpec); ok {
+				if valSpec.Doc != nil {
+					for _, comment := range valSpec.Doc.List {
+						comments = append(comments, cleanComment(comment.Text))
+					}
+				}
+
+				if valSpec.Comment != nil {
+					for _, comment := range valSpec.Comment.List {
+						comments = append(comments, cleanComment(comment.Text))
+					}
+				}
+
+				for j, name := range valSpec.Names {
+					if name.Name == "_" {
+						continue
+					}
+
+					varScopedDecl := newScopedDecl(m.packageName, name.String(), elem.Tok)
+					if valSpec.Values != nil {
+						if val, ok := valSpec.Values[j].(*ast.BasicLit); ok && val.Kind == token.STRING {
+							valStr := strings.Replace(val.Value, "\"", "", -1)
+							varScopedDecl.BodyText = append(varScopedDecl.BodyText, cleanComment(valStr))
+						}
+					}
+					varScopedDecl.Comments = comments
+					varScopedDecl.PackageComments = m.packageComments
+
+					m.scopes[varScopedDecl.ID] = varScopedDecl
+				}
+			}
+
+			// TODO: add type
+		}
 	}
 
 	return m
+}
+
+func (m Scope) shouldMine(elem *ast.GenDecl) bool {
+	var shouldMine bool
+	for _, d := range m.included {
+		if d.Pos() == elem.Pos() {
+			shouldMine = true
+			break
+		}
+	}
+
+	return shouldMine
 }
 
 // Amap represents an AMAP miner, which extracts the scopes from a file.

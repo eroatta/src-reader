@@ -220,14 +220,257 @@ func TestVisit_OnScopeWithMultipleFuncDeclWithFullBody_ShouldReturnScopedDeclara
 	assert.Equal(t, expected, scopedDecls)
 }
 
-/*func TestVisit_OnScopeWithVarDecl_ShouldReturnDeclarationScopesForVars(t *testing.T) {
-	assert.FailNow(t, "not yet implemented")
+func TestVisit_OnScopeWithPlainVarDecl_ShouldReturnScopedDeclaration(t *testing.T) {
+	src := `
+		package main
+
+		var Common string
+	`
+
+	expected := map[string]miner.ScopedDecl{
+		"main++var::Common": miner.ScopedDecl{
+			ID:              "main++var::Common",
+			DeclType:        token.VAR,
+			Name:            "Common",
+			VariableDecls:   make([]string, 0),
+			Statements:      make([]string, 0),
+			BodyText:        make([]string, 0),
+			Comments:        make([]string, 0),
+			PackageComments: make([]string, 0),
+		},
+	}
+
+	fs := token.NewFileSet()
+	node, _ := parser.ParseFile(fs, "testfile", []byte(src), parser.ParseComments)
+
+	m := miner.NewScope("testfile")
+	ast.Walk(m, node)
+
+	scopedDecls := m.ScopedDeclarations()
+	assert.Equal(t, expected, scopedDecls)
 }
 
-func TestVisit_OnScopeWithConstDecl_ShouldReturnDeclarationScopesForConsts(t *testing.T) {
-	assert.FailNow(t, "not yet implemented")
+func TestVisit_OnScopeWithFullyCommentedVarDecl_ShouldReturnScopedDeclaration(t *testing.T) {
+	src := `
+		// package comment
+		package main
+
+		// outer comment
+		var Common string // inner comment
+	`
+
+	expected := map[string]miner.ScopedDecl{
+		"main++var::Common": miner.ScopedDecl{
+			ID:            "main++var::Common",
+			DeclType:      token.VAR,
+			Name:          "Common",
+			VariableDecls: make([]string, 0),
+			Statements:    make([]string, 0),
+			BodyText:      make([]string, 0),
+			Comments: []string{
+				"outer comment",
+				"inner comment",
+			},
+			PackageComments: []string{"package comment"},
+		},
+	}
+
+	fs := token.NewFileSet()
+	node, _ := parser.ParseFile(fs, "testfile", []byte(src), parser.ParseComments)
+
+	m := miner.NewScope("testfile")
+	ast.Walk(m, node)
+
+	scopedDecls := m.ScopedDeclarations()
+	assert.Equal(t, expected, scopedDecls)
 }
 
+func TestVisit_OnScopeWithVarBlockDecl_ShouldReturnScopedDeclaration(t *testing.T) {
+	src := `
+		package main
+		
+		// outer comment
+		var (
+			common string
+			regular string = "valid"
+			nrzXXZ int = 32
+		)
+	`
+
+	expected := map[string]miner.ScopedDecl{
+		"main++var::common": miner.ScopedDecl{
+			ID:              "main++var::common",
+			DeclType:        token.VAR,
+			Name:            "common",
+			VariableDecls:   make([]string, 0),
+			Statements:      make([]string, 0),
+			BodyText:        make([]string, 0),
+			Comments:        []string{"outer comment"},
+			PackageComments: make([]string, 0),
+		},
+		"main++var::regular": miner.ScopedDecl{
+			ID:              "main++var::regular",
+			DeclType:        token.VAR,
+			Name:            "regular",
+			VariableDecls:   make([]string, 0),
+			Statements:      make([]string, 0),
+			BodyText:        []string{"valid"},
+			Comments:        []string{"outer comment"},
+			PackageComments: make([]string, 0),
+		},
+		"main++var::nrzXXZ": miner.ScopedDecl{
+			ID:              "main++var::nrzXXZ",
+			DeclType:        token.VAR,
+			Name:            "nrzXXZ",
+			VariableDecls:   make([]string, 0),
+			Statements:      make([]string, 0),
+			BodyText:        make([]string, 0),
+			Comments:        []string{"outer comment"},
+			PackageComments: make([]string, 0),
+		},
+	}
+
+	fs := token.NewFileSet()
+	node, _ := parser.ParseFile(fs, "testfile", []byte(src), parser.ParseComments)
+
+	m := miner.NewScope("testfile")
+	ast.Walk(m, node)
+
+	scopedDecls := m.ScopedDeclarations()
+	assert.Equal(t, expected, scopedDecls)
+}
+
+func TestVisit_OnScopeWithPlainConstDecl_ShouldReturnScopedDeclaration(t *testing.T) {
+	src := `
+		package main
+
+		const Common string = "valid"
+	`
+
+	expected := map[string]miner.ScopedDecl{
+		"main++const::Common": miner.ScopedDecl{
+			ID:              "main++const::Common",
+			DeclType:        token.CONST,
+			Name:            "Common",
+			VariableDecls:   make([]string, 0),
+			Statements:      make([]string, 0),
+			BodyText:        []string{"valid"},
+			Comments:        make([]string, 0),
+			PackageComments: make([]string, 0),
+		},
+	}
+
+	fs := token.NewFileSet()
+	node, _ := parser.ParseFile(fs, "testfile", []byte(src), parser.ParseComments)
+
+	m := miner.NewScope("testfile")
+	ast.Walk(m, node)
+
+	scopedDecls := m.ScopedDeclarations()
+	assert.Equal(t, expected, scopedDecls)
+}
+
+func TestVisit_OnScopeWithFullyCommentedConstDecl_ShouldReturnScopedDeclaration(t *testing.T) {
+	src := `
+		// package comment
+		package main
+
+		// outer comment
+		const Common string = "valid" // inner comment
+	`
+
+	expected := map[string]miner.ScopedDecl{
+		"main++const::Common": miner.ScopedDecl{
+			ID:            "main++const::Common",
+			DeclType:      token.CONST,
+			Name:          "Common",
+			VariableDecls: make([]string, 0),
+			Statements:    make([]string, 0),
+			BodyText:      []string{"valid"},
+			Comments: []string{
+				"outer comment",
+				"inner comment",
+			},
+			PackageComments: []string{"package comment"},
+		},
+	}
+
+	fs := token.NewFileSet()
+	node, _ := parser.ParseFile(fs, "testfile", []byte(src), parser.ParseComments)
+
+	m := miner.NewScope("testfile")
+	ast.Walk(m, node)
+
+	scopedDecls := m.ScopedDeclarations()
+	assert.Equal(t, expected, scopedDecls)
+}
+
+func TestVisit_OnScopeWithConstBlockDecl_ShouldReturnScopedDeclaration(t *testing.T) {
+	src := `
+		package main
+		
+		// outer comment
+		const (
+			common string = "common"
+			regular, notRegular string = "valid", "invalid"
+			nrzXXZ int = 32
+		)
+	`
+
+	expected := map[string]miner.ScopedDecl{
+		"main++const::common": miner.ScopedDecl{
+			ID:              "main++const::common",
+			DeclType:        token.CONST,
+			Name:            "common",
+			VariableDecls:   make([]string, 0),
+			Statements:      make([]string, 0),
+			BodyText:        []string{"common"},
+			Comments:        []string{"outer comment"},
+			PackageComments: make([]string, 0),
+		},
+		"main++const::regular": miner.ScopedDecl{
+			ID:              "main++const::regular",
+			DeclType:        token.CONST,
+			Name:            "regular",
+			VariableDecls:   make([]string, 0),
+			Statements:      make([]string, 0),
+			BodyText:        []string{"valid"},
+			Comments:        []string{"outer comment"},
+			PackageComments: make([]string, 0),
+		},
+		"main++const::notRegular": miner.ScopedDecl{
+			ID:              "main++const::notRegular",
+			DeclType:        token.CONST,
+			Name:            "notRegular",
+			VariableDecls:   make([]string, 0),
+			Statements:      make([]string, 0),
+			BodyText:        []string{"invalid"},
+			Comments:        []string{"outer comment"},
+			PackageComments: make([]string, 0),
+		},
+		"main++const::nrzXXZ": miner.ScopedDecl{
+			ID:              "main++const::nrzXXZ",
+			DeclType:        token.CONST,
+			Name:            "nrzXXZ",
+			VariableDecls:   make([]string, 0),
+			Statements:      make([]string, 0),
+			BodyText:        make([]string, 0),
+			Comments:        []string{"outer comment"},
+			PackageComments: make([]string, 0),
+		},
+	}
+
+	fs := token.NewFileSet()
+	node, _ := parser.ParseFile(fs, "testfile", []byte(src), parser.ParseComments)
+
+	m := miner.NewScope("testfile")
+	ast.Walk(m, node)
+
+	scopedDecls := m.ScopedDeclarations()
+	assert.Equal(t, expected, scopedDecls)
+}
+
+/*
 func TestVisit_OnScopeWithStructDecl_ShouldReturnDeclarationScopesForStructs(t *testing.T) {
 	assert.FailNow(t, "not yet implemented")
 }
