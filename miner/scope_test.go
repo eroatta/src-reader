@@ -521,8 +521,8 @@ func TestVisit_OnScopeWithFullyCommentedStructDecl_ShouldReturnScopedDeclaration
 			Statements:    make([]string, 0),
 			BodyText:      make([]string, 0),
 			Comments: []string{
-				"field comment",
 				"type comment",
+				"field comment",
 			},
 			PackageComments: []string{"package comment"},
 		},
@@ -568,17 +568,18 @@ func TestVisit_OnScopeWithStructBlockDecl_ShouldReturnScopedDeclaration(t *testi
 			Statements:    make([]string, 0),
 			BodyText:      make([]string, 0),
 			Comments: []string{
-				"field comment",
+				"global comment",
 				"local comment",
+				"field comment",
 			},
 			PackageComments: []string{"package comment"},
 		},
 		"main++struct::httpClient": miner.ScopedDecl{
 			ID:       "main++struct::httpClient",
 			DeclType: token.STRUCT,
-			Name:     "http client",
+			Name:     "httpClient",
 			VariableDecls: []string{
-				"protocol picker string",
+				"protocolPicker string",
 				"url string",
 			},
 			Statements: make([]string, 0),

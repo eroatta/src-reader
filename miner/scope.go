@@ -143,7 +143,46 @@ func (m Scope) Visit(node ast.Node) ast.Visitor {
 				}
 			}
 
-			// TODO: add type
+			// TODO: add struct/interface
+			if typeSpec, ok := spec.(*ast.TypeSpec); ok {
+				specificComments := make([]string, 0)
+				if typeSpec.Doc != nil {
+					for _, comment := range typeSpec.Doc.List {
+						specificComments = append(specificComments, cleanComment(comment.Text))
+					}
+				}
+
+				name := typeSpec.Name.String()
+
+				if structType, ok := typeSpec.Type.(*ast.StructType); ok {
+					structScopedDecl := newScopedDecl(m.packageName, name, token.STRUCT)
+
+					if structType.Fields != nil && structType.Fields.List != nil {
+						variableDecls := make([]string, 0)
+						for _, field := range structType.Fields.List {
+							fieldType := field.Type.(*ast.Ident)
+							for _, name := range field.Names {
+								variableDecls = append(variableDecls, fmt.Sprintf("%s %s", name.String(), fieldType.String()))
+							}
+
+							if field.Doc != nil {
+								for _, comment := range field.Doc.List {
+									specificComments = append(specificComments, cleanComment(comment.Text))
+								}
+							}
+						}
+						structScopedDecl.VariableDecls = variableDecls
+					}
+					structScopedDecl.Comments = append(comments, specificComments...)
+					structScopedDecl.PackageComments = m.packageComments
+
+					m.scopes[structScopedDecl.ID] = structScopedDecl
+				}
+
+				if _, ok := typeSpec.Type.(*ast.InterfaceType); ok {
+
+				}
+			}
 		}
 	}
 
