@@ -602,7 +602,134 @@ func TestVisit_OnScopeWithStructBlockDecl_ShouldReturnScopedDeclaration(t *testi
 	assert.Equal(t, expected, scopedDecls)
 }
 
-/*
-func TestVisit_OnScopeWithInterfaceDecl_ShouldReturnDeclarationScopesForInterfaces(t *testing.T) {
-	assert.FailNow(t, "not yet implemented")
-}*/
+func TestVisit_OnScopeWithPlainInterfaceDecl_ShouldReturnScopedDeclaration(t *testing.T) {
+	src := `
+		package main
+
+		type selector interface{}
+	`
+
+	expected := map[string]miner.ScopedDecl{
+		"main++interface::selector": miner.ScopedDecl{
+			ID:              "main++interface::selector",
+			DeclType:        token.INTERFACE,
+			Name:            "selector",
+			VariableDecls:   make([]string, 0),
+			Statements:      make([]string, 0),
+			BodyText:        make([]string, 0),
+			Comments:        make([]string, 0),
+			PackageComments: make([]string, 0),
+		},
+	}
+
+	fs := token.NewFileSet()
+	node, _ := parser.ParseFile(fs, "testfile", []byte(src), parser.ParseComments)
+
+	m := miner.NewScope("testfile")
+	ast.Walk(m, node)
+
+	scopedDecls := m.ScopedDeclarations()
+	assert.Equal(t, expected, scopedDecls)
+}
+
+func TestVisit_OnScopeWithFullyCommentedInterfaceDecl_ShouldReturnScopedDeclaration(t *testing.T) {
+	src := `
+		// package comment
+		package main
+
+		// type comment
+		type selector interface{
+			// function comment
+			pick() string
+		}
+	`
+
+	expected := map[string]miner.ScopedDecl{
+		"main++interface::selector": miner.ScopedDecl{
+			ID:            "main++interface::selector",
+			DeclType:      token.INTERFACE,
+			Name:          "selector",
+			VariableDecls: make([]string, 0),
+			Statements:    []string{"pick"},
+			BodyText:      make([]string, 0),
+			Comments: []string{
+				"type comment",
+				"function comment",
+			},
+			PackageComments: []string{"package comment"},
+		},
+	}
+
+	fs := token.NewFileSet()
+	node, _ := parser.ParseFile(fs, "testfile", []byte(src), parser.ParseComments)
+
+	m := miner.NewScope("testfile")
+	ast.Walk(m, node)
+
+	scopedDecls := m.ScopedDeclarations()
+	assert.Equal(t, expected, scopedDecls)
+}
+
+func TestVisit_OnScopeWithInterfaceBlockDecl_ShouldReturnScopedDeclaration(t *testing.T) {
+	src := `
+		// package comment
+		package main
+
+		// global comment
+		type (
+			// interface comment
+			selector interface {
+				// function comment
+				pick() string
+			}
+
+			// inner comment
+			httpClient interface {
+				protocolPicker() string
+				url() string
+			}
+		)
+	`
+
+	expected := map[string]miner.ScopedDecl{
+		"main++interface::selector": miner.ScopedDecl{
+			ID:            "main++interface::selector",
+			DeclType:      token.INTERFACE,
+			Name:          "selector",
+			VariableDecls: make([]string, 0),
+			Statements:    []string{"pick"},
+			BodyText:      make([]string, 0),
+			Comments: []string{
+				"global comment",
+				"interface comment",
+				"function comment",
+			},
+			PackageComments: []string{"package comment"},
+		},
+		"main++interface::httpClient": miner.ScopedDecl{
+			ID:            "main++interface::httpClient",
+			DeclType:      token.INTERFACE,
+			Name:          "httpClient",
+			VariableDecls: make([]string, 0),
+			Statements: []string{
+				"protocolPicker",
+				"url",
+			},
+			BodyText: make([]string, 0),
+			Comments: []string{
+				"global comment",
+				"inner comment",
+			},
+			PackageComments: []string{"package comment"},
+		},
+	}
+
+	fs := token.NewFileSet()
+	node, _ := parser.ParseFile(fs, "testfile", []byte(src), parser.ParseComments)
+
+	m := miner.NewScope("testfile")
+	ast.Walk(m, node)
+
+	scopedDecls := m.ScopedDeclarations()
+	assert.Equal(t, expected, scopedDecls)
+}
