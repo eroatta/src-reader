@@ -173,7 +173,13 @@ func TestVisit_OnScopeWithMultipleFuncDeclWithFullBody_ShouldReturnScopedDeclara
 
 		// another comment
 		func another() {
+			// comment inside another
+		}
 
+		func (m Miner) apply(strategy string, nodes int64) (results []string) {
+			// apply strategy comment
+			results = append(results, "result 1")
+			return results
 		}
 	`
 
@@ -202,6 +208,26 @@ func TestVisit_OnScopeWithMultipleFuncDeclWithFullBody_ShouldReturnScopedDeclara
 			BodyText:      make([]string, 0),
 			Comments: []string{
 				"another comment",
+				"comment inside another",
+			},
+			PackageComments: []string{
+				"package comment line 1",
+				"package comment line 2",
+			},
+		},
+		"main++func::apply": miner.ScopedDecl{
+			ID:       "main++func::apply",
+			DeclType: token.FUNC,
+			Name:     "apply",
+			VariableDecls: []string{
+				"strategy string",
+				"nodes int64",
+				"results []string",
+			},
+			Statements: make([]string, 0),
+			BodyText:   make([]string, 0),
+			Comments: []string{
+				"apply strategy comment",
 			},
 			PackageComments: []string{
 				"package comment line 1",
