@@ -167,5 +167,47 @@ func TestVisit_OnExtractorWithStructDecl_ShouldReturnFoundIdentifiers(t *testing
 }
 
 func TestVisit_OnExtractorWithInterfaceDecl_ShouldReturnFoundIdentifiers(t *testing.T) {
-	assert.FailNow(t, "not yet implemented")
+	src := `
+		package main
+		
+		type (
+			// local comment
+			selector interface {
+				pick() string
+			}
+		
+			httpClient interface {
+				protocolPicker() string
+				url() string
+			}
+		)
+	`
+
+	expected := []code.Identifier{
+		{
+			File:       "testfile",
+			Position:   52,
+			Name:       "selector",
+			Type:       "InterfaceDecl",
+			Splits:     make(map[string][]string),
+			Expansions: make(map[string][]string),
+		},
+		{
+			File:       "testfile",
+			Position:   102,
+			Name:       "httpClient",
+			Type:       "InterfaceDecl",
+			Splits:     make(map[string][]string),
+			Expansions: make(map[string][]string),
+		},
+	}
+
+	fs := token.NewFileSet()
+	node, _ := parser.ParseFile(fs, "testfile", []byte(src), parser.ParseComments)
+
+	e := extractor.New("testfile")
+	ast.Walk(e, node.Decls[0])
+
+	identifiers := e.Identifiers()
+	assert.Equal(t, expected, identifiers)
 }
