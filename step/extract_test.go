@@ -4,7 +4,6 @@ import (
 	"go/ast"
 	"go/parser"
 	"go/token"
-	"reflect"
 	"testing"
 
 	"github.com/eroatta/src-reader/code"
@@ -13,7 +12,7 @@ import (
 )
 
 func TestExtract_OnNoFiles_ShouldReturnZeroIdentifiers(t *testing.T) {
-	identc := step.Extract([]code.File{}, extractor{})
+	identc := step.Extract([]code.File{}, newExtractor)
 
 	var identifiers int
 	for range identc {
@@ -28,7 +27,7 @@ func TestExtract_OnFileWithoutAST_ShouldReturnZeroIdentifiers(t *testing.T) {
 		Name: "main.go",
 		AST:  nil,
 	}
-	identc := step.Extract([]code.File{fileWithoutAST}, extractor{})
+	identc := step.Extract([]code.File{fileWithoutAST}, newExtractor)
 
 	var identifiers int
 	for range identc {
@@ -67,7 +66,7 @@ func TestExtract_OnFileWithAST_ShouldReturnFoundIdentifiers(t *testing.T) {
 		FileSet: testFileset,
 	}
 
-	identc := step.Extract([]code.File{file}, extractor{})
+	identc := step.Extract([]code.File{file}, newExtractor)
 
 	identifiers := make(map[string]code.Identifier)
 	for ident := range identc {
@@ -78,24 +77,32 @@ func TestExtract_OnFileWithAST_ShouldReturnFoundIdentifiers(t *testing.T) {
 	assert.Equal(t, "main", identifiers["main"].Name)
 }
 
-type extractor struct {
-	node *ast.Ident
+func newExtractor(filename string) step.Extractor {
+	return &testExtractor{
+		idents: make([]code.Identifier, 0),
+	}
 }
 
-func (e extractor) NodeType() reflect.Type {
-	return reflect.TypeOf(e.node)
+type testExtractor struct {
+	idents []code.Identifier
 }
 
-func (e extractor) Extract(filename string, node ast.Node) []code.Identifier {
-	i, ok := node.(*ast.Ident)
-	if ok {
-		ident := code.Identifier{
-			Name:     i.Name,
-			Position: i.Pos(),
-		}
-
-		return []code.Identifier{ident}
+func (t *testExtractor) Visit(node ast.Node) ast.Visitor {
+	if node == nil {
+		return nil
 	}
 
-	return []code.Identifier{}
+	switch elem := node.(type) {
+	case *ast.File:
+		t.idents = append(t.idents, code.Identifier{
+			Name:     elem.Name.String(),
+			Position: elem.Pos(),
+		})
+	}
+
+	return t
+}
+
+func (t *testExtractor) Identifiers() []code.Identifier {
+	return t.idents
 }

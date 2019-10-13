@@ -42,7 +42,7 @@ func newGoodMain(url string) {
 		frequencyTable.SetOccurrences(token, count)
 	}
 
-	identc := step.Extract(files, extractor.FuncDecl{})
+	identc := step.Extract(files, extractor.New)
 
 	tCtx := samurai.NewTokenContext(frequencyTable, frequencyTable)
 	samuraiSplitter := newSamuraiSplitter(tCtx)
@@ -107,11 +107,11 @@ type mydb struct {
 func (m mydb) Save(ident code.Identifier) error {
 	log.Println("Storing identifier...")
 	for alg, splits := range ident.Splits {
-		log.Println(fmt.Sprintf("FuncDecl \"%s\" Splitted into: %v by %s", ident.Name, splits, alg))
+		log.Println(fmt.Sprintf("%s \"%s\" Splitted into: %v by %s", ident.Type, ident.Name, splits, alg))
 	}
 
 	for alg, expans := range ident.Expansions {
-		log.Println(fmt.Sprintf("FuncDecl \"%s\" Expanded into: %v by %s", ident.Name, expans, alg))
+		log.Println(fmt.Sprintf("%s \"%s\" Expanded into: %v by %s", ident.Type, ident.Name, expans, alg))
 	}
 
 	return nil
