@@ -8,8 +8,10 @@ import (
 )
 
 var types = map[token.Token]string{
-	token.CONST: "ConstDecl",
-	token.VAR:   "VarDecl",
+	token.CONST:     "ConstDecl",
+	token.INTERFACE: "InterfaceDecl",
+	token.STRUCT:    "StructDecl",
+	token.VAR:       "VarDecl",
 }
 
 type Extractor struct {
@@ -37,28 +39,65 @@ func (e *Extractor) Visit(node ast.Node) ast.Visitor {
 		for _, spec := range elem.Specs {
 			switch decl := spec.(type) {
 			case *ast.ValueSpec:
-				for _, name := range decl.Names {
-					if name.Name == "_" {
-						continue
-					}
-
-					identifier := code.Identifier{
-						// TODO, perhaps we can use just the position
-						File:       e.filename,
-						Position:   name.Pos(),
-						Name:       name.String(),
-						Type:       types[elem.Tok],
-						Splits:     make(map[string][]string),
-						Expansions: make(map[string][]string),
-					}
-
-					e.identifiers = append(e.identifiers, identifier)
-				}
+				e.identifiers = append(e.identifiers, fromValueSpec(e.filename, elem.Tok, decl)...)
+			case *ast.TypeSpec:
+				e.identifiers = append(e.identifiers, fromTypeSpec(e.filename, decl)...)
 			}
 		}
 	}
 
 	return e
+}
+
+func fromValueSpec(filename string, token token.Token, decl *ast.ValueSpec) []code.Identifier {
+	identifiers := []code.Identifier{}
+	for _, name := range decl.Names {
+		if name.Name == "_" {
+			continue
+		}
+
+		identifier := code.Identifier{
+			File:       filename,
+			Position:   name.Pos(),
+			Name:       name.String(),
+			Type:       types[token],
+			Splits:     make(map[string][]string),
+			Expansions: make(map[string][]string),
+		}
+
+		identifiers = append(identifiers, identifier)
+	}
+
+	return identifiers
+}
+
+func fromTypeSpec(filename string, decl *ast.TypeSpec) []code.Identifier {
+	var identifierType string
+	switch decl.Type.(type) {
+	case *ast.StructType:
+		identifierType = types[token.STRUCT]
+	case *ast.InterfaceType:
+		identifierType = types[token.INTERFACE]
+	default:
+		return []code.Identifier{}
+	}
+
+	identifiers := []code.Identifier{
+		newIdentifier(filename, decl.Name.Pos(), decl.Name.String(), identifierType),
+	}
+
+	return identifiers
+}
+
+func newIdentifier(filename string, pos token.Pos, name string, identifierType string) code.Identifier {
+	return code.Identifier{
+		File:       filename,
+		Position:   pos,
+		Name:       name,
+		Type:       identifierType,
+		Splits:     make(map[string][]string),
+		Expansions: make(map[string][]string),
+	}
 }
 
 // Identifiers returns the list of found identifiers.
