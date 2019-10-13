@@ -29,6 +29,8 @@ type Identifier struct {
 	Position   token.Pos
 	Name       string
 	Type       string
+	Parent     string
+	ParentPos  token.Pos
 	Node       *ast.Node
 	Splits     map[string][]string
 	Expansions map[string][]string

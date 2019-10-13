@@ -12,7 +12,56 @@ import (
 )
 
 func TestVisit_OnExtractorWithFuncDecl_ShouldReturnFoundIdentifiers(t *testing.T) {
-	assert.FailNow(t, "not yet implemented")
+	src := `
+		package main
+
+		func iterate(path, method string, routes RoutesInfo, root *node) RoutesInfo {
+			path += root.path
+			if len(root.handlers) > 0 {
+				handlerFunc := root.handlers.Last()
+				routes = append(routes, RouteInfo{
+					Method:      method,
+					Path:        path,
+					Handler:     nameOfFunction(handlerFunc),
+					HandlerFunc: handlerFunc,
+				})
+			}
+			for _, child := range root.children {
+				routes = iterate(path, method, routes, child)
+			}
+			return routes
+		}
+	`
+
+	expected := []code.Identifier{
+		{
+			File:       "testfile",
+			Position:   20,
+			Name:       "iterate",
+			Type:       "FuncDecl",
+			Splits:     make(map[string][]string),
+			Expansions: make(map[string][]string),
+		},
+		{
+			File:       "testfile",
+			Position:   154,
+			Name:       "handlerFunc",
+			Type:       "AssignStmt",
+			Parent:     "iterate",
+			ParentPos:  20,
+			Splits:     make(map[string][]string),
+			Expansions: make(map[string][]string),
+		},
+	}
+
+	fs := token.NewFileSet()
+	node, _ := parser.ParseFile(fs, "testfile", []byte(src), parser.ParseComments)
+
+	e := extractor.New("testfile")
+	ast.Walk(e, node.Decls[0])
+
+	identifiers := e.Identifiers()
+	assert.Equal(t, expected, identifiers)
 }
 
 func TestVisit_OnExtractorWithVarDecl_ShouldReturnFoundIdentifiers(t *testing.T) {

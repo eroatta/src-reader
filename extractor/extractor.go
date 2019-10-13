@@ -9,15 +9,18 @@ import (
 
 var types = map[token.Token]string{
 	token.CONST:     "ConstDecl",
+	token.DEFINE:    "AssignStmt",
+	token.FUNC:      "FuncDecl",
 	token.INTERFACE: "InterfaceDecl",
 	token.STRUCT:    "StructDecl",
 	token.VAR:       "VarDecl",
 }
 
 type Extractor struct {
-	filename    string
-	currentLoc  string
-	identifiers []code.Identifier
+	filename      string
+	currentLoc    string
+	currentLocPos token.Pos
+	identifiers   []code.Identifier
 }
 
 // New creates a new Extractor.
@@ -35,6 +38,43 @@ func (e *Extractor) Visit(node ast.Node) ast.Visitor {
 	}
 
 	switch elem := node.(type) {
+	case *ast.FuncDecl:
+		name := elem.Name.String()
+		e.currentLoc = name
+		e.currentLocPos = elem.Pos()
+
+		e.identifiers = append(e.identifiers, newIdentifier(e.filename, elem.Pos(), name, types[token.FUNC]))
+
+	case *ast.AssignStmt:
+		if elem.Tok != token.DEFINE {
+			return e
+		}
+
+		for _, name := range elem.Lhs {
+			ident, ok := name.(*ast.Ident)
+			if !ok {
+				continue
+			}
+
+			if ident.Name == "_" || ident.Name == "" {
+				continue
+			}
+
+			if ident.Obj != nil && ident.Obj.Pos() == ident.Pos() {
+				e.identifiers = append(e.identifiers,
+					code.Identifier{
+						File:       e.filename,
+						Position:   ident.Pos(),
+						Name:       ident.Name,
+						Type:       types[elem.Tok],
+						Parent:     e.currentLoc,
+						ParentPos:  e.currentLocPos,
+						Splits:     make(map[string][]string),
+						Expansions: make(map[string][]string),
+					})
+			}
+		}
+
 	case *ast.GenDecl:
 		for _, spec := range elem.Specs {
 			switch decl := spec.(type) {
@@ -56,16 +96,8 @@ func fromValueSpec(filename string, token token.Token, decl *ast.ValueSpec) []co
 			continue
 		}
 
-		identifier := code.Identifier{
-			File:       filename,
-			Position:   name.Pos(),
-			Name:       name.String(),
-			Type:       types[token],
-			Splits:     make(map[string][]string),
-			Expansions: make(map[string][]string),
-		}
-
-		identifiers = append(identifiers, identifier)
+		identifiers = append(identifiers,
+			newIdentifier(filename, name.Pos(), name.String(), types[token]))
 	}
 
 	return identifiers
