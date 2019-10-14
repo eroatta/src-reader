@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/eroatta/token/lists"
@@ -18,16 +19,22 @@ func main() {
 }
 
 func newGoodMain(url string) {
+	// cloning step
 	_, filesc, err := step.Clone(url, cloner.New())
 	if err != nil {
 		log.Fatalf("Error reading repository %s: %v", url, err)
 	}
 
+	// parsing step
 	parsedc := step.Parse(filesc)
 	files := step.Merge(parsedc)
 
+	// mining step
 	countMiner := miner.NewCount()
-	miningResults := step.Mine(files, countMiner)
+	declarationMiner := miner.NewDeclaration(lists.Dicctionary)
+	scopeMiner := miner.NewScope("fail")
+
+	miningResults := step.Mine(files, countMiner, declarationMiner, scopeMiner)
 
 	frequencyTable := samurai.NewFrequencyTable()
 
@@ -40,13 +47,31 @@ func newGoodMain(url string) {
 		frequencyTable.SetOccurrences(token, count)
 	}
 
+	declarationResults := miningResults[declarationMiner.Name()].(miner.Declaration)
+	decls := declarationResults.Decls()
+	for k := range decls {
+		log.Println(fmt.Sprintf("Declaration: %s", k))
+	}
+
+	scopeResults := miningResults[scopeMiner.Name()].(miner.Scope)
+	scopes := scopeResults.ScopedDeclarations()
+	for k := range scopes {
+		log.Println(fmt.Sprintf("Scope: %s", k))
+	}
+
+	// extraction step
 	identc := step.Extract(files, extractor.New)
 
+	// splitting step
 	tCtx := samurai.NewTokenContext(frequencyTable, frequencyTable)
 	samuraiSplitter := newSamuraiSplitter(tCtx)
 
 	splittedc := step.Split(identc, samuraiSplitter)
+
+	// expansion step
 	expandedc := step.Expand(splittedc)
+
+	// storing step
 	errors := step.Store(expandedc, storer.New())
 	if len(errors) > 0 {
 		log.Fatal("Something failed")

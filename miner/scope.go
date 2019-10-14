@@ -232,14 +232,15 @@ func (m Scope) Visit(node ast.Node) ast.Visitor {
 					if structType.Fields != nil && structType.Fields.List != nil {
 						variableDecls := make([]string, 0)
 						for _, field := range structType.Fields.List {
-							fieldType := field.Type.(*ast.Ident)
-							for _, name := range field.Names {
-								variableDecls = append(variableDecls, fmt.Sprintf("%s %s", name.String(), fieldType.String()))
-							}
+							if fieldType, ok := field.Type.(*ast.Ident); ok {
+								for _, name := range field.Names {
+									variableDecls = append(variableDecls, fmt.Sprintf("%s %s", name.String(), fieldType.String()))
+								}
 
-							if field.Doc != nil {
-								for _, comment := range field.Doc.List {
-									specificComments = append(specificComments, cleanComment(comment.Text))
+								if field.Doc != nil {
+									for _, comment := range field.Doc.List {
+										specificComments = append(specificComments, cleanComment(comment.Text))
+									}
 								}
 							}
 						}
