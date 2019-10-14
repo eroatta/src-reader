@@ -5,12 +5,10 @@ import (
 
 	"github.com/eroatta/token/lists"
 	"github.com/eroatta/token/samurai"
-	"gopkg.in/src-d/go-git.v4"
 
-	"github.com/eroatta/src-reader/code"
+	"github.com/eroatta/src-reader/cloner"
 	"github.com/eroatta/src-reader/extractor"
 	"github.com/eroatta/src-reader/miner"
-	"github.com/eroatta/src-reader/repository"
 	"github.com/eroatta/src-reader/step"
 	"github.com/eroatta/src-reader/storer"
 )
@@ -20,7 +18,7 @@ func main() {
 }
 
 func newGoodMain(url string) {
-	_, filesc, err := step.Clone(url, &cloner{})
+	_, filesc, err := step.Clone(url, cloner.New())
 	if err != nil {
 		log.Fatalf("Error reading repository %s: %v", url, err)
 	}
@@ -53,30 +51,6 @@ func newGoodMain(url string) {
 	if len(errors) > 0 {
 		log.Fatal("Something failed")
 	}
-}
-
-type cloner struct {
-	repo *git.Repository
-}
-
-func (c *cloner) Clone(url string) (code.Repository, error) {
-	repo, err := repository.Clone(repository.GoGitClonerFunc, url)
-	if err != nil {
-		return code.Repository{}, err
-	}
-	c.repo = repo
-
-	return code.Repository{Name: url}, nil
-}
-
-// Filenames retrieves the list of file names existing on a repository.
-func (c *cloner) Filenames() ([]string, error) {
-	return repository.Filenames(c.repo)
-}
-
-// File provides the bytes representation of a given file.
-func (c *cloner) File(name string) ([]byte, error) {
-	return repository.File(c.repo, name)
 }
 
 type splitter struct {
