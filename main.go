@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 
 	"github.com/eroatta/token/lists"
@@ -13,6 +12,7 @@ import (
 	"github.com/eroatta/src-reader/miner"
 	"github.com/eroatta/src-reader/repository"
 	"github.com/eroatta/src-reader/step"
+	"github.com/eroatta/src-reader/storer"
 )
 
 func main() {
@@ -49,7 +49,7 @@ func newGoodMain(url string) {
 
 	splittedc := step.Split(identc, samuraiSplitter)
 	expandedc := step.Expand(splittedc)
-	errors := step.Store(expandedc, mydb{})
+	errors := step.Store(expandedc, storer.New())
 	if len(errors) > 0 {
 		log.Fatal("Something failed")
 	}
@@ -99,20 +99,4 @@ func newSamuraiSplitter(tokenContext samurai.TokenContext) splitter {
 			return samurai.Split(t, tokenContext, lists.Prefixes, lists.Suffixes)
 		},
 	}
-}
-
-type mydb struct {
-}
-
-func (m mydb) Save(ident code.Identifier) error {
-	log.Println("Storing identifier...")
-	for alg, splits := range ident.Splits {
-		log.Println(fmt.Sprintf("%s \"%s\" Splitted into: %v by %s", ident.Type, ident.Name, splits, alg))
-	}
-
-	for alg, expans := range ident.Expansions {
-		log.Println(fmt.Sprintf("%s \"%s\" Expanded into: %v by %s", ident.Type, ident.Name, expans, alg))
-	}
-
-	return nil
 }
