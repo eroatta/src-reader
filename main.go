@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/eroatta/token/conserv"
+	"github.com/eroatta/token/greedy"
 	"github.com/eroatta/token/lists"
 	"github.com/eroatta/token/samurai"
 
@@ -65,8 +67,10 @@ func newGoodMain(url string) {
 	// splitting step
 	tCtx := samurai.NewTokenContext(frequencyTable, frequencyTable)
 	samuraiSplitter := newSamuraiSplitter(tCtx)
+	conservSplitter := newConservSplitter()
+	greedySplitter := newGreedySplitter()
 
-	splittedc := step.Split(identc, samuraiSplitter)
+	splittedc := step.Split(identc, samuraiSplitter, conservSplitter, greedySplitter)
 
 	// expansion step
 	expandedc := step.Expand(splittedc)
@@ -96,6 +100,24 @@ func newSamuraiSplitter(tokenContext samurai.TokenContext) splitter {
 		name: "samurai",
 		fn: func(t string) []string {
 			return samurai.Split(t, tokenContext, lists.Prefixes, lists.Suffixes)
+		},
+	}
+}
+
+func newConservSplitter() splitter {
+	return splitter{
+		name: "conserv",
+		fn: func(t string) []string {
+			return conserv.Split(t)
+		},
+	}
+}
+
+func newGreedySplitter() splitter {
+	return splitter{
+		name: "greedy",
+		fn: func(t string) []string {
+			return greedy.Split(t, greedy.DefaultList)
 		},
 	}
 }
