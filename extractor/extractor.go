@@ -63,16 +63,7 @@ func (e *Extractor) Visit(node ast.Node) ast.Visitor {
 
 			if ident.Obj != nil && ident.Obj.Pos() == ident.Pos() {
 				e.identifiers = append(e.identifiers,
-					code.Identifier{
-						File:       e.filename,
-						Position:   ident.Pos(),
-						Name:       ident.Name,
-						Type:       types[elem.Tok],
-						Parent:     e.currentLoc,
-						ParentPos:  e.currentLocPos,
-						Splits:     make(map[string][]string),
-						Expansions: make(map[string][]string),
-					})
+					newChildIdentifier(e.filename, ident.Pos(), ident.Name, types[elem.Tok], e.currentLoc, e.currentLocPos))
 			}
 		}
 
@@ -131,6 +122,14 @@ func newIdentifier(filename string, pos token.Pos, name string, identifierType s
 		Splits:     make(map[string][]string),
 		Expansions: make(map[string][]string),
 	}
+}
+
+func newChildIdentifier(filename string, pos token.Pos, name string, identifierType string, parent string, parentPos token.Pos) code.Identifier {
+	i := newIdentifier(filename, pos, name, identifierType)
+	i.Parent = parent
+	i.ParentPos = parentPos
+
+	return i
 }
 
 // Identifiers returns the list of found identifiers.
