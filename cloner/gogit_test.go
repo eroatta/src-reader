@@ -24,15 +24,15 @@ func TestClone_OnGoGitCloner_ShouldReturnRepository(t *testing.T) {
 	assert.Nil(t, err, "error should be nil")
 	assert.NotNil(t, repository, "cloned repository shouldn't be nil")
 }
-func TestClone_ClonerError_ShouldReturnAnError(t *testing.T) {
+func TestClone_OnGoGitClonerWithError_ShouldReturnAnError(t *testing.T) {
 	clnr := goGitCloner{
 		clonerFunc: func(url string) (*git.Repository, error) {
 			return nil, errors.New("Connection error")
 		},
 	}
-	repo, err := clnr.Clone("git@github.com/test/case")
+	repository, err := clnr.Clone("git@github.com/test/case")
 
-	assert.Equal(t, code.Repository{}, repo, "cloned repository should be empty")
+	assert.Equal(t, code.Repository{}, repository, "cloned repository should be empty")
 	assert.Equal(t, "Connection error", err.Error())
 }
 

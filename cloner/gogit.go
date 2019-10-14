@@ -15,7 +15,7 @@ const (
 	rootDir = ""
 )
 
-// New TODO
+// New creates and initializes a new cloner.
 func New() step.Cloner {
 	return &goGitCloner{
 		clonerFunc: goGitClonerFunc,
