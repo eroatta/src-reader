@@ -4,14 +4,13 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/eroatta/token/conserv"
-	"github.com/eroatta/token/greedy"
 	"github.com/eroatta/token/lists"
 	"github.com/eroatta/token/samurai"
 
 	"github.com/eroatta/src-reader/cloner"
 	"github.com/eroatta/src-reader/extractor"
 	"github.com/eroatta/src-reader/miner"
+	"github.com/eroatta/src-reader/splitter"
 	"github.com/eroatta/src-reader/step"
 	"github.com/eroatta/src-reader/storer"
 )
@@ -66,9 +65,9 @@ func newGoodMain(url string) {
 
 	// splitting step
 	tCtx := samurai.NewTokenContext(frequencyTable, frequencyTable)
-	samuraiSplitter := newSamuraiSplitter(tCtx)
-	conservSplitter := newConservSplitter()
-	greedySplitter := newGreedySplitter()
+	samuraiSplitter := splitter.NewSamurai(tCtx)
+	conservSplitter := splitter.NewConserv()
+	greedySplitter := splitter.NewGreedy()
 
 	splittedc := step.Split(identc, samuraiSplitter, conservSplitter, greedySplitter)
 
@@ -79,45 +78,5 @@ func newGoodMain(url string) {
 	errors := step.Store(expandedc, storer.New())
 	if len(errors) > 0 {
 		log.Fatal("Something failed")
-	}
-}
-
-type splitter struct {
-	name string
-	fn   func(string) []string
-}
-
-func (s splitter) Name() string {
-	return s.name
-}
-
-func (s splitter) Split(token string) []string {
-	return s.fn(token)
-}
-
-func newSamuraiSplitter(tokenContext samurai.TokenContext) splitter {
-	return splitter{
-		name: "samurai",
-		fn: func(t string) []string {
-			return samurai.Split(t, tokenContext, lists.Prefixes, lists.Suffixes)
-		},
-	}
-}
-
-func newConservSplitter() splitter {
-	return splitter{
-		name: "conserv",
-		fn: func(t string) []string {
-			return conserv.Split(t)
-		},
-	}
-}
-
-func newGreedySplitter() splitter {
-	return splitter{
-		name: "greedy",
-		fn: func(t string) []string {
-			return greedy.Split(t, greedy.DefaultList)
-		},
 	}
 }
