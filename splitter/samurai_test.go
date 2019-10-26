@@ -17,3 +17,11 @@ func TestNewSamurai_ShouldReturnSamuraiSplitter(t *testing.T) {
 	assert.NotNil(t, splitter)
 	assert.Equal(t, "samurai", splitter.Name())
 }
+
+func TestSplit_OnSamurai_ShouldReturnAnArrayOfStrings(t *testing.T) {
+	context := samurai.NewTokenContext(samurai.NewFrequencyTable(), samurai.NewFrequencyTable())
+	splitter := splitter.NewSamurai(context)
+	got := splitter.Split("car")
+
+	assert.ElementsMatch(t, []string{"car"}, got)
+}

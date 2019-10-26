@@ -13,3 +13,10 @@ func TestNewConserv_ShouldReturnConservSplitter(t *testing.T) {
 	assert.NotNil(t, splitter)
 	assert.Equal(t, "conserv", splitter.Name())
 }
+
+func TestSplit_OnConserv_ShouldReturnAnArrayOfStrings(t *testing.T) {
+	splitter := splitter.NewConserv()
+	got := splitter.Split("car")
+
+	assert.ElementsMatch(t, []string{"car"}, got)
+}
