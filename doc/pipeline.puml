@@ -1,0 +1,35 @@
+@@startuml Pipeline
+
+start
+:Clone the repository;
+:Parse the files and obtain ASTs;
+:Merge files into one stream;
+
+fork
+    :Mine by Count;
+fork again
+    :Mine by Scope;
+fork again
+    :Mine by Declaration;
+end fork
+
+:Extract the identifiers;
+
+fork
+    :Create Conserv;
+    :Split by Conserv;
+fork again
+    :Create Greedy;
+    :Split by Greedy;
+fork again
+    :Create Samurai;
+    :Split By Samurai;
+fork again
+    :Split/Expand by GenTest;
+end fork
+
+:Store;
+
+end
+
+@@enduml
