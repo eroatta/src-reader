@@ -1,0 +1,18 @@
+@@startuml Pipeline Class Diagram
+
+interface Splitter
+Splitter : Name()
+Splitter : Split(string) []string
+
+Splitter <|--- Conserv
+Splitter <|--- Greedy
+Splitter <|--- Samurai
+
+class Conserv
+class Greedy
+class Samurai
+
+interface Expander
+Expander : name()
+
+@@enduml
