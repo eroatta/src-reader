@@ -10,6 +10,8 @@ Splitter <|--- Greedy
 Splitter <|--- Samurai
 
 class Conserv
+Conserv --> token.conserv.Exported
+
 class Greedy
 class Samurai
 
@@ -25,5 +27,11 @@ Expander <|--- Normalize
 class Basic
 class AMAP
 class Normalize
+
+package token.conserv {
+    class Exported <<package>> {
+        Split(string) []string
+    }
+}
 
 @@enduml
