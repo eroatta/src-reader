@@ -1,35 +1,44 @@
 @@startuml Pipeline Class Diagram
 
 interface Splitter {
-    Name()
+    Name() string
     Split(string) []string
 }
 
-Splitter <|--- Conserv
-Splitter <|--- Greedy
-Splitter <|--- Samurai
+package splitter {
+    Splitter <|--- Conserv
+    Splitter <|--- Greedy
+    Splitter <|--- Samurai
 
-class Conserv
-Conserv --> token.Conserv
+    class Conserv
+    Conserv --> token.Conserv
 
-class Greedy
-Greedy ---> token.Greedy
+    class Greedy
+    Greedy ---> token.Greedy
 
-class Samurai
-Samurai ---> token.Samurai
+    class Samurai
+    Samurai ---> token.Samurai
+}
 
 interface Expander {
-    name()
+    Name() string
     Expand([]string) []string
 }
 
-Expander <|--- Basic
-Expander <|--- AMAP
-Expander <|--- Normalize
+package expander {
+    Expander <|--- Basic
+    Expander <|--- AMAP
+    Expander <|--- Normalize
 
-class Basic
-class AMAP
-class Normalize
+    class Basic
+    Basic ---> token.Basic
+
+    class AMAP
+    AMAP ---> token.AMAP
+
+    class Normalize
+    Normalize ---> token.Normalize
+}
 
 package token {
     class Conserv <<module>> {
@@ -37,11 +46,41 @@ package token {
     }
 
     class Greedy <<module>> {
-        Split(string) []string
+        Split(string, List) []string
     }
 
     class Samurai <<module>> {
-        Split(string) []string
+        Split(string, TokenContext, List, List) []string
+    }
+
+    class GenTest <<module>> {
+        Split(string, SimilarityCalculator, List, Set) []string
+    }
+
+    class Basic <<module>> {
+        Expand(string, Set, map[string]string, Set) []string
+    }
+
+    class AMAP <<module>> {
+        Expand(string, TokenScope, []string) []string
+    }
+
+    class Normalize <<module>> {
+        Expand(string, SimilarityCalculator, List, Set) []string
+    }
+}
+
+package token {
+    package list {
+        interface List {
+
+        }
+    }
+    
+    package expansion {
+        interface Set {
+
+        }
     }
 }
 
