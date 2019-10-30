@@ -10,10 +10,13 @@ Splitter <|--- Greedy
 Splitter <|--- Samurai
 
 class Conserv
-Conserv --> token.conserv.Exported
+Conserv --> token.Conserv
 
 class Greedy
+Greedy ---> token.Greedy
+
 class Samurai
+Samurai ---> token.Samurai
 
 interface Expander {
     name()
@@ -28,8 +31,16 @@ class Basic
 class AMAP
 class Normalize
 
-package token.conserv {
-    class Exported <<package>> {
+package token {
+    class Conserv <<module>> {
+        Split(string) []string
+    }
+
+    class Greedy <<module>> {
+        Split(string) []string
+    }
+
+    class Samurai <<module>> {
         Split(string) []string
     }
 }
