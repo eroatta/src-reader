@@ -10,6 +10,12 @@ package splitter {
     Splitter <|--- Greedy
     Splitter <|--- Samurai
 
+    class splitter.Functions <<(F, orchid)>> {
+        NewConserv() step.Splitter
+        NewGreedy() step.Splitter
+        NewSamurai(FrequencyTable, FrequencyTable) step.Splitter
+    }
+
     class Conserv
     Conserv --> token.Conserv
 
@@ -29,6 +35,12 @@ package expander {
     Expander <|--- Basic
     Expander <|--- AMAP
     Expander <|--- Normalize
+
+    class expander.Functions <<(F, orchid)>> {
+        NewBasic() step.Expander
+        NewAMAP() step.Expander
+        NewNormalize() step.Expander
+    }
 
     class Basic
     Basic ---> token.Basic
