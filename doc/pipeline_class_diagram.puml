@@ -1,14 +1,22 @@
 @@startuml Pipeline Class Diagram
 
-interface Splitter {
-    Name() string
-    Split(string) []string
+package step {
+    interface Splitter {
+        Name() string
+        Split(string) []string
+    }
+
+    interface Expander {
+        Name() string
+        Expand([]string) []string
+    }
 }
 
 package splitter {
     Splitter <|--- Conserv
     Splitter <|--- Greedy
     Splitter <|--- Samurai
+    Splitter <|--- GenTest
 
     class splitter.Functions <<(F, orchid)>> {
         NewConserv() step.Splitter
@@ -17,18 +25,16 @@ package splitter {
     }
 
     class Conserv
-    Conserv --> token.Conserv
+    Conserv --> token.conserv
 
     class Greedy
-    Greedy ---> token.Greedy
+    Greedy ---> token.greedy
 
     class Samurai
-    Samurai ---> token.Samurai
-}
+    Samurai ---> token.samurai
 
-interface Expander {
-    Name() string
-    Expand([]string) []string
+    class GenTest
+    GenTest ---> token.gentest
 }
 
 package expander {
@@ -43,56 +49,49 @@ package expander {
     }
 
     class Basic
-    Basic ---> token.Basic
+    Basic ---> token.basic
 
     class AMAP
-    AMAP ---> token.AMAP
+    AMAP ---> token.amap
 
     class Normalize
-    Normalize ---> token.Normalize
+    Normalize ---> token.gentest
 }
 
-package token {
-    class Conserv <<module>> {
+package token.conserv {
+    class Functions <<(F, orchid)>> {
         Split(string) []string
     }
+}
 
-    class Greedy <<module>> {
+package token.greedy {
+    class token.greedy.Functions <<(F, orchid)>> {
         Split(string, List) []string
     }
+}
 
-    class Samurai <<module>> {
+package token.samurai {
+    class token.samurai.Functions <<(F, orchid)>> {
         Split(string, TokenContext, List, List) []string
     }
+}
 
-    class GenTest <<module>> {
+package token.gentest {
+    class token.gentest.Functions <<(F, orchid)>> {
         Split(string, SimilarityCalculator, List, Set) []string
-    }
-
-    class Basic <<module>> {
-        Expand(string, Set, map[string]string, Set) []string
-    }
-
-    class AMAP <<module>> {
-        Expand(string, TokenScope, []string) []string
-    }
-
-    class Normalize <<module>> {
         Expand(string, SimilarityCalculator, List, Set) []string
     }
 }
 
-package token {
-    package list {
-        interface List {
-
-        }
+package token.basic {
+    class token.basic.Functions <<(F, orchid)>> {
+        Expand(string, Set, map[string]string, Set) []string
     }
-    
-    package expansion {
-        interface Set {
+}
 
-        }
+package token.amap {
+    class token.amap.Functions <<(F, orchid)>>  {
+        Expand(string, TokenScope, []string) []string
     }
 }
 
