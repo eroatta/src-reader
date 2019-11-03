@@ -64,8 +64,7 @@ func newGoodMain(url string) {
 	identc := step.Extract(files, extractor.New)
 
 	// splitting step
-	tCtx := samurai.NewTokenContext(frequencyTable, frequencyTable)
-	samuraiSplitter := splitter.NewSamurai(tCtx)
+	samuraiSplitter := splitter.NewSamurai(frequencyTable, frequencyTable)
 	conservSplitter := splitter.NewConserv()
 	greedySplitter := splitter.NewGreedy()
 

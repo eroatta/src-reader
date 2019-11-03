@@ -17,9 +17,9 @@ func (s samuraiSplitter) Split(token string) []string {
 }
 
 // NewSamurai creates a new Samurai splitter that will work under the provided context.
-func NewSamurai(context samurai.TokenContext) step.Splitter {
+func NewSamurai(local, global *samurai.FrequencyTable) step.Splitter {
 	return samuraiSplitter{
 		splitter: splitter{"samurai"},
-		context:  context,
+		context:  samurai.NewTokenContext(local, global),
 	}
 }
