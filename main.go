@@ -8,6 +8,7 @@ import (
 	"github.com/eroatta/token/samurai"
 
 	"github.com/eroatta/src-reader/cloner"
+	"github.com/eroatta/src-reader/expander"
 	"github.com/eroatta/src-reader/extractor"
 	"github.com/eroatta/src-reader/miner"
 	"github.com/eroatta/src-reader/splitter"
@@ -71,7 +72,8 @@ func newGoodMain(url string) {
 	splittedc := step.Split(identc, samuraiSplitter, conservSplitter, greedySplitter)
 
 	// expansion step
-	expandedc := step.Expand(splittedc)
+	basicExpander := expander.NewBasic(declarationResults.Decls())
+	expandedc := step.Expand(splittedc, basicExpander)
 
 	// storing step
 	errors := step.Store(expandedc, storer.New())
