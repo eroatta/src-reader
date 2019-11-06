@@ -15,17 +15,7 @@ type amapExpander struct {
 	referenceText      []string
 }
 
-func (a amapExpander) ApplicableOn() string {
-	// TODO change approach
-	return "samurai"
-}
-
-func (a amapExpander) Expand(token []string) []string {
-	// TODO remove
-	return []string{}
-}
-
-func (a amapExpander) ExpandIdent(ident code.Identifier) []string {
+func (a amapExpander) Expand(ident code.Identifier) []string {
 	scopedDecl, ok := a.scopedDeclarations[ident.Name]
 	if !ok {
 		// TODO perhaps we should return the identifier split
@@ -44,6 +34,10 @@ func (a amapExpander) ExpandIdent(ident code.Identifier) []string {
 	}
 
 	return expanded
+}
+
+func (a amapExpander) ApplicableOn() string {
+	return "samurai"
 }
 
 // TODO check if ScopedDecl should be part of miner...

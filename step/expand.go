@@ -11,7 +11,7 @@ type Expander interface {
 	// ApplicableOn defines the name of splits used as input.
 	ApplicableOn() string
 	// Expand performs the expansion on the token as a whole.
-	Expand(splits []string) []string
+	Expand(ident code.Identifier) []string
 }
 
 // Expand returns a channel of code.Identifier where each element has been processed by
@@ -21,12 +21,11 @@ func Expand(identc <-chan code.Identifier, expanders ...Expander) chan code.Iden
 	go func() {
 		for ident := range identc {
 			for _, expander := range expanders {
-				split, processable := ident.Splits[expander.ApplicableOn()]
-				if !processable {
+				if _, processable := ident.Splits[expander.ApplicableOn()]; !processable {
 					continue
 				}
 
-				ident.Expansions[expander.Name()] = expander.Expand(split)
+				ident.Expansions[expander.Name()] = expander.Expand(ident)
 			}
 
 			expandedc <- ident

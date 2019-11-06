@@ -13,12 +13,7 @@ func (n normalizeExpander) ApplicableOn() string {
 	return "gentest"
 }
 
-func (n normalizeExpander) Expand(token []string) []string {
-	// TODO remove
-	return []string{}
-}
-
-func (n normalizeExpander) ExpandIdent(ident code.Identifier) []string {
+func (n normalizeExpander) Expand(ident code.Identifier) []string {
 	var expanded []string
 	return expanded
 }

@@ -1,6 +1,7 @@
 package expander
 
 import (
+	"log"
 	"strings"
 
 	"github.com/eroatta/src-reader/code"
@@ -16,15 +17,23 @@ type basicExpander struct {
 	defaultWords expansion.Set
 }
 
-func (b basicExpander) Expand(tokens []string) []string {
-	var expanded []string
-	return expanded
-}
+// Expand receives a code.Identifier and processes the available splits that
+// can be expanded with the current algorithm.
+// On Basic, we rely on the related declaration information for the identifier.
+// If no declaration information can be found, we avoid trying to expand the identifier
+// because results can be broad.
+// If a declaration is found but several expansions are found, we handle a subset of them.
+func (b basicExpander) Expand(ident code.Identifier) []string {
+	split, ok := ident.Splits[b.ApplicableOn()]
+	if !ok {
+		return []string{}
+	}
 
-func (b basicExpander) ExpandIdent(ident code.Identifier) []string {
-	var expanded []string
-
-	decl := b.declarations[ident.File]
+	// TODO: use key
+	decl, ok := b.declarations[ident.Name]
+	if !ok {
+		return split
+	}
 
 	wordsBuilder := expansion.NewSetBuilder()
 	for k := range decl.Words {
@@ -34,14 +43,26 @@ func (b basicExpander) ExpandIdent(ident code.Identifier) []string {
 
 	phrases := make(map[string]string)
 	for phrase := range decl.Phrases {
-		// TODO
-		var acron string
-		phrases[acron] = strings.Join(strings.Split(phrase, " "), "-")
+		var acron strings.Builder
+		for _, word := range strings.Split(phrase, " ") {
+			acron.WriteByte(word[0])
+		}
+
+		phrases[acron.String()] = strings.ReplaceAll(phrase, " ", "-")
 	}
 
-	tokens := ident.Splits[b.ApplicableOn()]
-	for _, token := range tokens {
+	var expanded []string
+	for _, token := range split {
 		expansions := basic.Expand(token, words, phrases, b.defaultWords)
+		if len(expansions) == 0 {
+			expansions = []string{token}
+		}
+
+		if len(expansions) > 1 {
+			// TODO: sort them
+			log.Println("multiple expansions...")
+		}
+
 		expanded = append(expanded, expansions...)
 	}
 
@@ -57,6 +78,6 @@ func NewBasic(declarations map[string]miner.Decl) step.Expander {
 	return basicExpander{
 		expander:     expander{"basic"},
 		declarations: declarations,
-		defaultWords: nil,
+		defaultWords: basic.DefaultExpansions,
 	}
 }

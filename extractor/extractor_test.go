@@ -64,6 +64,14 @@ func TestVisit_OnExtractorWithFuncDecl_ShouldReturnFoundIdentifiers(t *testing.T
 	assert.Equal(t, expected, identifiers)
 }
 
+func TestVisit_OnExtractorWithFuncDeclUsingSameFuncName_ShouldReturnFoundIdentifiers(t *testing.T) {
+	assert.FailNow(t, "not yet implemented")
+}
+
+func TestVisit_OnExtractorWithFuncDecl_ShouldReturnFoundLocalIdentifiers(t *testing.T) {
+	assert.FailNow(t, "not yet implemented")
+}
+
 func TestVisit_OnExtractorWithVarDecl_ShouldReturnFoundIdentifiers(t *testing.T) {
 	src := `
 		package main

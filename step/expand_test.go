@@ -109,9 +109,9 @@ func (e expander) ApplicableOn() string {
 	return e.worksOn
 }
 
-func (e expander) Expand(token []string) []string {
+func (e expander) Expand(ident code.Identifier) []string {
 	if e.efunc != nil {
-		return e.efunc(token)
+		return e.efunc(ident.Splits[e.worksOn])
 	}
 
 	return []string{}
