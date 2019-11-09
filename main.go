@@ -73,7 +73,9 @@ func newGoodMain(url string) {
 
 	// expansion step
 	basicExpander := expander.NewBasic(declarationResults.Decls())
-	expandedc := step.Expand(splittedc, basicExpander)
+	// TODO: add reference text
+	amapExpander := expander.NewAMAP(scopes, []string{})
+	expandedc := step.Expand(splittedc, basicExpander, amapExpander)
 
 	// storing step
 	errors := step.Store(expandedc, storer.New())
