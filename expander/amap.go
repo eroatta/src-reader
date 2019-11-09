@@ -15,22 +15,31 @@ type amapExpander struct {
 	referenceText      []string
 }
 
+// Expand receives a code.Identifier and processes the available splits that
+// can be expanded with the current algorithm.
+// On AMAP, we rely on the related scoped declaration information for the identifier.
+// If no decalaration information can be found, we avoid trying to expand the identifier
+// because results can be broad.
 func (a amapExpander) Expand(ident code.Identifier) []string {
-	scopedDecl, ok := a.scopedDeclarations[ident.Name]
+	split, ok := ident.Splits[a.ApplicableOn()]
 	if !ok {
-		// TODO perhaps we should return the identifier split
 		return []string{}
 	}
 
+	// TODO: use key
+	scopedDecl, ok := a.scopedDeclarations[ident.Name]
+	if !ok {
+		return split
+	}
+
 	// TODO change strings.Join
+	// TODO: also, we can use amap.NewTokenScope(code.ScopedDecl)
 	scope := amap.NewTokenScope(scopedDecl.VariableDecls, scopedDecl.Name,
 		strings.Join(scopedDecl.BodyText, " "), scopedDecl.Comments, scopedDecl.PackageComments)
 
 	var expanded []string
-	tokens := ident.Splits[a.ApplicableOn()]
-	for _, token := range tokens {
-		expansions := amap.Expand(token, scope, a.referenceText)
-		expanded = append(expanded, expansions...)
+	for _, token := range split {
+		expanded = append(expanded, amap.Expand(token, scope, a.referenceText)...)
 	}
 
 	return expanded
@@ -40,11 +49,12 @@ func (a amapExpander) ApplicableOn() string {
 	return "samurai"
 }
 
-// TODO check if ScopedDecl should be part of miner...
-func NewAMAP(declarations map[string]miner.ScopedDecl) step.Expander {
+// NewAMAP creates a new AMAP expander. It depends on scoped declarations and also on a
+// reference text.
+func NewAMAP(declarations map[string]miner.ScopedDecl, referenceText []string) step.Expander {
 	return amapExpander{
 		expander:           expander{"amap"},
 		scopedDeclarations: declarations,
-		referenceText:      []string{}, // TODO where do we get it?
+		referenceText:      referenceText,
 	}
 }
