@@ -10,14 +10,14 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestNewBasic_ShouldReturnBasicExpander(t *testing.T) {
+func TestNewBasic_ShouldReturnBasic(t *testing.T) {
 	basic := expander.NewBasic(map[string]miner.Decl{})
 
 	assert.NotNil(t, basic)
 	assert.Equal(t, "basic", basic.Name())
 }
 
-func TestApplicableOn_OnBasicExpander_ShouldReturnGreedy(t *testing.T) {
+func TestApplicableOn_OnBasic_ShouldReturnGreedy(t *testing.T) {
 	basic := expander.NewBasic(map[string]miner.Decl{})
 
 	assert.NotNil(t, basic)
