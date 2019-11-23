@@ -1,0 +1,15 @@
+@@startuml Code Class Diagram
+
+class Repository {
+    Name string
+    URL string
+    Hash string
+    DateCreated string
+    Error error
+}
+
+class File {
+    
+}
+
+@@enduml
