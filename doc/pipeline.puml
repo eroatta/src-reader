@@ -1,4 +1,4 @@
-@@startuml Pipeline
+@@startuml General Process Activity Diagram
 
 start
 :Clone the repository;
@@ -26,9 +26,19 @@ fork again
     :Split By Samurai;
 fork again
     :Split/Expand by GenTest;
+    note right
+        Not included on the
+        current version.
+    end note
 end fork
 
-:Store;
+fork
+    :Rewrite AST;
+fork again
+    :Extract Metrics;
+end fork
+
+:Store Results;
 
 end
 
