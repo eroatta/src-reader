@@ -1,4 +1,4 @@
-@@startuml General Process Activity Diagram
+@@startuml System Activity Diagram
 
 start
 :Clone the repository;

@@ -1,0 +1,21 @@
+@@startuml System Use Cases
+
+actor User
+
+rectangle "src-reader" {
+    usecase (Import Project) as ImportProject
+    usecase (Split and Expand\n Identifiers) as SplitAndExpand
+    usecase (Collect Project\n Metrics) as CollectProjectMetrics
+    usecase (Collect Global\n Metrics) as CollectGlobalMetrics
+    usecase (Visualize Metrics) as VisualizeMetrics
+}
+
+left to right direction
+
+User --> ImportProject
+User --> SplitAndExpand
+User --> CollectProjectMetrics
+User --> CollectGlobalMetrics
+User --> VisualizeMetrics
+
+@@enduml
