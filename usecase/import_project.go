@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/eroatta/src-reader/entity"
 	"github.com/eroatta/src-reader/repository"
 	log "github.com/sirupsen/logrus"
 )
@@ -21,7 +22,7 @@ var (
 type ImportProjectUsecase interface {
 	// Import executes the pipeline to import a project from GitHub and
 	// extract the identifiers. It returns the project informartion.
-	Import(ctx context.Context, url string) (repository.Project, error)
+	Import(ctx context.Context, url string) (entity.Project, error)
 }
 
 // NewImportProjectUsecase initializes a new ImportProjectUsecase handler.
@@ -40,7 +41,7 @@ type importProjectUsecase struct {
 	sourceCodeRepository    repository.SourceCodeRepository
 }
 
-func (uc importProjectUsecase) Import(ctx context.Context, url string) (repository.Project, error) {
+func (uc importProjectUsecase) Import(ctx context.Context, url string) (entity.Project, error) {
 	// check if not previously imported
 	project, err := uc.projectRepository.GetByURL(ctx, url)
 	switch err {
@@ -50,17 +51,17 @@ func (uc importProjectUsecase) Import(ctx context.Context, url string) (reposito
 		// continue
 	default:
 		log.WithError(err).Error(fmt.Sprintf("unable to retrieve project for %s", url))
-		return repository.Project{}, ErrUnableToReadProject
+		return entity.Project{}, ErrUnableToReadProject
 	}
 
 	// retrieve metadata
 	metadata, err := uc.remoteProjectRepository.RetrieveMetadata(ctx, url)
 	if err != nil {
 		log.WithError(err).Error(fmt.Sprintf("unable to retrive metadata for %s", url))
-		return repository.Project{}, ErrUnableToRetrieveMetadata
+		return entity.Project{}, ErrUnableToRetrieveMetadata
 	}
 
-	project = repository.Project{
+	project = entity.Project{
 		Metadata: metadata,
 	}
 
@@ -68,7 +69,7 @@ func (uc importProjectUsecase) Import(ctx context.Context, url string) (reposito
 	err = uc.sourceCodeRepository.Clone(ctx, url)
 	if err != nil {
 		log.WithError(err).Error(fmt.Sprintf("unable to clone source code for %s", url))
-		return repository.Project{}, ErrUnableToCloneSourceCode
+		return entity.Project{}, ErrUnableToCloneSourceCode
 	}
 
 	// store the results
@@ -76,7 +77,7 @@ func (uc importProjectUsecase) Import(ctx context.Context, url string) (reposito
 	if err != nil {
 		// TODO: should we delete the cloned project?
 		log.WithError(err).Error(fmt.Sprintf("unable to save project for %s", url))
-		return repository.Project{}, ErrUnableToSaveProject
+		return entity.Project{}, ErrUnableToSaveProject
 	}
 
 	// after every step is completed, the import process is done

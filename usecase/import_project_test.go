@@ -4,6 +4,7 @@ import (
 	"context"
 	"testing"
 
+	"github.com/eroatta/src-reader/entity"
 	"github.com/eroatta/src-reader/repository"
 	"github.com/eroatta/src-reader/usecase"
 	"github.com/stretchr/testify/assert"
@@ -20,7 +21,10 @@ func TestImport_OnImportProjectUsecase_ShouldReturnImportResults(t *testing.T) {
 		getByURLErr: repository.ErrNoResults,
 	}
 	rprMock := remoteProjectRepositoryMock{
-		metadata: repository.Metadata{},
+		metadata: entity.Metadata{
+			Fullname: "test/mytest",
+			Owner:    "test",
+		},
 	}
 	scrMock := sourceCodeRepositoryMock{
 		err: nil,
@@ -31,11 +35,12 @@ func TestImport_OnImportProjectUsecase_ShouldReturnImportResults(t *testing.T) {
 
 	assert.NoError(t, err)
 	assert.Equal(t, "done", project.Status)
+	assert.Equal(t, "test/mytest", project.Metadata.Fullname)
 }
 
 func TestImport_OnImportProjectUsecase_WhenAlreadyImportedProject_ShouldImportResults(t *testing.T) {
 	prMock := projectRepositoryMock{
-		project: repository.Project{
+		project: entity.Project{
 			Status: "finished",
 		},
 		getByURLErr: nil,
@@ -51,7 +56,7 @@ func TestImport_OnImportProjectUsecase_WhenAlreadyImportedProject_ShouldImportRe
 
 func TestImport_OnImportProjectUsecase_WhenUnableToCheckExistingProject_ShouldReturnError(t *testing.T) {
 	prMock := projectRepositoryMock{
-		project:     repository.Project{},
+		project:     entity.Project{},
 		getByURLErr: repository.ErrUnexpected,
 	}
 	uc := usecase.NewImportProjectUsecase(prMock, nil, nil)
@@ -82,7 +87,10 @@ func TestImport_OnImportProjectUsecase_WhenUnableToCloneSourceCode_ShouldReturnE
 		getByURLErr: repository.ErrNoResults,
 	}
 	rprMock := remoteProjectRepositoryMock{
-		metadata: repository.Metadata{},
+		metadata: entity.Metadata{
+			Fullname: "test/mytest",
+			Owner:    "test",
+		},
 	}
 	scrMock := sourceCodeRepositoryMock{
 		err: repository.ErrUnexpected,
@@ -101,7 +109,10 @@ func TestImport_OnImportProjectUsecase_WhenUnableToSaveImportedProject_ShouldRet
 		addErr:      repository.ErrUnexpected,
 	}
 	rprMock := remoteProjectRepositoryMock{
-		metadata: repository.Metadata{},
+		metadata: entity.Metadata{
+			Fullname: "test/mytest",
+			Owner:    "test",
+		},
 	}
 	scrMock := sourceCodeRepositoryMock{
 		err: nil,
@@ -116,25 +127,25 @@ func TestImport_OnImportProjectUsecase_WhenUnableToSaveImportedProject_ShouldRet
 
 // mocks
 type projectRepositoryMock struct {
-	project     repository.Project
+	project     entity.Project
 	getByURLErr error
 	addErr      error
 }
 
-func (m projectRepositoryMock) Add(ctx context.Context, p repository.Project) error {
+func (m projectRepositoryMock) Add(ctx context.Context, p entity.Project) error {
 	return m.addErr
 }
 
-func (m projectRepositoryMock) GetByURL(ctx context.Context, url string) (repository.Project, error) {
+func (m projectRepositoryMock) GetByURL(ctx context.Context, url string) (entity.Project, error) {
 	return m.project, m.getByURLErr
 }
 
 type remoteProjectRepositoryMock struct {
-	metadata repository.Metadata
+	metadata entity.Metadata
 	err      error
 }
 
-func (m remoteProjectRepositoryMock) RetrieveMetadata(ctx context.Context, url string) (repository.Metadata, error) {
+func (m remoteProjectRepositoryMock) RetrieveMetadata(ctx context.Context, url string) (entity.Metadata, error) {
 	return m.metadata, m.err
 }
 
