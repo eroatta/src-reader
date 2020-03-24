@@ -85,7 +85,6 @@ func TestImport_OnImportProjectUsecase_WhenUnableToCloneSourceCode_ShouldReturnE
 		metadata: repository.Metadata{},
 	}
 	scrMock := sourceCodeRepositoryMock{
-		// TODO: change?
 		err: repository.ErrUnexpected,
 	}
 	uc := usecase.NewImportProjectUsecase(prMock, rprMock, scrMock)

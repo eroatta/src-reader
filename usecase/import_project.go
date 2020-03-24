@@ -10,10 +10,10 @@ import (
 )
 
 var (
-	ErrUnableToReadProject      = errors.New("")
-	ErrUnableToRetrieveMetadata = errors.New("")
-	ErrUnableToCloneSourceCode  = errors.New("")
-	ErrUnableToSaveProject      = errors.New("")
+	ErrUnableToReadProject      = errors.New("Unable to check against existing projects")
+	ErrUnableToRetrieveMetadata = errors.New("Unable to retrieve project metadata")
+	ErrUnableToCloneSourceCode  = errors.New("Unable to access or clone the source code")
+	ErrUnableToSaveProject      = errors.New("Unable to store project changes")
 )
 
 // ImportProjectUsecase defines the contract for the use case related to the import process
@@ -61,7 +61,6 @@ func (uc importProjectUsecase) Import(ctx context.Context, url string) (reposito
 	}
 
 	project = repository.Project{
-		Status:   "retrieved",
 		Metadata: metadata,
 	}
 
