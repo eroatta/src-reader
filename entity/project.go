@@ -6,6 +6,7 @@ import "time"
 // Project defines a project under analysis.
 type Project struct {
 	Status   string
+	URL      string
 	Metadata Metadata
 }
 

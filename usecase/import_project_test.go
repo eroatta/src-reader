@@ -35,6 +35,7 @@ func TestImport_OnImportProjectUsecase_ShouldReturnImportResults(t *testing.T) {
 
 	assert.NoError(t, err)
 	assert.Equal(t, "done", project.Status)
+	assert.Equal(t, "https://github.com/test/mytest", project.URL)
 	assert.Equal(t, "test/mytest", project.Metadata.Fullname)
 }
 
@@ -42,6 +43,7 @@ func TestImport_OnImportProjectUsecase_WhenAlreadyImportedProject_ShouldImportRe
 	prMock := projectRepositoryMock{
 		project: entity.Project{
 			Status: "finished",
+			URL:    "https://github.com/test/mytest",
 		},
 		getByURLErr: nil,
 	}
@@ -52,6 +54,7 @@ func TestImport_OnImportProjectUsecase_WhenAlreadyImportedProject_ShouldImportRe
 	assert.NoError(t, err)
 	assert.NotEmpty(t, project)
 	assert.Equal(t, "finished", project.Status)
+	assert.Equal(t, "https://github.com/test/mytest", project.URL)
 }
 
 func TestImport_OnImportProjectUsecase_WhenUnableToCheckExistingProject_ShouldReturnError(t *testing.T) {

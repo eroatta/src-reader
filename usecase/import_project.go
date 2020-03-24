@@ -62,6 +62,7 @@ func (uc importProjectUsecase) Import(ctx context.Context, url string) (entity.P
 	}
 
 	project = entity.Project{
+		URL:      url,
 		Metadata: metadata,
 	}
 
