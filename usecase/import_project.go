@@ -25,10 +25,12 @@ type ImportProjectUsecase interface {
 }
 
 // NewImportProjectUsecase initializes a new ImportProjectUsecase handler.
-func NewImportProjectUsecase(pr repository.ProjectRepository, rpr repository.RemoteProjectRepository) ImportProjectUsecase {
+func NewImportProjectUsecase(pr repository.ProjectRepository, rpr repository.RemoteProjectRepository,
+	scr repository.SourceCodeRepository) ImportProjectUsecase {
 	return importProjectUsecase{
 		projectRepository:       pr,
 		remoteProjectRepository: rpr,
+		sourceCodeRepository:    scr,
 	}
 }
 
@@ -66,14 +68,20 @@ func (uc importProjectUsecase) Import(ctx context.Context, url string) (reposito
 	// clone the source code
 	err = uc.sourceCodeRepository.Clone(ctx, url)
 	if err != nil {
-		// TODO: handle error
+		log.WithError(err).Error(fmt.Sprintf("unable to clone source code for %s", url))
+		return repository.Project{}, ErrUnableToCloneSourceCode
 	}
 
 	// store the results
 	err = uc.projectRepository.Add(ctx, project)
 	if err != nil {
-		// TODO: handle error
+		// TODO: should we delete the cloned project?
+		log.WithError(err).Error(fmt.Sprintf("unable to save project for %s", url))
+		return repository.Project{}, ErrUnableToSaveProject
 	}
 
-	return repository.Project{}, nil
+	// after every step is completed, the import process is done
+	project.Status = "done"
+
+	return project, nil
 }

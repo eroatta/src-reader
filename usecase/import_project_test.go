@@ -10,13 +10,27 @@ import (
 )
 
 func TestNewImportProjectUsecase_ShouldReturnNewInstance(t *testing.T) {
-	uc := usecase.NewImportProjectUsecase(nil, nil)
+	uc := usecase.NewImportProjectUsecase(nil, nil, nil)
 
 	assert.NotNil(t, uc)
 }
 
 func TestImport_OnImportProjectUsecase_ShouldReturnImportResults(t *testing.T) {
-	assert.FailNow(t, "not yet implemented")
+	prMock := projectRepositoryMock{
+		getByURLErr: repository.ErrNoResults,
+	}
+	rprMock := remoteProjectRepositoryMock{
+		metadata: repository.Metadata{},
+	}
+	scrMock := sourceCodeRepositoryMock{
+		err: nil,
+	}
+	uc := usecase.NewImportProjectUsecase(prMock, rprMock, scrMock)
+
+	project, err := uc.Import(context.TODO(), "https://github.com/test/mytest")
+
+	assert.NoError(t, err)
+	assert.Equal(t, "done", project.Status)
 }
 
 func TestImport_OnImportProjectUsecase_WhenAlreadyImportedProject_ShouldImportResults(t *testing.T) {
@@ -24,9 +38,9 @@ func TestImport_OnImportProjectUsecase_WhenAlreadyImportedProject_ShouldImportRe
 		project: repository.Project{
 			Status: "finished",
 		},
-		err: nil,
+		getByURLErr: nil,
 	}
-	uc := usecase.NewImportProjectUsecase(prMock, nil)
+	uc := usecase.NewImportProjectUsecase(prMock, nil, nil)
 
 	project, err := uc.Import(context.TODO(), "https://github.com/test/mytest")
 
@@ -37,10 +51,10 @@ func TestImport_OnImportProjectUsecase_WhenAlreadyImportedProject_ShouldImportRe
 
 func TestImport_OnImportProjectUsecase_WhenUnableToCheckExistingProject_ShouldReturnError(t *testing.T) {
 	prMock := projectRepositoryMock{
-		project: repository.Project{},
-		err:     repository.ErrUnexpected,
+		project:     repository.Project{},
+		getByURLErr: repository.ErrUnexpected,
 	}
-	uc := usecase.NewImportProjectUsecase(prMock, nil)
+	uc := usecase.NewImportProjectUsecase(prMock, nil, nil)
 
 	project, err := uc.Import(context.TODO(), "https://github.com/test/mytest")
 
@@ -50,12 +64,12 @@ func TestImport_OnImportProjectUsecase_WhenUnableToCheckExistingProject_ShouldRe
 
 func TestImport_OnImportProjectUsecase_WhenUnableToRetrieveMetadataFromRemoteRepository_ShouldReturnError(t *testing.T) {
 	prMock := projectRepositoryMock{
-		err: repository.ErrNoResults,
+		getByURLErr: repository.ErrNoResults,
 	}
 	rprMock := remoteProjectRepositoryMock{
 		err: repository.ErrUnexpected,
 	}
-	uc := usecase.NewImportProjectUsecase(prMock, rprMock)
+	uc := usecase.NewImportProjectUsecase(prMock, rprMock, nil)
 
 	project, err := uc.Import(context.TODO(), "https://github.com/test/mytest")
 
@@ -64,21 +78,56 @@ func TestImport_OnImportProjectUsecase_WhenUnableToRetrieveMetadataFromRemoteRep
 }
 
 func TestImport_OnImportProjectUsecase_WhenUnableToCloneSourceCode_ShouldReturnError(t *testing.T) {
-	assert.FailNow(t, "not yet implemented")
+	prMock := projectRepositoryMock{
+		getByURLErr: repository.ErrNoResults,
+	}
+	rprMock := remoteProjectRepositoryMock{
+		metadata: repository.Metadata{},
+	}
+	scrMock := sourceCodeRepositoryMock{
+		// TODO: change?
+		err: repository.ErrUnexpected,
+	}
+	uc := usecase.NewImportProjectUsecase(prMock, rprMock, scrMock)
+
+	project, err := uc.Import(context.TODO(), "https://github.com/test/mytest")
+
+	assert.EqualError(t, err, usecase.ErrUnableToCloneSourceCode.Error())
+	assert.Empty(t, project)
+}
+
+func TestImport_OnImportProjectUsecase_WhenUnableToSaveImportedProject_ShouldReturnError(t *testing.T) {
+	prMock := projectRepositoryMock{
+		getByURLErr: repository.ErrNoResults,
+		addErr:      repository.ErrUnexpected,
+	}
+	rprMock := remoteProjectRepositoryMock{
+		metadata: repository.Metadata{},
+	}
+	scrMock := sourceCodeRepositoryMock{
+		err: nil,
+	}
+	uc := usecase.NewImportProjectUsecase(prMock, rprMock, scrMock)
+
+	project, err := uc.Import(context.TODO(), "https://github.com/test/mytest")
+
+	assert.EqualError(t, err, usecase.ErrUnableToSaveProject.Error())
+	assert.Empty(t, project)
 }
 
 // mocks
 type projectRepositoryMock struct {
-	project repository.Project
-	err     error
+	project     repository.Project
+	getByURLErr error
+	addErr      error
 }
 
 func (m projectRepositoryMock) Add(ctx context.Context, p repository.Project) error {
-	return nil
+	return m.addErr
 }
 
 func (m projectRepositoryMock) GetByURL(ctx context.Context, url string) (repository.Project, error) {
-	return m.project, m.err
+	return m.project, m.getByURLErr
 }
 
 type remoteProjectRepositoryMock struct {
@@ -88,6 +137,14 @@ type remoteProjectRepositoryMock struct {
 
 func (m remoteProjectRepositoryMock) RetrieveMetadata(ctx context.Context, url string) (repository.Metadata, error) {
 	return m.metadata, m.err
+}
+
+type sourceCodeRepositoryMock struct {
+	err error
+}
+
+func (m sourceCodeRepositoryMock) Clone(ctx context.Context, url string) error {
+	return m.err
 }
 
 // end mocks
