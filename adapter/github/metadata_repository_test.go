@@ -22,11 +22,22 @@ func TestNewRESTMetadataRepository_ShouldReturnNewInstance(t *testing.T) {
 
 func TestRetrieveMetadata_OnRESTMetadataRepository_WhileInvalidToken_ShouldReturnError(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintln(w, "Hola!")
+		accessToken := r.Header.Get("Authorization")
+		assert.Equal(t, "token invalid-token", accessToken)
+		fmt.Println(accessToken)
+
+		w.WriteHeader(http.StatusUnauthorized)
+		body := `
+			{
+				"message": "Bad credentials",
+				"documentation_url": "https://developer.github.com/v3"
+		  	}
+		`
+		fmt.Fprintln(w, body)
 	}))
 	defer server.Close()
 
-	repository := NewRESTMetadataRepository(server.Client(), server.URL, "token")
+	repository := NewRESTMetadataRepository(server.Client(), server.URL, "invalid-token")
 
 	_, err := repository.RetrieveMetadata(context.TODO(), "owner/reponame")
 
