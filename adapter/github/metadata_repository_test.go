@@ -110,7 +110,7 @@ func TestRetrieveMetadata_OnRESTMetadataRepository_ShouldMetadata(t *testing.T) 
 
 	metadataRepository := NewRESTMetadataRepository(server.Client(), server.URL, "valid-token")
 
-	metadata, err := metadataRepository.RetrieveMetadata(context.TODO(), "owner/reponame")
+	metadata, err := metadataRepository.RetrieveMetadata(context.TODO(), "https://github.com/owner/reponame")
 
 	assert.NoError(t, err)
 	assert.Equal(t, "223739110", metadata.RemoteID)

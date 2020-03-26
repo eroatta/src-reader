@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/eroatta/src-reader/repository"
@@ -29,6 +30,8 @@ type RESTMetadataRepository struct {
 }
 
 func (r RESTMetadataRepository) RetrieveMetadata(ctx context.Context, remoteRepository string) (entity.Metadata, error) {
+	// clean url in case of full remote address
+	remoteRepository = strings.Replace(remoteRepository, "https://github.com/", "", -1)
 	url := fmt.Sprintf("%s/repos/%s", r.baseURL, remoteRepository)
 	request, _ := http.NewRequest("GET", url, nil)
 	request.Header.Add("Authorization", fmt.Sprintf("token %s", r.accessToken))
