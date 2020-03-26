@@ -53,9 +53,26 @@ func (r RESTMetadataRepository) RetrieveMetadata(ctx context.Context, remoteRepo
 		return entity.Metadata{}, repository.ErrUnexpected
 	}
 
-	return entity.Metadata{}, nil
+	var okResponse successResponse
+	err = json.Unmarshal(body, &okResponse)
+	if err != nil {
+		log.WithError(err).Error("an error occurred while parsing OK response body")
+		return entity.Metadata{}, repository.ErrUnexpected
+	}
+
+	return entity.Metadata{
+		License: okResponse.License.Key,
+	}, nil
 }
 
 type errorResponse struct {
 	Message string `json:"message"`
+}
+
+type successResponse struct {
+	License license
+}
+
+type license struct {
+	Key string
 }
