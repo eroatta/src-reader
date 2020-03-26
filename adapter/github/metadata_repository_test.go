@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
 	"github.com/eroatta/src-reader/repository"
 	"github.com/stretchr/testify/assert"
@@ -112,7 +113,20 @@ func TestRetrieveMetadata_OnRESTMetadataRepository_ShouldMetadata(t *testing.T) 
 	metadata, err := metadataRepository.RetrieveMetadata(context.TODO(), "owner/reponame")
 
 	assert.NoError(t, err)
+	assert.Equal(t, "223739110", metadata.RemoteID)
+	assert.Equal(t, "eroatta", metadata.Owner)
+	assert.Equal(t, "eroatta/freqtable", metadata.Fullname)
+	assert.Equal(t, "Frequency Table builder, extracting and counting words from Go source code.", metadata.Description)
+	assert.Equal(t, "https://github.com/eroatta/freqtable.git", metadata.CloneURL)
+	assert.Equal(t, "master", metadata.DefaultBranch)
 	assert.Equal(t, "mit", metadata.License)
+	assert.Equal(t, "2019-11-24T12:16:58Z", metadata.CreatedAt.Format(time.RFC3339))
+	assert.Equal(t, "2020-02-16T20:07:09Z", metadata.UpdatedAt.Format(time.RFC3339))
+	assert.False(t, metadata.IsFork)
+	assert.Equal(t, int32(299), metadata.Size)
+	assert.Equal(t, int32(0), metadata.Stargazers)
+	assert.Equal(t, int32(0), metadata.Watchers)
+	assert.Equal(t, int32(0), metadata.Forks)
 }
 
 var bodyResponseOK = `

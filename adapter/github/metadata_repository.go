@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"time"
 
 	"github.com/eroatta/src-reader/repository"
 	log "github.com/sirupsen/logrus"
@@ -61,7 +62,20 @@ func (r RESTMetadataRepository) RetrieveMetadata(ctx context.Context, remoteRepo
 	}
 
 	return entity.Metadata{
-		License: okResponse.License.Key,
+		RemoteID:      fmt.Sprintf("%d", okResponse.ID),
+		Owner:         okResponse.Owner.Username,
+		Fullname:      okResponse.Fullname,
+		Description:   okResponse.Description,
+		CloneURL:      okResponse.CloneURL,
+		DefaultBranch: okResponse.Branch,
+		License:       okResponse.License.ID,
+		CreatedAt:     okResponse.CreatedAt,
+		UpdatedAt:     okResponse.UpdatedAt,
+		IsFork:        okResponse.IsFork,
+		Size:          okResponse.Size,
+		Stargazers:    okResponse.StargazersCount,
+		Watchers:      okResponse.WatchersCount,
+		Forks:         okResponse.ForksCount,
 	}, nil
 }
 
@@ -70,9 +84,26 @@ type errorResponse struct {
 }
 
 type successResponse struct {
-	License license
+	ID              int32      `json:"id"`
+	Owner           owner      `json:"owner"`
+	Fullname        string     `json:"full_name"`
+	Description     string     `json:"description"`
+	CreatedAt       *time.Time `json:"created_at"`
+	UpdatedAt       *time.Time `json:"updated_at"`
+	CloneURL        string     `json:"clone_url"`
+	Size            int32      `json:"size"`
+	IsFork          bool       `json:"fork"`
+	StargazersCount int32      `json:"stargazers_count"`
+	WatchersCount   int32      `json:"watchers_count"`
+	ForksCount      int32      `json:"forks"`
+	License         license    `json:"license"`
+	Branch          string     `json:"default_branch"`
+}
+
+type owner struct {
+	Username string `json:"login"`
 }
 
 type license struct {
-	Key string
+	ID string `json:"key"`
 }
