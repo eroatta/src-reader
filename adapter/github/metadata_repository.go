@@ -15,6 +15,8 @@ import (
 	"github.com/eroatta/src-reader/entity"
 )
 
+// NewRESTMetadataRepository creates a new MetadataRepository that retrieves the information
+// for a project through the GitHub REST API v3.
 func NewRESTMetadataRepository(httpClient *http.Client, baseURL string, accessToken string) *RESTMetadataRepository {
 	return &RESTMetadataRepository{
 		httpClient:  httpClient,
@@ -23,12 +25,14 @@ func NewRESTMetadataRepository(httpClient *http.Client, baseURL string, accessTo
 	}
 }
 
+// RESTMetadataRepository represents a MetadataRepository that uses the official GitHub REST API v3.
 type RESTMetadataRepository struct {
 	httpClient  *http.Client
 	baseURL     string
 	accessToken string
 }
 
+// RetrieveMetadata retrieves a repository's current information.
 func (r RESTMetadataRepository) RetrieveMetadata(ctx context.Context, remoteRepository string) (entity.Metadata, error) {
 	// clean url in case of full remote address
 	remoteRepository = strings.Replace(remoteRepository, "https://github.com/", "", -1)
