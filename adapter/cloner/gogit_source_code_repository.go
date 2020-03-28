@@ -105,3 +105,17 @@ func read(fs billy.Filesystem, rootDir string) ([]string, error) {
 
 	return names, nil
 }
+
+func (r GogitCloneRepository) Remove(ctx context.Context, location string) error {
+	if !strings.HasPrefix(location, r.baseDir) {
+		return repository.ErrSourceCodeUnableToRemove
+	}
+
+	err := os.RemoveAll(location)
+	if err != nil {
+		log.WithError(err).Error(fmt.Sprintf("unable to remove folder %s", location))
+		return repository.ErrSourceCodeUnableToRemove
+	}
+
+	return nil
+}

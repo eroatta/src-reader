@@ -145,3 +145,15 @@ func TestClone_OnGogitCloneRepository_ShouldReturnSourceCode(t *testing.T) {
 	assert.Equal(t, fmt.Sprintf("%s/eroatta/testrepo", tmpDir), sourceCode.Location)
 	assert.ElementsMatch(t, []string{"main.go", "file.go", "file_test.go", "README.md"}, sourceCode.Files)
 }
+
+func TestRemove_OnNonSharedBaseDir_ShouldReturnError(t *testing.T) {
+	assert.FailNow(t, "not yet implemented")
+}
+
+func TestRemove_OnMissingLocation_ShouldReturnError(t *testing.T) {
+	assert.FailNow(t, "not yet implemented")
+}
+
+func TestRemove_OnLocation_ShouldRemoveLocation(t *testing.T) {
+	assert.FailNow(t, "not yet implemented")
+}

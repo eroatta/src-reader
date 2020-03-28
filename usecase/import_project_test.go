@@ -39,7 +39,7 @@ func TestImport_OnImportProjectUsecase_ShouldReturnImportResults(t *testing.T) {
 	project, err := uc.Import(context.TODO(), "https://github.com/test/mytest")
 
 	assert.NoError(t, err)
-	assert.Equal(t, "done", project.Status)
+	assert.Equal(t, "imported", project.Status)
 	assert.Equal(t, "https://github.com/test/mytest", project.URL)
 	assert.Equal(t, "test/mytest", project.Metadata.Fullname)
 	assert.Equal(t, "asdasda", project.SourceCode.Hash)
@@ -166,6 +166,10 @@ type sourceCodeRepositoryMock struct {
 
 func (m sourceCodeRepositoryMock) Clone(ctx context.Context, fullname string, url string) (entity.SourceCode, error) {
 	return m.sourceCode, m.err
+}
+
+func (m sourceCodeRepositoryMock) Remove(ctx context.Context, location string) error {
+	return m.err
 }
 
 // end mocks

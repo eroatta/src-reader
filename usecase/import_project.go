@@ -77,13 +77,13 @@ func (uc importProjectUsecase) Import(ctx context.Context, url string) (entity.P
 	// store the results
 	err = uc.projectRepository.Add(ctx, project)
 	if err != nil {
-		// TODO: should we delete the cloned project?
+		defer uc.sourceCodeRepository.Remove(ctx, sourceCode.Location)
 		log.WithError(err).Error(fmt.Sprintf("unable to save project for %s", url))
 		return entity.Project{}, ErrUnableToSaveProject
 	}
 
 	// after every step is completed, the import process is done
-	project.Status = "done"
+	project.Status = "imported"
 
 	return project, nil
 }
