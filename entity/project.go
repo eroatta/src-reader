@@ -5,9 +5,10 @@ import "time"
 // TODO: change description
 // Project defines a project under analysis.
 type Project struct {
-	Status   string
-	URL      string
-	Metadata Metadata
+	Status     string
+	URL        string
+	Metadata   Metadata
+	SourceCode SourceCode
 }
 
 // Metadata holds the project information.
@@ -26,4 +27,10 @@ type Metadata struct {
 	Stargazers    int32
 	Watchers      int32
 	Forks         int32
+}
+
+type SourceCode struct {
+	Hash     string
+	Location string
+	Files    []string
 }

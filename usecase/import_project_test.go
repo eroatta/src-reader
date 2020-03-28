@@ -27,6 +27,11 @@ func TestImport_OnImportProjectUsecase_ShouldReturnImportResults(t *testing.T) {
 		},
 	}
 	scrMock := sourceCodeRepositoryMock{
+		sourceCode: entity.SourceCode{
+			Hash:     "asdasda",
+			Location: "/tmp/src-code-location",
+			Files:    []string{"myfile.go"},
+		},
 		err: nil,
 	}
 	uc := usecase.NewImportProjectUsecase(prMock, rprMock, scrMock)
@@ -37,6 +42,8 @@ func TestImport_OnImportProjectUsecase_ShouldReturnImportResults(t *testing.T) {
 	assert.Equal(t, "done", project.Status)
 	assert.Equal(t, "https://github.com/test/mytest", project.URL)
 	assert.Equal(t, "test/mytest", project.Metadata.Fullname)
+	assert.Equal(t, "asdasda", project.SourceCode.Hash)
+	assert.Equal(t, 1, len(project.SourceCode.Files))
 }
 
 func TestImport_OnImportProjectUsecase_WhenAlreadyImportedProject_ShouldImportResults(t *testing.T) {
@@ -153,11 +160,12 @@ func (m remoteProjectRepositoryMock) RetrieveMetadata(ctx context.Context, url s
 }
 
 type sourceCodeRepositoryMock struct {
-	err error
+	sourceCode entity.SourceCode
+	err        error
 }
 
-func (m sourceCodeRepositoryMock) Clone(ctx context.Context, url string) error {
-	return m.err
+func (m sourceCodeRepositoryMock) Clone(ctx context.Context, fullname string, url string) (entity.SourceCode, error) {
+	return m.sourceCode, m.err
 }
 
 // end mocks

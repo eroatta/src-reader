@@ -67,11 +67,12 @@ func (uc importProjectUsecase) Import(ctx context.Context, url string) (entity.P
 	}
 
 	// clone the source code
-	err = uc.sourceCodeRepository.Clone(ctx, url)
+	sourceCode, err := uc.sourceCodeRepository.Clone(ctx, project.Metadata.Fullname, project.Metadata.CloneURL)
 	if err != nil {
 		log.WithError(err).Error(fmt.Sprintf("unable to clone source code for %s", url))
 		return entity.Project{}, ErrUnableToCloneSourceCode
 	}
+	project.SourceCode = sourceCode
 
 	// store the results
 	err = uc.projectRepository.Add(ctx, project)
