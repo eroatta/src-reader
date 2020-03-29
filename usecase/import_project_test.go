@@ -2,6 +2,7 @@ package usecase_test
 
 import (
 	"context"
+	"errors"
 	"testing"
 
 	"github.com/eroatta/src-reader/entity"
@@ -170,6 +171,10 @@ func (m sourceCodeRepositoryMock) Clone(ctx context.Context, fullname string, ur
 
 func (m sourceCodeRepositoryMock) Remove(ctx context.Context, location string) error {
 	return m.err
+}
+
+func (m sourceCodeRepositoryMock) Read(ctx context.Context, location string, filename string) ([]byte, error) {
+	return []byte{}, errors.New("shouldn't be called")
 }
 
 // end mocks

@@ -165,3 +165,41 @@ func TestRemove_OnGogitCloneRepository_WithExistingLocation_ShouldRemoveLocation
 
 	assert.NoError(t, err)
 }
+
+func TestRead_OnGogitCloneRepository_WithNonSharedBaseDir_ShouldReturnError(t *testing.T) {
+	sourceCodeRepository := NewGogitCloneRepository("/tmp/mydir", nil)
+	rawFile, err := sourceCodeRepository.Read(context.TODO(), "/tmp/another/dir", "file.go")
+
+	assert.EqualError(t, err, repository.ErrSourceCodeUnableReadFile.Error())
+	assert.Empty(t, rawFile)
+}
+
+func TestRead_OnGogitCloneRepository_WithNoExistingFile_ShouldReturnError(t *testing.T) {
+	sourceCodeRepository := NewGogitCloneRepository("/tmp/mydir", nil)
+	rawFile, err := sourceCodeRepository.Read(context.TODO(), "/tmp/mydir", "file.go")
+
+	assert.EqualError(t, err, repository.ErrSourceCodeUnableReadFile.Error())
+	assert.Empty(t, rawFile)
+}
+
+func TestRead_OnGogitCloneRepository_WithExistingFile_ShouldReturnBytes(t *testing.T) {
+	tmp, err := ioutil.TempFile(os.TempDir(), "test-ok")
+	if err != nil {
+		assert.FailNow(t, "unexpected error creating temp file", err)
+	}
+	defer os.Remove(tmp.Name())
+
+	err = ioutil.WriteFile(tmp.Name(), []byte("test"), 0666)
+	if err != nil {
+		assert.FailNow(t, "unexpected error creating temp file", err)
+	}
+
+	filename := strings.ReplaceAll(tmp.Name(), os.TempDir(), "")
+	filename = strings.TrimPrefix(filename, "/")
+
+	sourceCodeRepository := NewGogitCloneRepository(os.TempDir(), nil)
+	rawFile, err := sourceCodeRepository.Read(context.TODO(), os.TempDir(), filename)
+
+	assert.NoError(t, err)
+	assert.EqualValues(t, []byte("test"), rawFile)
+}

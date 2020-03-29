@@ -3,6 +3,7 @@ package cloner
 import (
 	"context"
 	"fmt"
+	"io/ioutil"
 	"os"
 	"strings"
 
@@ -118,4 +119,25 @@ func (r GogitCloneRepository) Remove(ctx context.Context, location string) error
 	}
 
 	return nil
+}
+
+func (r GogitCloneRepository) Read(ctx context.Context, location string, filename string) ([]byte, error) {
+	if !strings.HasPrefix(location, r.baseDir) {
+		return []byte{}, repository.ErrSourceCodeUnableReadFile
+	}
+
+	path := fmt.Sprintf("%s/%s", location, filename)
+	file, err := os.Open(path)
+	if err != nil {
+		log.WithError(err).Error(fmt.Sprintf("unable to access or open file %s", path))
+		return []byte{}, repository.ErrSourceCodeUnableReadFile
+	}
+
+	raw, err := ioutil.ReadAll(file)
+	if err != nil {
+		log.WithError(err).Error(fmt.Sprintf("unable read content on file %s", path))
+		return []byte{}, repository.ErrSourceCodeUnableReadFile
+	}
+
+	return raw, nil
 }
