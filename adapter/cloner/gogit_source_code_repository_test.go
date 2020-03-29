@@ -146,14 +146,14 @@ func TestClone_OnGogitCloneRepository_ShouldReturnSourceCode(t *testing.T) {
 	assert.ElementsMatch(t, []string{"main.go", "file.go", "file_test.go", "README.md"}, sourceCode.Files)
 }
 
-func TestRemove_OnNonSharedBaseDir_ShouldReturnError(t *testing.T) {
+func TestRemove_OnGogitCloneRepository_WithNonSharedBaseDir_ShouldReturnError(t *testing.T) {
 	sourceCodeRepository := NewGogitCloneRepository("/tmp/mydir", nil)
 	err := sourceCodeRepository.Remove(context.TODO(), "/tmp/another/dir")
 
 	assert.EqualError(t, err, repository.ErrSourceCodeUnableToRemove.Error())
 }
 
-func TestRemove_OnLocation_ShouldRemoveLocation(t *testing.T) {
+func TestRemove_OnGogitCloneRepository_WithExistingLocation_ShouldRemoveLocation(t *testing.T) {
 	tmp, err := ioutil.TempDir(os.TempDir(), "")
 	if err != nil {
 		assert.FailNow(t, "unexpected error creating temp folder", err)
