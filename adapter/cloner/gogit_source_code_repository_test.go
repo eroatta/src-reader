@@ -147,13 +147,21 @@ func TestClone_OnGogitCloneRepository_ShouldReturnSourceCode(t *testing.T) {
 }
 
 func TestRemove_OnNonSharedBaseDir_ShouldReturnError(t *testing.T) {
-	assert.FailNow(t, "not yet implemented")
-}
+	sourceCodeRepository := NewGogitCloneRepository("/tmp/mydir", nil)
+	err := sourceCodeRepository.Remove(context.TODO(), "/tmp/another/dir")
 
-func TestRemove_OnMissingLocation_ShouldReturnError(t *testing.T) {
-	assert.FailNow(t, "not yet implemented")
+	assert.EqualError(t, err, repository.ErrSourceCodeUnableToRemove.Error())
 }
 
 func TestRemove_OnLocation_ShouldRemoveLocation(t *testing.T) {
-	assert.FailNow(t, "not yet implemented")
+	tmp, err := ioutil.TempDir(os.TempDir(), "")
+	if err != nil {
+		assert.FailNow(t, "unexpected error creating temp folder", err)
+	}
+	defer os.Remove(tmp)
+
+	sourceCodeRepository := NewGogitCloneRepository(os.TempDir(), nil)
+	err = sourceCodeRepository.Remove(context.TODO(), tmp)
+
+	assert.NoError(t, err)
 }
