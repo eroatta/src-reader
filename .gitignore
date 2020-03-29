@@ -5,6 +5,7 @@
 *.so
 *.dylib
 src-reader
+*.http
 
 # Test binary, build with `go test -c`
 *.test
