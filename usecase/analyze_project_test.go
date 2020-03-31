@@ -34,7 +34,7 @@ func TestAnalyze_OnAnalyzeProjectUsecase_WhenFailingToReadFiles_ShouldReturnErro
 
 	results, err := uc.Analyze(context.TODO(), project)
 
-	assert.EqualError(t, err, usecase.ErrUnableToRetrieveFiles.Error())
+	assert.EqualError(t, err, usecase.ErrUnableToBuildASTs.Error())
 	assert.Empty(t, results)
 }
 
@@ -49,8 +49,10 @@ func TestAnalyze_OnAnalyzeProjectUsecase_WhenFailingToParseFiles_ShouldReturnErr
 	}
 
 	sourceCodeRepositoryMock := sourceCodeFileReaderMock{
-		files: make(map[string][]byte),
-		err:   repository.ErrSourceCodeUnableReadFile,
+		files: map[string][]byte{
+			"main.go": []byte("packa main"),
+		},
+		err: nil,
 	}
 
 	uc := usecase.NewAnalyzeProjectUsecase(sourceCodeRepositoryMock, nil)
@@ -75,5 +77,14 @@ func (m sourceCodeFileReaderMock) Remove(ctx context.Context, location string) e
 }
 
 func (m sourceCodeFileReaderMock) Read(ctx context.Context, location string, filename string) ([]byte, error) {
-	return []byte{}, m.err
+	if m.err != nil {
+		return []byte{}, m.err
+	}
+
+	b, ok := m.files[filename]
+	if !ok {
+		return []byte{}, errors.New("not found")
+	}
+
+	return b, nil
 }
