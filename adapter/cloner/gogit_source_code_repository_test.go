@@ -60,7 +60,7 @@ func TestClone_OnGogitCloneRepository_WhenUnableToCloneRemoteRepository_ShouldRe
 
 	sourceCode, err := sourceCodeRepository.Clone(context.TODO(), "eroatta/testrepo", "clone_url")
 
-	assert.EqualError(t, err, repository.ErrSourceCodeCloneRemoteRepository.Error())
+	assert.EqualError(t, err, repository.ErrSourceCodeUnableCloneRemoteRepository.Error())
 	assert.Empty(t, sourceCode)
 }
 

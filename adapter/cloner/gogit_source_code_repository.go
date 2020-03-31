@@ -51,7 +51,7 @@ func (r GogitCloneRepository) Clone(ctx context.Context, fullname string, cloneU
 	cloned, err := r.clonerFunc(ctx, path, cloneURL)
 	if err != nil {
 		log.WithError(err).Error(fmt.Sprintf("failed to clone repository %s into %s", cloneURL, path))
-		return entity.SourceCode{}, repository.ErrSourceCodeCloneRemoteRepository
+		return entity.SourceCode{}, repository.ErrSourceCodeUnableCloneRemoteRepository
 	}
 
 	ref, err := cloned.Head()
