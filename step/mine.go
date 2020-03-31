@@ -7,6 +7,18 @@ import (
 	"github.com/eroatta/src-reader/code"
 )
 
+type MinerType string
+
+type MiningResults map[MinerType]interface{}
+
+const (
+	Words                MinerType = "Words"
+	Phrases              MinerType = "Phrases"
+	LocalFrequencyTable  MinerType = "Local Frequency Table"
+	GlobalFrequencyTable MinerType = "Global Frequency Table"
+	ScopedDeclarations   MinerType = "Scoped Declarations"
+)
+
 // Miner interface is used to define a custom miner.
 type Miner interface {
 	// Name provides the name of the miner.
