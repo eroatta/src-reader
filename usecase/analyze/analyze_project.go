@@ -13,8 +13,10 @@ import (
 )
 
 var (
-	ErrUnableToBuildASTs = errors.New("unable to create ASTs from input")
-	ErrUnableToMineASTs  = errors.New("unable to apply one or more miners to the ASTs")
+	ErrUnableToBuildASTs        = errors.New("unable to create ASTs from input")
+	ErrUnableToMineASTs         = errors.New("unable to apply one or more miners to the ASTs")
+	ErrUnableToCreateProcessors = errors.New("unable to create splitting or expansion algorithms")
+	ErrUnableToSaveIdentifiers  = errors.New("unable to save extracted and processed indentifiers")
 )
 
 type AnalyzeProjectUsecase interface {
@@ -31,11 +33,6 @@ func NewAnalyzeProjectUsecase(scr repository.SourceCodeRepository, ir repository
 type analyzeProjectUsecase struct {
 	sourceCodeRepository repository.SourceCodeRepository
 	identifierRepository repository.IdentifierRepository
-}
-
-type processConfig struct {
-	reader string
-	parser string
 }
 
 type Results struct {
@@ -65,18 +62,66 @@ func (uc analyzeProjectUsecase) Analyze(ctx context.Context, project entity.Proj
 
 	// apply the pre-process step (mine them)
 	miningResults := step.Mine(valid, config.Miners...)
-	// TODO: remove
-	fmt.Println(miningResults)
 
-	identc := step.Extract(valid, config.ExtractorFactory)
-	splittedc := step.Split(identc, []entity.Splitter{}...)
-	expandedc := step.Expand(splittedc, []entity.Expander{}...)
-	for i := range expandedc {
-		log.Info(i)
+	// make the splitters from input and mining results
+	splitters := make([]entity.Splitter, 0)
+	for _, name := range config.Splitters {
+		factory, err := config.SplittingAlgorithmFactory.Get(name)
+		if err != nil {
+			log.WithError(err).Error(fmt.Sprintf("unable to get splitting factory for %s", name))
+			continue
+		}
+
+		splitter, err := factory.Make(config.StaticInputs, miningResults)
+		if err != nil {
+			log.WithError(err).Error(fmt.Sprintf("unable to make splitting algorithm for %s", name))
+			continue
+		}
+
+		splitters = append(splitters, splitter)
+	}
+	if len(splitters) == 0 {
+		log.WithField("desired", config.Splitters).Error("unable to create any splitter")
+		return Results{}, ErrUnableToCreateProcessors
+	}
+
+	// make the expanders from input and mining results
+	expanders := make([]entity.Expander, 0)
+	for _, name := range config.Expanders {
+		factory, err := config.ExpansionAlgorithmFactory.Get(name)
+		if err != nil {
+			log.WithError(err).Error(fmt.Sprintf("unable to get expasions factory for %s", name))
+			continue
+		}
+
+		expander, err := factory.Make(config.StaticInputs, miningResults)
+		if err != nil {
+			log.WithError(err).Error(fmt.Sprintf("unable to make expansion algorithm for %s", name))
+			continue
+		}
+
+		expanders = append(expanders, expander)
+	}
+	if len(expanders) == 0 {
+		log.WithField("desired", config.Expanders).Error("unable to create any expander")
+		return Results{}, ErrUnableToCreateProcessors
 	}
 
 	// analyze each identifier
-	// return the splits and expansions found
-	// store them
+	identc := step.Extract(valid, config.ExtractorFactory)
+	splittedc := step.Split(identc, splitters...)
+	expandedc := step.Expand(splittedc, expanders...)
+
+	//errs := make([]error, 0)
+	for ident := range expandedc {
+		err := uc.identifierRepository.Add(ctx, project, ident)
+		if err != nil {
+			log.WithError(err).Error(fmt.Sprintf("unable to save identifier %s, on file %s for project %s",
+				ident.Name, ident.File, project.URL))
+			//errs = append(errs, err)
+			return Results{}, ErrUnableToSaveIdentifiers
+		}
+	}
+
 	return Results{}, nil
 }

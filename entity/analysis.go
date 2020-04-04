@@ -17,11 +17,13 @@ const (
 
 // AnalysisConfig defines the configuration options for an analysis execution.
 type AnalysisConfig struct {
-	StaticInputs     map[string]lists.List
-	Miners           []Miner
-	ExtractorFactory ExtractorFactory
-	Splitters        []Splitter
-	Expanders        []Expander
+	StaticInputs              map[string]lists.List
+	Miners                    []Miner
+	ExtractorFactory          ExtractorFactory
+	SplittingAlgorithmFactory SplitterAbstractFactory
+	Splitters                 []string
+	ExpansionAlgorithmFactory ExpanderAbstractFactory
+	Expanders                 []string
 }
 
 type MinerType string
@@ -60,4 +62,20 @@ type Expander interface {
 	ApplicableOn() string
 	// Expand performs the expansion on the token as a whole.
 	Expand(ident code.Identifier) []string
+}
+
+type SplitterAbstractFactory interface {
+	Get(algorithm string) (SplitterFactory, error)
+}
+
+type SplitterFactory interface {
+	Make(staticInputs map[string]lists.List, miningResults map[MinerType]Miner) (Splitter, error)
+}
+
+type ExpanderAbstractFactory interface {
+	Get(algorithm string) (ExpanderFactory, error)
+}
+
+type ExpanderFactory interface {
+	Make(staticInputs map[string]lists.List, miningResults map[MinerType]Miner) (Expander, error)
 }

@@ -9,20 +9,21 @@ import (
 	"github.com/eroatta/src-reader/adapter/cloner"
 	"github.com/eroatta/src-reader/adapter/github"
 	"github.com/eroatta/src-reader/adapter/persistence"
+	"github.com/eroatta/src-reader/code"
 	"github.com/eroatta/src-reader/entity"
 	"github.com/eroatta/src-reader/extractor"
+	"github.com/eroatta/src-reader/splitter"
 	"github.com/eroatta/src-reader/usecase/analyze"
 	"github.com/eroatta/src-reader/usecase/create"
 )
 
 func main() {
-	//newGoodMain("https://github.com/src-d/go-siva")
 	importProjectUsecase("https://github.com/src-d/go-siva")
 }
 
 func importProjectUsecase(url string) {
 	projectRepository := persistence.NewInMemoryProjectRepository()
-	remoteProjectRepository := github.NewRESTMetadataRepository(&http.Client{}, "https://api.github.com", "token")
+	remoteProjectRepository := github.NewRESTMetadataRepository(&http.Client{}, "https://api.github.com", "")
 	sourceCodeRepository := cloner.NewGogitCloneRepository("/tmp/repositories/github.com", cloner.PlainClonerFunc)
 
 	uc := create.NewImportProjectUsecase(projectRepository, remoteProjectRepository, sourceCodeRepository)
@@ -48,10 +49,11 @@ func importProjectUsecase(url string) {
 	analyzeUsecase := analyze.NewAnalyzeProjectUsecase(sourceCodeRepository, identiferRepository)
 
 	_, err = analyzeUsecase.Analyze(context.TODO(), project, &entity.AnalysisConfig{
-		Miners:           make([]entity.Miner, 0),
-		ExtractorFactory: extractor.New2,
-		Splitters:        make([]entity.Splitter, 0),
-		Expanders:        make([]entity.Expander, 0),
+		Miners:                    make([]entity.Miner, 0),
+		ExtractorFactory:          extractor.New,
+		Splitters:                 []string{"conserv"},
+		SplittingAlgorithmFactory: splitter.NewSplitterFactory(),
+		Expanders:                 make([]string, 0),
 	})
 	if err != nil {
 		log.Fatalln(err)
@@ -61,6 +63,19 @@ func importProjectUsecase(url string) {
 }
 
 type identifierRepositoryMock struct {
+}
+
+func (i identifierRepositoryMock) Add(ctx context.Context, p entity.Project, ident code.Identifier) error {
+	log.Println("Storing identifier...")
+	for alg, splits := range ident.Splits {
+		log.Println(fmt.Sprintf("%s \"%s\" Splitted into: %v by %s", ident.Type, ident.Name, splits, alg))
+	}
+
+	for alg, expans := range ident.Expansions {
+		log.Println(fmt.Sprintf("%s \"%s\" Expanded into: %v by %s", ident.Type, ident.Name, expans, alg))
+	}
+
+	return nil
 }
 
 func newGoodMain(url string) {

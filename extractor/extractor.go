@@ -32,14 +32,6 @@ func New(filename string) entity.Extractor {
 	}
 }
 
-// TODO: change
-func New2(filename string) entity.Extractor {
-	return &Extractor{
-		filename:    filename,
-		identifiers: make([]code.Identifier, 0),
-	}
-}
-
 // Visit implements the ast.Visitor interface and handles the logic for the identifiers extraction.
 func (e *Extractor) Visit(node ast.Node) ast.Visitor {
 	if node == nil {
