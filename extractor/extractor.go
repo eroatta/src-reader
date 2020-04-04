@@ -5,6 +5,7 @@ import (
 	"go/token"
 
 	"github.com/eroatta/src-reader/code"
+	"github.com/eroatta/src-reader/entity"
 	"github.com/eroatta/src-reader/step"
 )
 
@@ -26,6 +27,14 @@ type Extractor struct {
 
 // New creates a new Extractor.
 func New(filename string) step.Extractor {
+	return &Extractor{
+		filename:    filename,
+		identifiers: make([]code.Identifier, 0),
+	}
+}
+
+// TODO: change
+func New2(filename string) entity.Extractor {
 	return &Extractor{
 		filename:    filename,
 		identifiers: make([]code.Identifier, 0),

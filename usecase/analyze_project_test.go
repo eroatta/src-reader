@@ -32,7 +32,7 @@ func TestAnalyze_OnAnalyzeProjectUsecase_WhenFailingToReadFiles_ShouldReturnErro
 
 	uc := usecase.NewAnalyzeProjectUsecase(sourceCodeRepositoryMock, nil)
 
-	results, err := uc.Analyze(context.TODO(), project)
+	results, err := uc.Analyze(context.TODO(), project, &entity.AnalysisConfig{})
 
 	assert.EqualError(t, err, usecase.ErrUnableToBuildASTs.Error())
 	assert.Empty(t, results)
@@ -57,7 +57,7 @@ func TestAnalyze_OnAnalyzeProjectUsecase_WhenFailingToParseFiles_ShouldReturnErr
 
 	uc := usecase.NewAnalyzeProjectUsecase(sourceCodeRepositoryMock, nil)
 
-	results, err := uc.Analyze(context.TODO(), project)
+	results, err := uc.Analyze(context.TODO(), project, &entity.AnalysisConfig{})
 
 	assert.EqualError(t, err, usecase.ErrUnableToBuildASTs.Error())
 	assert.Empty(t, results)

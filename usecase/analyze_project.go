@@ -17,7 +17,7 @@ var (
 )
 
 type AnalyzeProjectUsecase interface {
-	Analyze(ctx context.Context, project entity.Project) (Results, error)
+	Analyze(ctx context.Context, project entity.Project, config *entity.AnalysisConfig) (Results, error)
 }
 
 func NewAnalyzeProjectUsecase(scr repository.SourceCodeRepository, ir repository.IdentifierRepository) AnalyzeProjectUsecase {
@@ -40,7 +40,7 @@ type processConfig struct {
 type Results struct {
 }
 
-func (uc analyzeProjectUsecase) Analyze(ctx context.Context, project entity.Project) (Results, error) {
+func (uc analyzeProjectUsecase) Analyze(ctx context.Context, project entity.Project, config *entity.AnalysisConfig) (Results, error) {
 	// read and parse files
 	filesc := read(ctx, uc.sourceCodeRepository, project.SourceCode.Location, project.SourceCode.Files)
 	parsed := parse(filesc)
@@ -63,6 +63,16 @@ func (uc analyzeProjectUsecase) Analyze(ctx context.Context, project entity.Proj
 	}
 
 	// apply the pre-process step (mine them)
+	miningResults := mine(valid, config.Miners...)
+	// TODO: remove
+	fmt.Println(miningResults)
+
+	identc := extract(valid, config.ExtractorFactory)
+	splittedc := split(identc, []entity.Splitter{}...)
+	expandedc := expand(splittedc, []entity.Expander{}...)
+	for i := range expandedc {
+		log.Info(i)
+	}
 
 	// analyze each identifier
 	// return the splits and expansions found

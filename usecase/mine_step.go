@@ -8,8 +8,6 @@ import (
 	"github.com/eroatta/src-reader/entity"
 )
 
-type MiningResults map[entity.MinerType]interface{}
-
 // mine traverses each Abstract Syntax Tree and applies every given miner to extract
 // the required pre-processing information. It returns a map of miners after work is done.
 func mine(parsed []code.File, miners ...entity.Miner) map[entity.MinerType]entity.Miner {
