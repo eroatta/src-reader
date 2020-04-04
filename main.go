@@ -22,7 +22,7 @@ func main() {
 
 func importProjectUsecase(url string) {
 	projectRepository := persistence.NewInMemoryProjectRepository()
-	remoteProjectRepository := github.NewRESTMetadataRepository(&http.Client{}, "https://api.github.com", "2fbe0c09c6e31cebb7ba1310bd2ca414a37cfb41")
+	remoteProjectRepository := github.NewRESTMetadataRepository(&http.Client{}, "https://api.github.com", "token")
 	sourceCodeRepository := cloner.NewGogitCloneRepository("/tmp/repositories/github.com", cloner.PlainClonerFunc)
 
 	uc := create.NewImportProjectUsecase(projectRepository, remoteProjectRepository, sourceCodeRepository)
