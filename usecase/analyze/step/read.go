@@ -1,4 +1,4 @@
-package usecase
+package step
 
 import (
 	"context"
@@ -8,7 +8,7 @@ import (
 	"github.com/eroatta/src-reader/repository"
 )
 
-func read(ctx context.Context, sc repository.SourceCodeRepository, location string, filenames []string) <-chan code.File {
+func Read(ctx context.Context, sc repository.SourceCodeRepository, location string, filenames []string) <-chan code.File {
 	namesc := make(chan string)
 	go func() {
 		for _, f := range filenames {

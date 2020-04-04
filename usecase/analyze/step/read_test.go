@@ -1,4 +1,4 @@
-package usecase
+package step_test
 
 import (
 	"context"
@@ -7,6 +7,7 @@ import (
 
 	"github.com/eroatta/src-reader/code"
 	"github.com/eroatta/src-reader/entity"
+	"github.com/eroatta/src-reader/usecase/analyze/step"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -15,7 +16,7 @@ func TestRead_OnErrorWhileRetrievingFile_ShouldReturnFileContainingError(t *test
 		err: errors.New("error reading file"),
 	}
 
-	filesc := read(context.TODO(), scMock, "/tmp/", []string{"main.go"})
+	filesc := step.Read(context.TODO(), scMock, "/tmp/", []string{"main.go"})
 
 	assert.NotNil(t, filesc)
 	for file := range filesc {
@@ -24,7 +25,7 @@ func TestRead_OnErrorWhileRetrievingFile_ShouldReturnFileContainingError(t *test
 }
 
 func TestClone_OnNonGolangRepository_ShouldReturnZeroFiles(t *testing.T) {
-	filesc := read(context.TODO(), nil, "/tmp/", []string{"README.md"})
+	filesc := step.Read(context.TODO(), nil, "/tmp/", []string{"README.md"})
 
 	assert.NotNil(t, filesc)
 
@@ -43,7 +44,7 @@ func TestClone_OnGolangRepository_ShouldReturnAllGolangFiles(t *testing.T) {
 		},
 	}
 
-	filesc := read(context.TODO(), scMock, "/tmp", []string{"main.go", "test.go"})
+	filesc := step.Read(context.TODO(), scMock, "/tmp", []string{"main.go", "test.go"})
 
 	assert.NotNil(t, filesc)
 

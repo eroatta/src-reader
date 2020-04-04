@@ -1,4 +1,4 @@
-package usecase_test
+package analyze_test
 
 import (
 	"context"
@@ -7,7 +7,7 @@ import (
 
 	"github.com/eroatta/src-reader/entity"
 	"github.com/eroatta/src-reader/repository"
-	"github.com/eroatta/src-reader/usecase"
+	"github.com/eroatta/src-reader/usecase/analyze"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -30,11 +30,11 @@ func TestAnalyze_OnAnalyzeProjectUsecase_WhenFailingToReadFiles_ShouldReturnErro
 		err:   repository.ErrSourceCodeUnableReadFile,
 	}
 
-	uc := usecase.NewAnalyzeProjectUsecase(sourceCodeRepositoryMock, nil)
+	uc := analyze.NewAnalyzeProjectUsecase(sourceCodeRepositoryMock, nil)
 
 	results, err := uc.Analyze(context.TODO(), project, &entity.AnalysisConfig{})
 
-	assert.EqualError(t, err, usecase.ErrUnableToBuildASTs.Error())
+	assert.EqualError(t, err, analyze.ErrUnableToBuildASTs.Error())
 	assert.Empty(t, results)
 }
 
@@ -55,11 +55,11 @@ func TestAnalyze_OnAnalyzeProjectUsecase_WhenFailingToParseFiles_ShouldReturnErr
 		err: nil,
 	}
 
-	uc := usecase.NewAnalyzeProjectUsecase(sourceCodeRepositoryMock, nil)
+	uc := analyze.NewAnalyzeProjectUsecase(sourceCodeRepositoryMock, nil)
 
 	results, err := uc.Analyze(context.TODO(), project, &entity.AnalysisConfig{})
 
-	assert.EqualError(t, err, usecase.ErrUnableToBuildASTs.Error())
+	assert.EqualError(t, err, analyze.ErrUnableToBuildASTs.Error())
 	assert.Empty(t, results)
 }
 

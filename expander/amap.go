@@ -4,8 +4,8 @@ import (
 	"strings"
 
 	"github.com/eroatta/src-reader/code"
+	"github.com/eroatta/src-reader/entity"
 	"github.com/eroatta/src-reader/miner"
-	"github.com/eroatta/src-reader/step"
 	"github.com/eroatta/token/amap"
 )
 
@@ -51,7 +51,7 @@ func (a amapExpander) ApplicableOn() string {
 
 // NewAMAP creates a new AMAP expander. It depends on scoped declarations and also on a
 // reference text.
-func NewAMAP(declarations map[string]miner.ScopedDecl, referenceText []string) step.Expander {
+func NewAMAP(declarations map[string]miner.ScopedDecl, referenceText []string) entity.Expander {
 	return amapExpander{
 		expander:           expander{"amap"},
 		scopedDeclarations: declarations,

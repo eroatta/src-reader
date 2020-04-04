@@ -1,4 +1,4 @@
-package usecase
+package analyze
 
 import (
 	"context"
@@ -8,6 +8,7 @@ import (
 	"github.com/eroatta/src-reader/code"
 	"github.com/eroatta/src-reader/entity"
 	"github.com/eroatta/src-reader/repository"
+	"github.com/eroatta/src-reader/usecase/analyze/step"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -42,9 +43,9 @@ type Results struct {
 
 func (uc analyzeProjectUsecase) Analyze(ctx context.Context, project entity.Project, config *entity.AnalysisConfig) (Results, error) {
 	// read and parse files
-	filesc := read(ctx, uc.sourceCodeRepository, project.SourceCode.Location, project.SourceCode.Files)
-	parsed := parse(filesc)
-	files := merge(parsed)
+	filesc := step.Read(ctx, uc.sourceCodeRepository, project.SourceCode.Location, project.SourceCode.Files)
+	parsed := step.Parse(filesc)
+	files := step.Merge(parsed)
 
 	valid := make([]code.File, 0)
 	for _, file := range files {
@@ -63,13 +64,13 @@ func (uc analyzeProjectUsecase) Analyze(ctx context.Context, project entity.Proj
 	}
 
 	// apply the pre-process step (mine them)
-	miningResults := mine(valid, config.Miners...)
+	miningResults := step.Mine(valid, config.Miners...)
 	// TODO: remove
 	fmt.Println(miningResults)
 
-	identc := extract(valid, config.ExtractorFactory)
-	splittedc := split(identc, []entity.Splitter{}...)
-	expandedc := expand(splittedc, []entity.Expander{}...)
+	identc := step.Extract(valid, config.ExtractorFactory)
+	splittedc := step.Split(identc, []entity.Splitter{}...)
+	expandedc := step.Expand(splittedc, []entity.Expander{}...)
 	for i := range expandedc {
 		log.Info(i)
 	}

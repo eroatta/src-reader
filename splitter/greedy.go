@@ -1,7 +1,7 @@
 package splitter
 
 import (
-	"github.com/eroatta/src-reader/step"
+	"github.com/eroatta/src-reader/entity"
 	"github.com/eroatta/token/greedy"
 )
 
@@ -15,7 +15,7 @@ func (g greedySplitter) Split(token string) []string {
 }
 
 // NewGreedy creates a new Greedy splitter.
-func NewGreedy() step.Splitter {
+func NewGreedy() entity.Splitter {
 	return greedySplitter{
 		splitter: splitter{"greedy"},
 	}

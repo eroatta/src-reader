@@ -1,4 +1,4 @@
-package usecase
+package step
 
 import (
 	"go/ast"
@@ -8,9 +8,9 @@ import (
 	"github.com/eroatta/src-reader/entity"
 )
 
-// mine traverses each Abstract Syntax Tree and applies every given miner to extract
+// Mine traverses each Abstract Syntax Tree and applies every given miner to extract
 // the required pre-processing information. It returns a map of miners after work is done.
-func mine(parsed []code.File, miners ...entity.Miner) map[entity.MinerType]entity.Miner {
+func Mine(parsed []code.File, miners ...entity.Miner) map[entity.MinerType]entity.Miner {
 	minersc := make(chan entity.Miner)
 
 	var wg sync.WaitGroup

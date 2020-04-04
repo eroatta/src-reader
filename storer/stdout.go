@@ -5,10 +5,9 @@ import (
 	"log"
 
 	"github.com/eroatta/src-reader/code"
-	"github.com/eroatta/src-reader/step"
 )
 
-func New() step.Storer {
+func New() interface{} {
 	return stdout{}
 }
 

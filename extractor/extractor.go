@@ -6,7 +6,6 @@ import (
 
 	"github.com/eroatta/src-reader/code"
 	"github.com/eroatta/src-reader/entity"
-	"github.com/eroatta/src-reader/step"
 )
 
 var types = map[token.Token]string{
@@ -26,7 +25,7 @@ type Extractor struct {
 }
 
 // New creates a new Extractor.
-func New(filename string) step.Extractor {
+func New(filename string) entity.Extractor {
 	return &Extractor{
 		filename:    filename,
 		identifiers: make([]code.Identifier, 0),

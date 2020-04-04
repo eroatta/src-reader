@@ -4,7 +4,8 @@ import (
 	"testing"
 
 	"github.com/eroatta/src-reader/code"
-	"github.com/eroatta/src-reader/step"
+	"github.com/eroatta/src-reader/entity"
+	"github.com/eroatta/src-reader/usecase/analyze/step"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -35,7 +36,7 @@ func TestExpand_OnEmptyExpander_ShouldSendElementsWithoutExpansions(t *testing.T
 		close(identc)
 	}()
 
-	expandedc := step.Expand(identc, []step.Expander{}...)
+	expandedc := step.Expand(identc, []entity.Expander{}...)
 
 	expanded := make([]code.Identifier, 0)
 	for ident := range expandedc {

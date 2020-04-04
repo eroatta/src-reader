@@ -1,7 +1,7 @@
 package splitter
 
 import (
-	"github.com/eroatta/src-reader/step"
+	"github.com/eroatta/src-reader/entity"
 	"github.com/eroatta/token/lists"
 	"github.com/eroatta/token/samurai"
 )
@@ -17,7 +17,7 @@ func (s samuraiSplitter) Split(token string) []string {
 }
 
 // NewSamurai creates a new Samurai splitter that will work under the provided context.
-func NewSamurai(local, global *samurai.FrequencyTable) step.Splitter {
+func NewSamurai(local, global *samurai.FrequencyTable) entity.Splitter {
 	return samuraiSplitter{
 		splitter: splitter{"samurai"},
 		context:  samurai.NewTokenContext(local, global),

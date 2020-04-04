@@ -5,7 +5,8 @@ import (
 	"testing"
 
 	"github.com/eroatta/src-reader/code"
-	"github.com/eroatta/src-reader/step"
+	"github.com/eroatta/src-reader/entity"
+	"github.com/eroatta/src-reader/usecase/analyze/step"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -33,7 +34,7 @@ func TestSplit_OnEmptySplitter_ShouldSendElementsWithoutSplits(t *testing.T) {
 		close(identc)
 	}()
 
-	splitc := step.Split(identc, []step.Splitter{}...)
+	splitc := step.Split(identc, []entity.Splitter{}...)
 
 	splits := make([]code.Identifier, 0)
 	for ident := range splitc {

@@ -1,7 +1,7 @@
 package splitter
 
 import (
-	"github.com/eroatta/src-reader/step"
+	"github.com/eroatta/src-reader/entity"
 	"github.com/eroatta/token/conserv"
 )
 
@@ -15,7 +15,7 @@ func (c conservSplitter) Split(token string) []string {
 }
 
 // NewConserv creates a new Conserv splitter.
-func NewConserv() step.Splitter {
+func NewConserv() entity.Splitter {
 	return conservSplitter{
 		splitter: splitter{"conserv"},
 	}

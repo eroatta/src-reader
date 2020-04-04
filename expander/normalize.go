@@ -2,8 +2,8 @@ package expander
 
 import (
 	"github.com/eroatta/src-reader/code"
+	"github.com/eroatta/src-reader/entity"
 	"github.com/eroatta/src-reader/miner"
-	"github.com/eroatta/src-reader/step"
 	"github.com/eroatta/token/expansion"
 	"github.com/eroatta/token/gentest"
 	"github.com/eroatta/token/lists"
@@ -45,7 +45,7 @@ func (n normalizeExpander) ApplicableOn() string {
 
 // NewNormalize creates a Normalize expander with the provided Similarity Calculator and the
 // given map of declarations.
-func NewNormalize(simCalculator gentest.SimilarityCalculator, decls map[string]miner.Decl, expansions expansion.Set) step.Expander {
+func NewNormalize(simCalculator gentest.SimilarityCalculator, decls map[string]miner.Decl, expansions expansion.Set) entity.Expander {
 	return normalizeExpander{
 		expander:           expander{"normalize"},
 		simCalculator:      simCalculator,

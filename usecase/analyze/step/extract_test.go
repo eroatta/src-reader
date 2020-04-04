@@ -1,4 +1,4 @@
-package usecase
+package step_test
 
 import (
 	"go/ast"
@@ -8,11 +8,12 @@ import (
 
 	"github.com/eroatta/src-reader/code"
 	"github.com/eroatta/src-reader/entity"
+	"github.com/eroatta/src-reader/usecase/analyze/step"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestExtract_OnNoFiles_ShouldReturnZeroIdentifiers(t *testing.T) {
-	identc := extract([]code.File{}, newExtractor)
+	identc := step.Extract([]code.File{}, newExtractor)
 
 	var identifiers int
 	for range identc {
@@ -27,7 +28,7 @@ func TestExtract_OnFileWithoutAST_ShouldReturnZeroIdentifiers(t *testing.T) {
 		Name: "main.go",
 		AST:  nil,
 	}
-	identc := extract([]code.File{fileWithoutAST}, newExtractor)
+	identc := step.Extract([]code.File{fileWithoutAST}, newExtractor)
 
 	var identifiers int
 	for range identc {
@@ -66,7 +67,7 @@ func TestExtract_OnFileWithAST_ShouldReturnFoundIdentifiers(t *testing.T) {
 		FileSet: testFileset,
 	}
 
-	identc := extract([]code.File{file}, newExtractor)
+	identc := step.Extract([]code.File{file}, newExtractor)
 
 	identifiers := make(map[string]code.Identifier)
 	for ident := range identc {

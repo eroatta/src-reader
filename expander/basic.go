@@ -5,8 +5,8 @@ import (
 	"strings"
 
 	"github.com/eroatta/src-reader/code"
+	"github.com/eroatta/src-reader/entity"
 	"github.com/eroatta/src-reader/miner"
-	"github.com/eroatta/src-reader/step"
 	"github.com/eroatta/token/basic"
 	"github.com/eroatta/token/expansion"
 )
@@ -74,7 +74,7 @@ func (b basicExpander) ApplicableOn() string {
 }
 
 // NewBasic creates a new Basic expander.
-func NewBasic(declarations map[string]miner.Decl) step.Expander {
+func NewBasic(declarations map[string]miner.Decl) entity.Expander {
 	return basicExpander{
 		expander:     expander{"basic"},
 		declarations: declarations,

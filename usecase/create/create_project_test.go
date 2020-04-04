@@ -1,4 +1,4 @@
-package usecase_test
+package create_test
 
 import (
 	"context"
@@ -7,12 +7,12 @@ import (
 
 	"github.com/eroatta/src-reader/entity"
 	"github.com/eroatta/src-reader/repository"
-	"github.com/eroatta/src-reader/usecase"
+	"github.com/eroatta/src-reader/usecase/create"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestNewImportProjectUsecase_ShouldReturnNewInstance(t *testing.T) {
-	uc := usecase.NewImportProjectUsecase(nil, nil, nil)
+	uc := create.NewImportProjectUsecase(nil, nil, nil)
 
 	assert.NotNil(t, uc)
 }
@@ -35,7 +35,7 @@ func TestImport_OnImportProjectUsecase_ShouldReturnImportResults(t *testing.T) {
 		},
 		err: nil,
 	}
-	uc := usecase.NewImportProjectUsecase(prMock, rprMock, scrMock)
+	uc := create.NewImportProjectUsecase(prMock, rprMock, scrMock)
 
 	project, err := uc.Import(context.TODO(), "https://github.com/test/mytest")
 
@@ -55,7 +55,7 @@ func TestImport_OnImportProjectUsecase_WhenAlreadyImportedProject_ShouldImportRe
 		},
 		getByURLErr: nil,
 	}
-	uc := usecase.NewImportProjectUsecase(prMock, nil, nil)
+	uc := create.NewImportProjectUsecase(prMock, nil, nil)
 
 	project, err := uc.Import(context.TODO(), "https://github.com/test/mytest")
 
@@ -70,11 +70,11 @@ func TestImport_OnImportProjectUsecase_WhenUnableToCheckExistingProject_ShouldRe
 		project:     entity.Project{},
 		getByURLErr: repository.ErrUnexpected,
 	}
-	uc := usecase.NewImportProjectUsecase(prMock, nil, nil)
+	uc := create.NewImportProjectUsecase(prMock, nil, nil)
 
 	project, err := uc.Import(context.TODO(), "https://github.com/test/mytest")
 
-	assert.EqualError(t, err, usecase.ErrUnableToReadProject.Error())
+	assert.EqualError(t, err, create.ErrUnableToReadProject.Error())
 	assert.Empty(t, project)
 }
 
@@ -85,11 +85,11 @@ func TestImport_OnImportProjectUsecase_WhenUnableToRetrieveMetadataFromRemoteRep
 	rprMock := remoteProjectRepositoryMock{
 		err: repository.ErrUnexpected,
 	}
-	uc := usecase.NewImportProjectUsecase(prMock, rprMock, nil)
+	uc := create.NewImportProjectUsecase(prMock, rprMock, nil)
 
 	project, err := uc.Import(context.TODO(), "https://github.com/test/mytest")
 
-	assert.EqualError(t, err, usecase.ErrUnableToRetrieveMetadata.Error())
+	assert.EqualError(t, err, create.ErrUnableToRetrieveMetadata.Error())
 	assert.Empty(t, project)
 }
 
@@ -106,11 +106,11 @@ func TestImport_OnImportProjectUsecase_WhenUnableToCloneSourceCode_ShouldReturnE
 	scrMock := sourceCodeRepositoryMock{
 		err: repository.ErrUnexpected,
 	}
-	uc := usecase.NewImportProjectUsecase(prMock, rprMock, scrMock)
+	uc := create.NewImportProjectUsecase(prMock, rprMock, scrMock)
 
 	project, err := uc.Import(context.TODO(), "https://github.com/test/mytest")
 
-	assert.EqualError(t, err, usecase.ErrUnableToCloneSourceCode.Error())
+	assert.EqualError(t, err, create.ErrUnableToCloneSourceCode.Error())
 	assert.Empty(t, project)
 }
 
@@ -128,11 +128,11 @@ func TestImport_OnImportProjectUsecase_WhenUnableToSaveImportedProject_ShouldRet
 	scrMock := sourceCodeRepositoryMock{
 		err: nil,
 	}
-	uc := usecase.NewImportProjectUsecase(prMock, rprMock, scrMock)
+	uc := create.NewImportProjectUsecase(prMock, rprMock, scrMock)
 
 	project, err := uc.Import(context.TODO(), "https://github.com/test/mytest")
 
-	assert.EqualError(t, err, usecase.ErrUnableToSaveProject.Error())
+	assert.EqualError(t, err, create.ErrUnableToSaveProject.Error())
 	assert.Empty(t, project)
 }
 

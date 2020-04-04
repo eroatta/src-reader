@@ -7,12 +7,13 @@ import (
 	"testing"
 
 	"github.com/eroatta/src-reader/code"
-	"github.com/eroatta/src-reader/step"
+	"github.com/eroatta/src-reader/entity"
+	"github.com/eroatta/src-reader/usecase/analyze/step"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestMine_OnNoFiles_ShouldReturnMinersWithoutResults(t *testing.T) {
-	processed := step.Mine([]code.File{}, &miner{name: "empty"})
+	processed := step.Mine([]code.File{}, &miner{typ: entity.MinerType("empty")})
 
 	assert.Equal(t, 1, len(processed))
 
@@ -23,13 +24,13 @@ func TestMine_OnNoFiles_ShouldReturnMinersWithoutResults(t *testing.T) {
 }
 
 func TestMine_OnEmptyMiners_ShouldReturnNoResults(t *testing.T) {
-	processed := step.Mine([]code.File{}, []step.Miner{}...)
+	processed := step.Mine([]code.File{}, []entity.Miner{}...)
 
 	assert.Equal(t, 0, len(processed))
 }
 
 func TestMine_OnFileWithNilAST_ShouldReturnMinersWithoutResults(t *testing.T) {
-	processed := step.Mine([]code.File{{Name: "main.go"}}, &miner{name: "empty"})
+	processed := step.Mine([]code.File{{Name: "main.go"}}, &miner{typ: entity.MinerType("empty")})
 
 	assert.Equal(t, 1, len(processed))
 
@@ -76,8 +77,8 @@ func TestMine_OnTwoMiners_ShouldReturnResultsBothMiners(t *testing.T) {
 		FileSet: testFileset,
 	}
 
-	first := &miner{name: "first"}
-	second := &miner{name: "second"}
+	first := &miner{typ: entity.MinerType("first")}
+	second := &miner{typ: entity.MinerType("second")}
 
 	processed := step.Mine([]code.File{file1, file2}, first, second)
 
@@ -95,12 +96,12 @@ func TestMine_OnTwoMiners_ShouldReturnResultsBothMiners(t *testing.T) {
 }
 
 type miner struct {
-	name   string
+	typ    entity.MinerType
 	visits int
 }
 
-func (m *miner) Name() string {
-	return m.name
+func (m *miner) Type() entity.MinerType {
+	return m.typ
 }
 
 func (m *miner) Visit(n ast.Node) ast.Visitor {
