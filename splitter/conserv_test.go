@@ -7,16 +7,18 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestNewConserv_ShouldReturnConservSplitter(t *testing.T) {
-	splitter := splitter.NewConserv()
+func TestNewConservFactory_ShouldReturnConservSplitterFactory(t *testing.T) {
+	factory := splitter.NewConservFactory()
 
-	assert.NotNil(t, splitter)
-	assert.Equal(t, "conserv", splitter.Name())
+	assert.NotNil(t, factory)
 }
 
 func TestSplit_OnConserv_ShouldReturnAnArrayOfStrings(t *testing.T) {
-	splitter := splitter.NewConserv()
+	factory := splitter.NewConservFactory()
+	splitter, _ := factory.Make(nil, nil)
+
 	got := splitter.Split("car")
 
+	assert.Equal(t, "conserv", splitter.Name())
 	assert.ElementsMatch(t, []string{"car"}, got)
 }
