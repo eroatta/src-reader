@@ -8,6 +8,7 @@ import (
 	"github.com/eroatta/src-reader/repository"
 )
 
+// Read filters only .go files and reads them.
 func Read(ctx context.Context, sc repository.SourceCodeRepository, location string, filenames []string) <-chan code.File {
 	namesc := make(chan string)
 	go func() {

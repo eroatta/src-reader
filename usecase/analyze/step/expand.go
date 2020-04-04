@@ -5,17 +5,6 @@ import (
 	"github.com/eroatta/src-reader/entity"
 )
 
-// TODO: remove
-// Expander interface is used to define a custom expander.
-/*type Expander interface {
-	// Name returns the name of the custom expander.
-	Name() string
-	// ApplicableOn defines the name of splits used as input.
-	ApplicableOn() string
-	// Expand performs the expansion on the token as a whole.
-	Expand(ident code.Identifier) []string
-}*/
-
 // Expand returns a channel of code.Identifier where each element has been processed by
 // every provided Expander.
 func Expand(identc <-chan code.Identifier, expanders ...entity.Expander) chan code.Identifier {
