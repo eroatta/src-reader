@@ -7,16 +7,19 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestNewGreedy_ShouldReturnGreedySplitter(t *testing.T) {
-	splitter := splitter.NewGreedy()
+func TestNewGreedyFactory_ShouldReturnGreedySplitterFactory(t *testing.T) {
+	factory := splitter.NewGreedyFactory()
 
-	assert.NotNil(t, splitter)
-	assert.Equal(t, "greedy", splitter.Name())
+	assert.NotNil(t, factory)
+
 }
 
 func TestSplit_OnGreedy_ShouldReturnAnArrayOfStrings(t *testing.T) {
-	splitter := splitter.NewGreedy()
+	factory := splitter.NewGreedyFactory()
+	splitter, _ := factory.Make(nil, nil)
+
 	got := splitter.Split("car")
 
+	assert.Equal(t, "greedy", splitter.Name())
 	assert.ElementsMatch(t, []string{"car"}, got)
 }
