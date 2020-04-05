@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/eroatta/src-reader/adapter/cloner"
+	"github.com/eroatta/src-reader/adapter/expander"
 	"github.com/eroatta/src-reader/adapter/github"
 	"github.com/eroatta/src-reader/adapter/persistence"
 	"github.com/eroatta/src-reader/adapter/splitter"
@@ -51,9 +52,10 @@ func importProjectUsecase(url string) {
 	_, err = analyzeUsecase.Analyze(context.TODO(), project, &entity.AnalysisConfig{
 		Miners:                    make([]entity.Miner, 0),
 		ExtractorFactory:          extractor.New,
-		Splitters:                 []string{"conserv"},
+		Splitters:                 []string{"conserv", "greedy"},
 		SplittingAlgorithmFactory: splitter.NewSplitterFactory(),
-		Expanders:                 make([]string, 0),
+		Expanders:                 []string{"noexp"},
+		ExpansionAlgorithmFactory: expander.NewExpanderFactory(),
 	})
 	if err != nil {
 		log.Fatalln(err)
