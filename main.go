@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/eroatta/src-reader/adapter/cloner"
 	"github.com/eroatta/src-reader/adapter/expander"
@@ -24,7 +25,7 @@ func main() {
 
 func importProjectUsecase(url string) {
 	projectRepository := persistence.NewInMemoryProjectRepository()
-	remoteProjectRepository := github.NewRESTMetadataRepository(&http.Client{}, "https://api.github.com", "")
+	remoteProjectRepository := github.NewRESTMetadataRepository(&http.Client{}, "https://api.github.com", os.Getenv("GITHUB_TOKEN"))
 	sourceCodeRepository := cloner.NewGogitCloneRepository("/tmp/repositories/github.com", cloner.PlainClonerFunc)
 
 	uc := create.NewImportProjectUsecase(projectRepository, remoteProjectRepository, sourceCodeRepository)
