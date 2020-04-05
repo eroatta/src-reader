@@ -11,6 +11,8 @@ func NewSplitterFactory() entity.SplitterAbstractFactory {
 	return &splitterFactory{
 		factories: map[string]entity.SplitterFactory{
 			"conserv": NewConservFactory(),
+			"greedy":  NewGreedyFactory(),
+			"samurai": NewSamuraiFactory(),
 		},
 	}
 }
