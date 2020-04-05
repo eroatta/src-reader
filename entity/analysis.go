@@ -9,6 +9,7 @@ const (
 	MinerWordCount          MinerType = "WordCount"
 	MinerScopedDeclarations MinerType = "Scoped Declarations"
 	MinerDeclarations       MinerType = "Declarations"
+	MinerComments           MinerType = "Comments"
 )
 
 // AnalysisConfig defines the configuration options for an analysis execution.
