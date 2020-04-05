@@ -6,6 +6,7 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/eroatta/src-reader/entity"
 	"github.com/eroatta/token/conserv"
 )
 
@@ -23,9 +24,9 @@ func NewCount() Count {
 	}
 }
 
-// Name returns the specific name for the miner.
-func (m Count) Name() string {
-	return "count"
+// Type returns the miner type.
+func (m Count) Type() entity.MinerType {
+	return entity.Words
 }
 
 // Visit implements the ast.Visitor interface and handles the logic for the data extraction.
@@ -214,6 +215,6 @@ func countOnFile(elem *ast.File) []string {
 }
 
 // Results returns the word count.
-func (m Count) Results() interface{} {
+func (m Count) Results() map[string]int {
 	return m.words
 }

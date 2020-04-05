@@ -3,7 +3,6 @@ package splitter
 import (
 	"github.com/eroatta/src-reader/entity"
 	"github.com/eroatta/token/conserv"
-	"github.com/eroatta/token/lists"
 )
 
 // NewConservFactory creates a new Conserv splitter factory.
@@ -13,7 +12,7 @@ func NewConservFactory() entity.SplitterFactory {
 
 type conservFactory struct{}
 
-func (f conservFactory) Make(staticInputs map[string]lists.List, miningResults map[entity.MinerType]entity.Miner) (entity.Splitter, error) {
+func (f conservFactory) Make(staticInputs map[string]interface{}, miningResults map[entity.MinerType]entity.Miner) (entity.Splitter, error) {
 	return conservSplitter{
 		splitter: splitter{"conserv"},
 	}, nil

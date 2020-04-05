@@ -3,7 +3,6 @@ package splitter
 import (
 	"github.com/eroatta/src-reader/entity"
 	"github.com/eroatta/token/greedy"
-	"github.com/eroatta/token/lists"
 )
 
 // NewGreedyFactory creates a new Greedy splitter factory.
@@ -13,7 +12,7 @@ func NewGreedyFactory() entity.SplitterFactory {
 
 type greedyFactory struct{}
 
-func (f greedyFactory) Make(staticInputs map[string]lists.List, miningResults map[entity.MinerType]entity.Miner) (entity.Splitter, error) {
+func (f greedyFactory) Make(staticInputs map[string]interface{}, miningResults map[entity.MinerType]entity.Miner) (entity.Splitter, error) {
 	return greedySplitter{
 		splitter: splitter{"greedy"},
 	}, nil

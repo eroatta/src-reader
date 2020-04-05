@@ -7,6 +7,7 @@ import (
 	"go/token"
 	"testing"
 
+	"github.com/eroatta/src-reader/entity"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -17,10 +18,10 @@ func TestNewCount_ShouldReturnNewCountMiner(t *testing.T) {
 	assert.IsType(t, Count{}, miner)
 }
 
-func TestGetName_OnCount_ShouldReturnCount(t *testing.T) {
+func TestGetType_OnCount_ShouldReturnCount(t *testing.T) {
 	miner := NewCount()
 
-	assert.Equal(t, "count", miner.Name())
+	assert.Equal(t, entity.Words, miner.Type())
 }
 
 func TestVisit_OnCountWithNilNode_ShouldReturnNil(t *testing.T) {
@@ -846,7 +847,7 @@ func TestResults_OnCountExtractorAfterExtraction_ShouldReturnWordCount(t *testin
 	count := NewCount()
 	ast.Walk(count, node)
 
-	wordCount := count.Results().(map[string]int)
+	wordCount := count.Results()
 	assert.NotEmpty(t, wordCount)
 	assert.Equal(t, 1, len(wordCount))
 

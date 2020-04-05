@@ -4,7 +4,6 @@ import (
 	"go/ast"
 
 	"github.com/eroatta/src-reader/code"
-	"github.com/eroatta/token/lists"
 )
 
 const (
@@ -17,7 +16,7 @@ const (
 
 // AnalysisConfig defines the configuration options for an analysis execution.
 type AnalysisConfig struct {
-	StaticInputs              map[string]lists.List
+	StaticInputs              map[string]interface{}
 	Miners                    []Miner
 	ExtractorFactory          ExtractorFactory
 	SplittingAlgorithmFactory SplitterAbstractFactory
@@ -69,7 +68,7 @@ type SplitterAbstractFactory interface {
 }
 
 type SplitterFactory interface {
-	Make(staticInputs map[string]lists.List, miningResults map[MinerType]Miner) (Splitter, error)
+	Make(staticInputs map[string]interface{}, miningResults map[MinerType]Miner) (Splitter, error)
 }
 
 type ExpanderAbstractFactory interface {
@@ -77,5 +76,5 @@ type ExpanderAbstractFactory interface {
 }
 
 type ExpanderFactory interface {
-	Make(staticInputs map[string]lists.List, miningResults map[MinerType]Miner) (Expander, error)
+	Make(staticInputs map[string]interface{}, miningResults map[MinerType]Miner) (Expander, error)
 }

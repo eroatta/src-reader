@@ -12,7 +12,6 @@ import (
 	"github.com/eroatta/src-reader/repository"
 	"github.com/eroatta/src-reader/splitter"
 	"github.com/eroatta/src-reader/usecase/analyze"
-	"github.com/eroatta/token/lists"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -232,7 +231,7 @@ func (e expanderAbstractFactoryMock) Get(name string) (entity.ExpanderFactory, e
 
 type expanderFactoryMock struct{}
 
-func (e expanderFactoryMock) Make(staticInputs map[string]lists.List, miningResults map[entity.MinerType]entity.Miner) (entity.Expander, error) {
+func (e expanderFactoryMock) Make(staticInputs map[string]interface{}, miningResults map[entity.MinerType]entity.Miner) (entity.Expander, error) {
 	return expanderMock{}, nil
 }
 
