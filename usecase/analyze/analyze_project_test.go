@@ -7,10 +7,10 @@ import (
 	"go/ast"
 	"testing"
 
+	"github.com/eroatta/src-reader/adapter/splitter"
 	"github.com/eroatta/src-reader/code"
 	"github.com/eroatta/src-reader/entity"
 	"github.com/eroatta/src-reader/repository"
-	"github.com/eroatta/src-reader/splitter"
 	"github.com/eroatta/src-reader/usecase/analyze"
 	"github.com/stretchr/testify/assert"
 )

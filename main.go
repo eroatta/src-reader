@@ -9,10 +9,10 @@ import (
 	"github.com/eroatta/src-reader/adapter/cloner"
 	"github.com/eroatta/src-reader/adapter/github"
 	"github.com/eroatta/src-reader/adapter/persistence"
+	"github.com/eroatta/src-reader/adapter/splitter"
 	"github.com/eroatta/src-reader/code"
 	"github.com/eroatta/src-reader/entity"
 	"github.com/eroatta/src-reader/extractor"
-	"github.com/eroatta/src-reader/splitter"
 	"github.com/eroatta/src-reader/usecase/analyze"
 	"github.com/eroatta/src-reader/usecase/create"
 )
