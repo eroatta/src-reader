@@ -12,6 +12,7 @@ const (
 	LocalFrequencyTable  MinerType = "Local Frequency Table"
 	GlobalFrequencyTable MinerType = "Global Frequency Table"
 	ScopedDeclarations   MinerType = "Scoped Declarations"
+	Declarations         MinerType = "Declarations"
 )
 
 // AnalysisConfig defines the configuration options for an analysis execution.

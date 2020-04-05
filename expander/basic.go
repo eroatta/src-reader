@@ -1,6 +1,7 @@
 package expander
 
 import (
+	"fmt"
 	"log"
 	"strings"
 
@@ -10,6 +11,34 @@ import (
 	"github.com/eroatta/token/basic"
 	"github.com/eroatta/token/expansion"
 )
+
+// NewBasicFactory creates a new Basic expanders factory.
+func NewBasicFactory() entity.ExpanderFactory {
+	return basicFactory{}
+}
+
+type basicFactory struct{}
+
+func (f basicFactory) Make(staticInputs map[string]interface{}, miningResults map[entity.MinerType]entity.Miner) (entity.Expander, error) {
+	declarationsMiner, ok := miningResults[entity.Declarations]
+	if !ok {
+		return nil, fmt.Errorf("unable to retrieve input from %s", entity.Declarations)
+	}
+	declarations := declarationsMiner.(miner.Declaration).Declarations()
+
+	exps, ok := staticInputs["DefaultExpansions"]
+	if !ok {
+		// TODO: improve
+		return nil, fmt.Errorf("unable to retrieve input from DefaultExpansions")
+	}
+	defaultWords := exps.(expansion.Set)
+
+	return &basicExpander{
+		expander:     expander{"amap"},
+		declarations: declarations,
+		defaultWords: defaultWords,
+	}, nil
+}
 
 type basicExpander struct {
 	expander
@@ -71,13 +100,4 @@ func (b basicExpander) Expand(ident code.Identifier) []string {
 
 func (b basicExpander) ApplicableOn() string {
 	return "greedy"
-}
-
-// NewBasic creates a new Basic expander.
-func NewBasic(declarations map[string]miner.Decl) entity.Expander {
-	return basicExpander{
-		expander:     expander{"basic"},
-		declarations: declarations,
-		defaultWords: basic.DefaultExpansions,
-	}
 }

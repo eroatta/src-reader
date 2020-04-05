@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/eroatta/nounphrases"
+	"github.com/eroatta/src-reader/entity"
 	"github.com/eroatta/token/conserv"
 	"github.com/eroatta/token/lists"
 )
@@ -31,24 +32,24 @@ func newDecl(ID string, declType token.Token) Decl {
 // Declaration represents the declarations miner, which extracts information about
 // words and phrases for each function/variable/struct/interface declaration.
 type Declaration struct {
-	dict        lists.List
-	packageName string
-	comments    []*ast.CommentGroup
-	included    []ast.Decl
-	decls       map[string]Decl
+	Dict        lists.List
+	PackageName string
+	Comments    []*ast.CommentGroup
+	Included    []ast.Decl
+	Decls       map[string]Decl
 }
 
 // NewDeclaration initializes a new declarations miner.
 func NewDeclaration(dict lists.List) Declaration {
 	return Declaration{
-		dict:  dict,
-		decls: make(map[string]Decl),
+		Dict:  dict,
+		Decls: make(map[string]Decl),
 	}
 }
 
-// Name returns the specific name for the miner.
-func (m Declaration) Name() string {
-	return "declaration"
+// Type returns the specific entity.MinerType for the miner.
+func (m Declaration) Type() entity.MinerType {
+	return entity.Declarations
 }
 
 // Visit implements the ast.Visitor interface and handles the logic for the data extraction.
@@ -60,13 +61,13 @@ func (m Declaration) Visit(node ast.Node) ast.Visitor {
 
 	switch elem := node.(type) {
 	case *ast.File:
-		m.packageName = elem.Name.String()
-		m.included = elem.Decls
-		m.comments = append(m.comments, elem.Comments...)
+		m.PackageName = elem.Name.String()
+		m.Included = elem.Decls
+		m.Comments = append(m.Comments, elem.Comments...)
 
 	case *ast.FuncDecl:
 		functionText := extractDeclFromFunction(elem, m)
-		m.decls[functionText.ID] = functionText
+		m.Decls[functionText.ID] = functionText
 
 	case *ast.GenDecl:
 		if elem.Tok != token.VAR && elem.Tok != token.CONST && elem.Tok != token.TYPE {
@@ -80,7 +81,7 @@ func (m Declaration) Visit(node ast.Node) ast.Visitor {
 		genDeclComments := newDecl("common", elem.Tok)
 		if elem.Doc != nil {
 			for _, comment := range elem.Doc.List {
-				genDeclComments = extractWordAndPhrasesFromComment(genDeclComments, comment.Text, m.dict)
+				genDeclComments = extractWordAndPhrasesFromComment(genDeclComments, comment.Text, m.Dict)
 			}
 		}
 
@@ -89,7 +90,7 @@ func (m Declaration) Visit(node ast.Node) ast.Visitor {
 				valDeclComments := newDecl("val", elem.Tok)
 				if valSpec.Doc != nil {
 					for _, comment := range valSpec.Doc.List {
-						valDeclComments = extractWordAndPhrasesFromComment(valDeclComments, comment.Text, m.dict)
+						valDeclComments = extractWordAndPhrasesFromComment(valDeclComments, comment.Text, m.Dict)
 					}
 				}
 
@@ -98,11 +99,11 @@ func (m Declaration) Visit(node ast.Node) ast.Visitor {
 						continue
 					}
 
-					declText := newDecl(declID(m.packageName, elem.Tok, name.String()), elem.Tok)
-					declText = extractDeclFromValue(declText, valSpec, name.Name, j, m.dict)
+					declText := newDecl(declID(m.PackageName, elem.Tok, name.String()), elem.Tok)
+					declText = extractDeclFromValue(declText, valSpec, name.Name, j, m.Dict)
 					declText = merge(merge(declText, genDeclComments), valDeclComments)
 
-					m.decls[declText.ID] = declText
+					m.Decls[declText.ID] = declText
 				}
 			}
 
@@ -111,32 +112,32 @@ func (m Declaration) Visit(node ast.Node) ast.Visitor {
 				declText := newDecl("", token.TYPE)
 
 				for _, part := range conserv.Split(name) {
-					if m.dict.Contains(part) {
+					if m.Dict.Contains(part) {
 						declText.Words[strings.ToLower(part)] = struct{}{}
 					}
 				}
 
 				if typeSpec.Doc != nil {
 					for _, comment := range typeSpec.Doc.List {
-						declText = extractWordAndPhrasesFromComment(declText, comment.Text, m.dict)
+						declText = extractWordAndPhrasesFromComment(declText, comment.Text, m.Dict)
 					}
 				}
 
 				if structType, ok := typeSpec.Type.(*ast.StructType); ok {
-					declText.ID = declID(m.packageName, token.STRUCT, name)
+					declText.ID = declID(m.PackageName, token.STRUCT, name)
 					declText.DeclType = token.STRUCT
-					declText = extractDeclFromStruct(declText, structType, m.dict)
+					declText = extractDeclFromStruct(declText, structType, m.Dict)
 				}
 
 				if interfaceType, ok := typeSpec.Type.(*ast.InterfaceType); ok {
-					declText.ID = declID(m.packageName, token.INTERFACE, name)
+					declText.ID = declID(m.PackageName, token.INTERFACE, name)
 					declText.DeclType = token.INTERFACE
-					declText = extractDeclFromInterface(declText, interfaceType, m.dict)
+					declText = extractDeclFromInterface(declText, interfaceType, m.Dict)
 				}
 
 				declText = merge(declText, genDeclComments)
 
-				m.decls[declText.ID] = declText
+				m.Decls[declText.ID] = declText
 			}
 		}
 	}
@@ -146,7 +147,7 @@ func (m Declaration) Visit(node ast.Node) ast.Visitor {
 
 func (m Declaration) shouldMine(elem *ast.GenDecl) bool {
 	var shouldMine bool
-	for _, d := range m.included {
+	for _, d := range m.Included {
 		if d.Pos() == elem.Pos() {
 			shouldMine = true
 			break
@@ -158,25 +159,25 @@ func (m Declaration) shouldMine(elem *ast.GenDecl) bool {
 
 func extractDeclFromFunction(elem *ast.FuncDecl, m Declaration) Decl {
 	name := elem.Name.String()
-	functionText := newDecl(declID(m.packageName, token.FUNC, name), token.FUNC)
+	functionText := newDecl(declID(m.PackageName, token.FUNC, name), token.FUNC)
 
 	for _, part := range conserv.Split(name) {
-		if m.dict.Contains(part) {
+		if m.Dict.Contains(part) {
 			functionText.Words[strings.ToLower(part)] = struct{}{}
 		}
 	}
 
 	if elem.Doc != nil {
 		for _, comment := range elem.Doc.List {
-			functionText = extractWordAndPhrasesFromComment(functionText, comment.Text, m.dict)
+			functionText = extractWordAndPhrasesFromComment(functionText, comment.Text, m.Dict)
 		}
 	}
 
 	start, end := elem.Pos(), elem.End()
-	for _, group := range m.comments {
+	for _, group := range m.Comments {
 		for _, comment := range group.List {
 			if comment.Slash > start && comment.Slash < end {
-				functionText = extractWordAndPhrasesFromComment(functionText, comment.Text, m.dict)
+				functionText = extractWordAndPhrasesFromComment(functionText, comment.Text, m.Dict)
 			}
 		}
 	}
@@ -300,7 +301,7 @@ func declID(pkg string, declType token.Token, name string) string {
 	return fmt.Sprintf("%s++%s::%s", pkg, declType, name)
 }
 
-// Decls returns a map of declaration IDs and the mined text for each declaration.
-func (m Declaration) Decls() map[string]Decl {
-	return m.decls
+// Declarations returns a map of declaration IDs and the mined text for each declaration.
+func (m Declaration) Declarations() map[string]Decl {
+	return m.Decls
 }

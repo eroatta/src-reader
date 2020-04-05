@@ -5,30 +5,65 @@ import (
 	"testing"
 
 	"github.com/eroatta/src-reader/code"
+	"github.com/eroatta/src-reader/entity"
 	"github.com/eroatta/src-reader/expander"
 	"github.com/eroatta/src-reader/miner"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestNewAMAP_ShouldReturnAMAP(t *testing.T) {
-	amap := expander.NewAMAP(map[string]miner.ScopedDecl{}, []string{})
+func TestNewAMAPFactory_ShouldReturnExpanderFactory(t *testing.T) {
+	factory := expander.NewAMAPFactory()
 
-	assert.NotNil(t, amap)
-	assert.Equal(t, "amap", amap.Name())
+	assert.NotNil(t, factory)
+}
+
+func TestMake_OnAMAPFactory_WhenMissingScopedDeclarations_ShouldReturnError(t *testing.T) {
+	staticInputs := map[string]interface{}{}
+	miningResults := map[entity.MinerType]entity.Miner{}
+
+	factory := expander.NewAMAPFactory()
+	expander, err := factory.Make(staticInputs, miningResults)
+
+	assert.Nil(t, expander)
+	assert.Error(t, err)
+}
+
+func TestMake_OnAMAPFactory_WhenMissingReferenceText_ShouldReturnError(t *testing.T) {
+	staticInputs := map[string]interface{}{}
+	miningResults := map[entity.MinerType]entity.Miner{
+		entity.ScopedDeclarations: miner.NewScope("test"),
+	}
+
+	factory := expander.NewAMAPFactory()
+	expander, err := factory.Make(staticInputs, miningResults)
+
+	assert.Nil(t, expander)
+	assert.Error(t, err)
 }
 
 func TestApplicableOn_OnAMAP_ShouldReturnSamurai(t *testing.T) {
-	amap := expander.NewAMAP(map[string]miner.ScopedDecl{}, []string{})
+	staticInputs := map[string]interface{}{}
+	miningResults := map[entity.MinerType]entity.Miner{
+		entity.ScopedDeclarations: miner.NewScope("test"),
+	}
+
+	factory := expander.NewAMAPFactory()
+	amap, _ := factory.Make(staticInputs, miningResults)
 
 	assert.NotNil(t, amap)
 	assert.Equal(t, "samurai", amap.ApplicableOn())
 }
 
 func TestExpand_OnAMAPWhenNoSplitsApplicable_ShouldReturnEmptyResults(t *testing.T) {
-	// TODO: miner.ScopedDecl should be moved to code.ScopedDecl
-	var scopedDecls map[string]miner.ScopedDecl
-	amap := expander.NewAMAP(scopedDecls, []string{})
+	staticInputs := map[string]interface{}{}
+	miningResults := map[entity.MinerType]entity.Miner{
+		entity.ScopedDeclarations: miner.NewScope("test"),
+	}
 
+	factory := expander.NewAMAPFactory()
+	amap, _ := factory.Make(staticInputs, miningResults)
+
+	// TODO: miner.ScopedDecl should be moved to code.ScopedDecl
 	ident := code.Identifier{
 		Name: "str",
 		Splits: map[string][]string{
@@ -42,9 +77,13 @@ func TestExpand_OnAMAPWhenNoSplitsApplicable_ShouldReturnEmptyResults(t *testing
 }
 
 func TestExpand_OnAMAPWhenNoDeclFound_ShouldReturnUnexpandedResults(t *testing.T) {
-	var scopedDecls map[string]miner.ScopedDecl
-	amap := expander.NewAMAP(scopedDecls, []string{})
+	staticInputs := map[string]interface{}{}
+	miningResults := map[entity.MinerType]entity.Miner{
+		entity.ScopedDeclarations: miner.NewScope("test"),
+	}
 
+	factory := expander.NewAMAPFactory()
+	amap, _ := factory.Make(staticInputs, miningResults)
 	ident := code.Identifier{
 		Name: "str",
 		Splits: map[string][]string{
@@ -59,14 +98,22 @@ func TestExpand_OnAMAPWhenNoDeclFound_ShouldReturnUnexpandedResults(t *testing.T
 }
 
 func TestExpand_OnAMAP_ShouldReturnExpandedResults(t *testing.T) {
-	strbuffDecl := miner.ScopedDecl{
-		ID:       "sb",
-		DeclType: token.FUNC,
-		Comments: []string{"string buffer"},
+	staticInputs := map[string]interface{}{}
+
+	miningResults := map[entity.MinerType]entity.Miner{
+		entity.ScopedDeclarations: miner.Scope{
+			Scopes: map[string]miner.ScopedDecl{
+				"sb": miner.ScopedDecl{
+					ID:       "sb",
+					DeclType: token.FUNC,
+					Comments: []string{"string buffer"},
+				},
+			},
+		},
 	}
-	amap := expander.NewAMAP(map[string]miner.ScopedDecl{
-		"sb": strbuffDecl,
-	}, []string{})
+
+	factory := expander.NewAMAPFactory()
+	amap, _ := factory.Make(staticInputs, miningResults)
 
 	ident := code.Identifier{
 		Name: "sb",

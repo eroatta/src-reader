@@ -6,6 +6,7 @@ import (
 	"go/token"
 	"testing"
 
+	"github.com/eroatta/src-reader/entity"
 	"github.com/eroatta/src-reader/miner"
 	"github.com/stretchr/testify/assert"
 )
@@ -19,7 +20,7 @@ func TestNewScopes_ShouldReturnScopesMiner(t *testing.T) {
 func TestGetName_OnScope_ShouldReturnScope(t *testing.T) {
 	miner := miner.NewScope("testfile")
 
-	assert.Equal(t, "scope", miner.Name())
+	assert.Equal(t, entity.ScopedDeclarations, miner.Type())
 }
 
 func TestScopedDeclarations_OnScope_ShouldReturnScopes(t *testing.T) {

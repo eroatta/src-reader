@@ -5,25 +5,27 @@ import (
 	"go/ast"
 	"go/token"
 	"strings"
+
+	"github.com/eroatta/src-reader/entity"
 )
 
 // Scope represents a scopes miner, which extracts information about
 // the scope for each function/variable/struct/interface declaration.
 type Scope struct {
-	filename        string
-	packageName     string
-	packageComments []string
-	comments        []*ast.CommentGroup
-	included        []ast.Decl
-	scopes          map[string]ScopedDecl
+	Filename        string
+	PackageName     string
+	PackageComments []string
+	Comments        []*ast.CommentGroup
+	Included        []ast.Decl
+	Scopes          map[string]ScopedDecl
 }
 
 // NewScope initializes a new scopes miner.
 func NewScope(filename string) Scope {
 	return Scope{
-		filename:        filename,
-		scopes:          make(map[string]ScopedDecl),
-		packageComments: make([]string, 0),
+		Filename:        filename,
+		Scopes:          make(map[string]ScopedDecl),
+		PackageComments: make([]string, 0),
 	}
 }
 
@@ -52,9 +54,9 @@ func newScopedDecl(pkg string, name string, declType token.Token) ScopedDecl {
 	}
 }
 
-// Name returns the specific name for the miner.
-func (m Scope) Name() string {
-	return "scope"
+// Type returns the specific entity.MinerType for the miner.
+func (m Scope) Type() entity.MinerType {
+	return entity.ScopedDeclarations
 }
 
 // Visit implements the ast.Visitor interface and handles the logic for the data extraction.
@@ -65,19 +67,19 @@ func (m Scope) Visit(node ast.Node) ast.Visitor {
 
 	switch elem := node.(type) {
 	case *ast.File:
-		m.packageName = elem.Name.String()
+		m.PackageName = elem.Name.String()
 		if elem.Doc != nil {
 			for _, comment := range elem.Doc.List {
-				m.packageComments = append(m.packageComments, cleanComment(comment.Text))
+				m.PackageComments = append(m.PackageComments, cleanComment(comment.Text))
 			}
 		}
 
-		m.included = elem.Decls
-		m.comments = append(m.comments, elem.Comments...)
+		m.Included = elem.Decls
+		m.Comments = append(m.Comments, elem.Comments...)
 
 	case *ast.FuncDecl:
 		name := elem.Name.String()
-		funcScopedDecl := newScopedDecl(m.packageName, name, token.FUNC)
+		funcScopedDecl := newScopedDecl(m.PackageName, name, token.FUNC)
 
 		// inbound and outbound parameters as variable declarations
 		variableDecls := make([]string, 0)
@@ -154,7 +156,7 @@ func (m Scope) Visit(node ast.Node) ast.Visitor {
 
 		// comments inside the function decl
 		start, end := elem.Pos(), elem.End()
-		for _, group := range m.comments {
+		for _, group := range m.Comments {
 			for _, comment := range group.List {
 				if comment.Slash > start && comment.Slash < end {
 					comments = append(comments, cleanComment(comment.Text))
@@ -163,9 +165,9 @@ func (m Scope) Visit(node ast.Node) ast.Visitor {
 		}
 
 		funcScopedDecl.Comments = comments
-		funcScopedDecl.PackageComments = m.packageComments
+		funcScopedDecl.PackageComments = m.PackageComments
 
-		m.scopes[funcScopedDecl.ID] = funcScopedDecl
+		m.Scopes[funcScopedDecl.ID] = funcScopedDecl
 
 	case *ast.GenDecl:
 		if !(elem.Tok == token.VAR || elem.Tok == token.CONST || elem.Tok == token.TYPE) {
@@ -202,7 +204,7 @@ func (m Scope) Visit(node ast.Node) ast.Visitor {
 						continue
 					}
 
-					varScopedDecl := newScopedDecl(m.packageName, name.String(), elem.Tok)
+					varScopedDecl := newScopedDecl(m.PackageName, name.String(), elem.Tok)
 					if valSpec.Values != nil {
 						if val, ok := valSpec.Values[j].(*ast.BasicLit); ok && val.Kind == token.STRING {
 							valStr := strings.Replace(val.Value, "\"", "", -1)
@@ -210,9 +212,9 @@ func (m Scope) Visit(node ast.Node) ast.Visitor {
 						}
 					}
 					varScopedDecl.Comments = comments
-					varScopedDecl.PackageComments = m.packageComments
+					varScopedDecl.PackageComments = m.PackageComments
 
-					m.scopes[varScopedDecl.ID] = varScopedDecl
+					m.Scopes[varScopedDecl.ID] = varScopedDecl
 				}
 			}
 
@@ -227,7 +229,7 @@ func (m Scope) Visit(node ast.Node) ast.Visitor {
 				name := typeSpec.Name.String()
 
 				if structType, ok := typeSpec.Type.(*ast.StructType); ok {
-					structScopedDecl := newScopedDecl(m.packageName, name, token.STRUCT)
+					structScopedDecl := newScopedDecl(m.PackageName, name, token.STRUCT)
 
 					if structType.Fields != nil && structType.Fields.List != nil {
 						variableDecls := make([]string, 0)
@@ -247,13 +249,13 @@ func (m Scope) Visit(node ast.Node) ast.Visitor {
 						structScopedDecl.VariableDecls = variableDecls
 					}
 					structScopedDecl.Comments = append(comments, specificComments...)
-					structScopedDecl.PackageComments = m.packageComments
+					structScopedDecl.PackageComments = m.PackageComments
 
-					m.scopes[structScopedDecl.ID] = structScopedDecl
+					m.Scopes[structScopedDecl.ID] = structScopedDecl
 				}
 
 				if interfaceType, ok := typeSpec.Type.(*ast.InterfaceType); ok {
-					interfaceScopedDecl := newScopedDecl(m.packageName, name, token.INTERFACE)
+					interfaceScopedDecl := newScopedDecl(m.PackageName, name, token.INTERFACE)
 
 					if interfaceType.Methods != nil && interfaceType.Methods.List != nil {
 						statements := make([]string, 0)
@@ -271,9 +273,9 @@ func (m Scope) Visit(node ast.Node) ast.Visitor {
 						interfaceScopedDecl.Statements = statements
 					}
 					interfaceScopedDecl.Comments = append(comments, specificComments...)
-					interfaceScopedDecl.PackageComments = m.packageComments
+					interfaceScopedDecl.PackageComments = m.PackageComments
 
-					m.scopes[interfaceScopedDecl.ID] = interfaceScopedDecl
+					m.Scopes[interfaceScopedDecl.ID] = interfaceScopedDecl
 				}
 			}
 		}
@@ -284,7 +286,7 @@ func (m Scope) Visit(node ast.Node) ast.Visitor {
 
 func (m Scope) shouldMine(elem *ast.GenDecl) bool {
 	var shouldMine bool
-	for _, d := range m.included {
+	for _, d := range m.Included {
 		if d.Pos() == elem.Pos() {
 			shouldMine = true
 			break
@@ -296,5 +298,5 @@ func (m Scope) shouldMine(elem *ast.GenDecl) bool {
 
 // ScopedDeclarations returns a map of declaration IDs and the mined scope for each declaration.
 func (m Scope) ScopedDeclarations() map[string]ScopedDecl {
-	return m.scopes
+	return m.Scopes
 }

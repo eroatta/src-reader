@@ -6,6 +6,7 @@ import (
 	"go/token"
 	"testing"
 
+	"github.com/eroatta/src-reader/entity"
 	"github.com/eroatta/src-reader/miner"
 	"github.com/eroatta/token/lists"
 	"github.com/stretchr/testify/assert"
@@ -20,7 +21,7 @@ func TestNewDeclaration_ShouldReturnDeclarationMiner(t *testing.T) {
 func TestGetName_OnDeclaration_ShouldReturnDeclaration(t *testing.T) {
 	miner := miner.NewDeclaration(nil)
 
-	assert.Equal(t, "declaration", miner.Name())
+	assert.Equal(t, entity.Declarations, miner.Type())
 }
 
 func TestVisit_OnDeclarationWithFunctions_ShouldReturnDecls(t *testing.T) {
@@ -116,7 +117,7 @@ func TestVisit_OnDeclarationWithFunctions_ShouldReturnDecls(t *testing.T) {
 			m := miner.NewDeclaration(lists.Dicctionary)
 			ast.Walk(m, node)
 
-			decls := m.Decls()
+			decls := m.Declarations()
 			assert.Equal(t, len(fixture.expected), len(decls))
 			assert.Equal(t, fixture.expected, decls)
 		})
@@ -268,7 +269,7 @@ func TestVisit_OnDeclarationWithVarDecl_ShouldReturnWordsAndPhrases(t *testing.T
 			m := miner.NewDeclaration(lists.Dicctionary)
 			ast.Walk(m, node)
 
-			decls := m.Decls()
+			decls := m.Declarations()
 			assert.Equal(t, len(fixture.expected), len(decls))
 			assert.Equal(t, fixture.expected, decls)
 		})
@@ -429,7 +430,7 @@ func TestVisit_OnDeclarationWithConstDecl_ShouldReturnWordsAndPhrases(t *testing
 			m := miner.NewDeclaration(lists.Dicctionary)
 			ast.Walk(m, node)
 
-			decls := m.Decls()
+			decls := m.Declarations()
 			assert.Equal(t, len(fixture.expected), len(decls))
 			assert.Equal(t, fixture.expected, decls)
 		})
@@ -608,7 +609,7 @@ func TestVisit_OnDeclarationWithTypeDecl_ShouldReturnWordsAndPhrases(t *testing.
 			m := miner.NewDeclaration(lists.Dicctionary)
 			ast.Walk(m, node)
 
-			decls := m.Decls()
+			decls := m.Declarations()
 			assert.Equal(t, len(fixture.expected), len(decls))
 			assert.Equal(t, fixture.expected, decls)
 		})
@@ -787,7 +788,7 @@ func TestVisit_OnDeclarationWithInterfaceDecl_ShouldReturnWordsAndPhrases(t *tes
 			m := miner.NewDeclaration(lists.Dicctionary)
 			ast.Walk(m, node)
 
-			decls := m.Decls()
+			decls := m.Declarations()
 			assert.Equal(t, len(fixture.expected), len(decls))
 			assert.Equal(t, fixture.expected, decls)
 		})

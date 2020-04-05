@@ -1,6 +1,7 @@
 package expander
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/eroatta/src-reader/code"
@@ -8,6 +9,29 @@ import (
 	"github.com/eroatta/src-reader/miner"
 	"github.com/eroatta/token/amap"
 )
+
+// NewAMAPFactory creates a new AMAP expanders factory.
+func NewAMAPFactory() entity.ExpanderFactory {
+	return amapFactory{}
+}
+
+type amapFactory struct{}
+
+func (f amapFactory) Make(staticInputs map[string]interface{}, miningResults map[entity.MinerType]entity.Miner) (entity.Expander, error) {
+	declarationsMiner, ok := miningResults[entity.ScopedDeclarations]
+	if !ok {
+		return nil, fmt.Errorf("unable to retrieve input from %s", entity.ScopedDeclarations)
+	}
+
+	scopedDeclarations := declarationsMiner.(miner.Scope).ScopedDeclarations()
+	referenceText := []string{} // TODO: add reference text
+
+	return &amapExpander{
+		expander:           expander{"amap"},
+		scopedDeclarations: scopedDeclarations,
+		referenceText:      referenceText,
+	}, nil
+}
 
 type amapExpander struct {
 	expander
@@ -47,14 +71,4 @@ func (a amapExpander) Expand(ident code.Identifier) []string {
 
 func (a amapExpander) ApplicableOn() string {
 	return "samurai"
-}
-
-// NewAMAP creates a new AMAP expander. It depends on scoped declarations and also on a
-// reference text.
-func NewAMAP(declarations map[string]miner.ScopedDecl, referenceText []string) entity.Expander {
-	return amapExpander{
-		expander:           expander{"amap"},
-		scopedDeclarations: declarations,
-		referenceText:      referenceText,
-	}
 }
