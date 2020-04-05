@@ -3,13 +3,13 @@
 package step {
     interface Splitter {
         Name() string
-        Split(code.Identifier) []string
+        Split(entity.Identifier) []string
     }
 
     interface Expander {
         Name() string
         ApplicableOn() string
-        Expand(code.Identifier) []string
+        Expand(entity.Identifier) []string
     }
 }
 

@@ -4,7 +4,6 @@ import (
 	"go/ast"
 	"go/token"
 
-	"github.com/eroatta/src-reader/code"
 	"github.com/eroatta/src-reader/entity"
 )
 
@@ -21,14 +20,14 @@ type Extractor struct {
 	filename      string
 	currentLoc    string
 	currentLocPos token.Pos
-	identifiers   []code.Identifier
+	identifiers   []entity.Identifier
 }
 
 // New creates a new Extractor.
 func New(filename string) entity.Extractor {
 	return &Extractor{
 		filename:    filename,
-		identifiers: make([]code.Identifier, 0),
+		identifiers: make([]entity.Identifier, 0),
 	}
 }
 
@@ -81,8 +80,8 @@ func (e *Extractor) Visit(node ast.Node) ast.Visitor {
 	return e
 }
 
-func fromValueSpec(filename string, token token.Token, decl *ast.ValueSpec) []code.Identifier {
-	identifiers := []code.Identifier{}
+func fromValueSpec(filename string, token token.Token, decl *ast.ValueSpec) []entity.Identifier {
+	identifiers := []entity.Identifier{}
 	for _, name := range decl.Names {
 		if name.Name == "_" {
 			continue
@@ -95,7 +94,7 @@ func fromValueSpec(filename string, token token.Token, decl *ast.ValueSpec) []co
 	return identifiers
 }
 
-func fromTypeSpec(filename string, decl *ast.TypeSpec) []code.Identifier {
+func fromTypeSpec(filename string, decl *ast.TypeSpec) []entity.Identifier {
 	var identifierType string
 	switch decl.Type.(type) {
 	case *ast.StructType:
@@ -103,18 +102,18 @@ func fromTypeSpec(filename string, decl *ast.TypeSpec) []code.Identifier {
 	case *ast.InterfaceType:
 		identifierType = types[token.INTERFACE]
 	default:
-		return []code.Identifier{}
+		return []entity.Identifier{}
 	}
 
-	identifiers := []code.Identifier{
+	identifiers := []entity.Identifier{
 		newIdentifier(filename, decl.Name.Pos(), decl.Name.String(), identifierType),
 	}
 
 	return identifiers
 }
 
-func newIdentifier(filename string, pos token.Pos, name string, identifierType string) code.Identifier {
-	return code.Identifier{
+func newIdentifier(filename string, pos token.Pos, name string, identifierType string) entity.Identifier {
+	return entity.Identifier{
 		File:       filename,
 		Position:   pos,
 		Name:       name,
@@ -124,7 +123,7 @@ func newIdentifier(filename string, pos token.Pos, name string, identifierType s
 	}
 }
 
-func newChildIdentifier(filename string, pos token.Pos, name string, identifierType string, parent string, parentPos token.Pos) code.Identifier {
+func newChildIdentifier(filename string, pos token.Pos, name string, identifierType string, parent string, parentPos token.Pos) entity.Identifier {
 	i := newIdentifier(filename, pos, name, identifierType)
 	i.Parent = parent
 	i.ParentPos = parentPos
@@ -133,6 +132,6 @@ func newChildIdentifier(filename string, pos token.Pos, name string, identifierT
 }
 
 // Identifiers returns the list of found identifiers.
-func (e *Extractor) Identifiers() []code.Identifier {
+func (e *Extractor) Identifiers() []entity.Identifier {
 	return e.identifiers
 }

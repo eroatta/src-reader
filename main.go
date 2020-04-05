@@ -12,7 +12,6 @@ import (
 	"github.com/eroatta/src-reader/adapter/github"
 	"github.com/eroatta/src-reader/adapter/persistence"
 	"github.com/eroatta/src-reader/adapter/splitter"
-	"github.com/eroatta/src-reader/code"
 	"github.com/eroatta/src-reader/entity"
 	"github.com/eroatta/src-reader/extractor"
 	"github.com/eroatta/src-reader/usecase/analyze"
@@ -68,7 +67,7 @@ func importProjectUsecase(url string) {
 type identifierRepositoryMock struct {
 }
 
-func (i identifierRepositoryMock) Add(ctx context.Context, p entity.Project, ident code.Identifier) error {
+func (i identifierRepositoryMock) Add(ctx context.Context, p entity.Project, ident entity.Identifier) error {
 	log.Println("Storing identifier...")
 	for alg, splits := range ident.Splits {
 		log.Println(fmt.Sprintf("%s \"%s\" Splitted into: %v by %s", ident.Type, ident.Name, splits, alg))

@@ -4,15 +4,15 @@ import (
 	"go/parser"
 	"go/token"
 
-	"github.com/eroatta/src-reader/code"
+	"github.com/eroatta/src-reader/entity"
 )
 
 // Parse parses a file and creates an Abstract Syntax Tree (AST) representation.
-// It handles and returns a channel of code.File elements.
-func Parse(filesc <-chan code.File) chan code.File {
+// It handles and returns a channel of entity.File elements.
+func Parse(filesc <-chan entity.File) chan entity.File {
 	fset := token.NewFileSet()
 
-	parsedc := make(chan code.File)
+	parsedc := make(chan entity.File)
 	go func() {
 		for file := range filesc {
 			node, err := parser.ParseFile(fset, file.Name, file.Raw, parser.ParseComments)
@@ -30,8 +30,8 @@ func Parse(filesc <-chan code.File) chan code.File {
 }
 
 // Merge joins files when necessary.
-func Merge(parsedc <-chan code.File) []code.File {
-	files := make([]code.File, 0)
+func Merge(parsedc <-chan entity.File) []entity.File {
+	files := make([]entity.File, 0)
 	for file := range parsedc {
 		files = append(files, file)
 	}

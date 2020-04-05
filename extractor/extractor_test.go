@@ -6,7 +6,7 @@ import (
 	"go/token"
 	"testing"
 
-	"github.com/eroatta/src-reader/code"
+	"github.com/eroatta/src-reader/entity"
 	"github.com/eroatta/src-reader/extractor"
 	"github.com/stretchr/testify/assert"
 )
@@ -33,7 +33,7 @@ func TestVisit_OnExtractorWithFuncDecl_ShouldReturnFoundIdentifiers(t *testing.T
 		}
 	`
 
-	expected := []code.Identifier{
+	expected := []entity.Identifier{
 		{
 			File:       "testfile",
 			Position:   20,
@@ -83,7 +83,7 @@ func TestVisit_OnExtractorWithVarDecl_ShouldReturnFoundIdentifiers(t *testing.T)
 		)
 	`
 
-	expected := []code.Identifier{
+	expected := []entity.Identifier{
 		{
 			File:       "testfile",
 			Position:   31,
@@ -132,7 +132,7 @@ func TestVisit_OnExtractorWithConstDecl_ShouldReturnFoundIdentifiers(t *testing.
 		)
 	`
 
-	expected := []code.Identifier{
+	expected := []entity.Identifier{
 		{
 			File:       "testfile",
 			Position:   52,
@@ -194,7 +194,7 @@ func TestVisit_OnExtractorWithStructDecl_ShouldReturnFoundIdentifiers(t *testing
 		)
 	`
 
-	expected := []code.Identifier{
+	expected := []entity.Identifier{
 		{
 			File:       "testfile",
 			Position:   52,
@@ -240,7 +240,7 @@ func TestVisit_OnExtractorWithInterfaceDecl_ShouldReturnFoundIdentifiers(t *test
 		)
 	`
 
-	expected := []code.Identifier{
+	expected := []entity.Identifier{
 		{
 			File:       "testfile",
 			Position:   52,

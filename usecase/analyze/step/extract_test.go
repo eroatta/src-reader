@@ -6,14 +6,13 @@ import (
 	"go/token"
 	"testing"
 
-	"github.com/eroatta/src-reader/code"
 	"github.com/eroatta/src-reader/entity"
 	"github.com/eroatta/src-reader/usecase/analyze/step"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestExtract_OnNoFiles_ShouldReturnZeroIdentifiers(t *testing.T) {
-	identc := step.Extract([]code.File{}, newExtractor)
+	identc := step.Extract([]entity.File{}, newExtractor)
 
 	var identifiers int
 	for range identc {
@@ -24,11 +23,11 @@ func TestExtract_OnNoFiles_ShouldReturnZeroIdentifiers(t *testing.T) {
 }
 
 func TestExtract_OnFileWithoutAST_ShouldReturnZeroIdentifiers(t *testing.T) {
-	fileWithoutAST := code.File{
+	fileWithoutAST := entity.File{
 		Name: "main.go",
 		AST:  nil,
 	}
-	identc := step.Extract([]code.File{fileWithoutAST}, newExtractor)
+	identc := step.Extract([]entity.File{fileWithoutAST}, newExtractor)
 
 	var identifiers int
 	for range identc {
@@ -61,15 +60,15 @@ func TestExtract_OnFileWithAST_ShouldReturnFoundIdentifiers(t *testing.T) {
 	testFileset := token.NewFileSet()
 
 	ast, _ := parser.ParseFile(testFileset, "main.go", `package main`, parser.AllErrors)
-	file := code.File{
+	file := entity.File{
 		Name:    "main.go",
 		AST:     ast,
 		FileSet: testFileset,
 	}
 
-	identc := step.Extract([]code.File{file}, newExtractor)
+	identc := step.Extract([]entity.File{file}, newExtractor)
 
-	identifiers := make(map[string]code.Identifier)
+	identifiers := make(map[string]entity.Identifier)
 	for ident := range identc {
 		identifiers[ident.Name] = ident
 	}
@@ -80,12 +79,12 @@ func TestExtract_OnFileWithAST_ShouldReturnFoundIdentifiers(t *testing.T) {
 
 func newExtractor(filename string) entity.Extractor {
 	return &testExtractor{
-		idents: make([]code.Identifier, 0),
+		idents: make([]entity.Identifier, 0),
 	}
 }
 
 type testExtractor struct {
-	idents []code.Identifier
+	idents []entity.Identifier
 }
 
 func (t *testExtractor) Visit(node ast.Node) ast.Visitor {
@@ -95,7 +94,7 @@ func (t *testExtractor) Visit(node ast.Node) ast.Visitor {
 
 	switch elem := node.(type) {
 	case *ast.File:
-		t.idents = append(t.idents, code.Identifier{
+		t.idents = append(t.idents, entity.Identifier{
 			Name:     elem.Name.String(),
 			Position: elem.Pos(),
 		})
@@ -104,6 +103,6 @@ func (t *testExtractor) Visit(node ast.Node) ast.Visitor {
 	return t
 }
 
-func (t *testExtractor) Identifiers() []code.Identifier {
+func (t *testExtractor) Identifiers() []entity.Identifier {
 	return t.idents
 }

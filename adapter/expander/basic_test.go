@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"github.com/eroatta/src-reader/adapter/expander"
-	"github.com/eroatta/src-reader/code"
 	"github.com/eroatta/src-reader/entity"
 	"github.com/eroatta/src-reader/miner"
 	"github.com/eroatta/token/expansion"
@@ -72,7 +71,7 @@ func TestExpand_OnBasicWhenNoSplitsApplicable_ShouldReturnEmptyResults(t *testin
 	factory := expander.NewBasicFactory()
 	basic, _ := factory.Make(staticInputs, miningResults)
 
-	ident := code.Identifier{
+	ident := entity.Identifier{
 		Name: "str",
 		Splits: map[string][]string{
 			"gentest": []string{"str"},
@@ -95,7 +94,7 @@ func TestExpand_OnBasicWhenNoDeclFound_ShouldReturnUnexpandedResults(t *testing.
 	factory := expander.NewBasicFactory()
 	basic, _ := factory.Make(staticInputs, miningResults)
 
-	ident := code.Identifier{
+	ident := entity.Identifier{
 		Name: "str",
 		Splits: map[string][]string{
 			"greedy": []string{"str"},
@@ -131,7 +130,7 @@ func TestExpand_OnBasic_ShouldReturnExpandedResultsFromWords(t *testing.T) {
 	factory := expander.NewBasicFactory()
 	basic, _ := factory.Make(staticInputs, miningResults)
 
-	ident := code.Identifier{
+	ident := entity.Identifier{
 		Name: "strbuff",
 		Splits: map[string][]string{
 			"greedy": []string{"str", "buff"},
@@ -166,7 +165,7 @@ func TestExpand_OnBasic_ShouldReturnExpandedResultsFromPhrases(t *testing.T) {
 	factory := expander.NewBasicFactory()
 	basic, _ := factory.Make(staticInputs, miningResults)
 
-	ident := code.Identifier{
+	ident := entity.Identifier{
 		Name: "sb",
 		Splits: map[string][]string{
 			"greedy": []string{"sb"},

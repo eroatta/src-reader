@@ -8,7 +8,6 @@ import (
 	"testing"
 
 	"github.com/eroatta/src-reader/adapter/splitter"
-	"github.com/eroatta/src-reader/code"
 	"github.com/eroatta/src-reader/entity"
 	"github.com/eroatta/src-reader/repository"
 	"github.com/eroatta/src-reader/usecase/analyze"
@@ -245,18 +244,18 @@ func (e expanderMock) ApplicableOn() string {
 	return "conserv"
 }
 
-func (e expanderMock) Expand(ident code.Identifier) []string {
+func (e expanderMock) Expand(ident entity.Identifier) []string {
 	return []string{fmt.Sprintf("%s-expanded", ident.Name)}
 }
 
 func newExtractorMock(filename string) entity.Extractor {
 	return &extractorMock{
-		idents: make([]code.Identifier, 0),
+		idents: make([]entity.Identifier, 0),
 	}
 }
 
 type extractorMock struct {
-	idents []code.Identifier
+	idents []entity.Identifier
 }
 
 func (t *extractorMock) Visit(node ast.Node) ast.Visitor {
@@ -266,7 +265,7 @@ func (t *extractorMock) Visit(node ast.Node) ast.Visitor {
 
 	switch elem := node.(type) {
 	case *ast.File:
-		t.idents = append(t.idents, code.Identifier{
+		t.idents = append(t.idents, entity.Identifier{
 			Name:       elem.Name.String(),
 			Position:   elem.Pos(),
 			Splits:     make(map[string][]string),
@@ -277,7 +276,7 @@ func (t *extractorMock) Visit(node ast.Node) ast.Visitor {
 	return t
 }
 
-func (t *extractorMock) Identifiers() []code.Identifier {
+func (t *extractorMock) Identifiers() []entity.Identifier {
 	return t.idents
 }
 
@@ -285,6 +284,6 @@ type identifierRepositoryMock struct {
 	err error
 }
 
-func (i identifierRepositoryMock) Add(ctx context.Context, project entity.Project, ident code.Identifier) error {
+func (i identifierRepositoryMock) Add(ctx context.Context, project entity.Project, ident entity.Identifier) error {
 	return i.err
 }

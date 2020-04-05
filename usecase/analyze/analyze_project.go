@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/eroatta/src-reader/code"
 	"github.com/eroatta/src-reader/entity"
 	"github.com/eroatta/src-reader/repository"
 	"github.com/eroatta/src-reader/usecase/analyze/step"
@@ -44,7 +43,7 @@ func (uc analyzeProjectUsecase) Analyze(ctx context.Context, project entity.Proj
 	parsed := step.Parse(filesc)
 	files := step.Merge(parsed)
 
-	valid := make([]code.File, 0)
+	valid := make([]entity.File, 0)
 	for _, file := range files {
 		if file.Error != nil {
 			log.WithError(file.Error).Warn(fmt.Sprintf("unable to read or parse file %s at %s", file.Name, project.SourceCode.Location))

@@ -6,14 +6,13 @@ import (
 	"go/token"
 	"testing"
 
-	"github.com/eroatta/src-reader/code"
 	"github.com/eroatta/src-reader/entity"
 	"github.com/eroatta/src-reader/usecase/analyze/step"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestMine_OnNoFiles_ShouldReturnMinersWithoutResults(t *testing.T) {
-	processed := step.Mine([]code.File{}, &miner{typ: entity.MinerType("empty")})
+	processed := step.Mine([]entity.File{}, &miner{typ: entity.MinerType("empty")})
 
 	assert.Equal(t, 1, len(processed))
 
@@ -24,13 +23,13 @@ func TestMine_OnNoFiles_ShouldReturnMinersWithoutResults(t *testing.T) {
 }
 
 func TestMine_OnEmptyMiners_ShouldReturnNoResults(t *testing.T) {
-	processed := step.Mine([]code.File{}, []entity.Miner{}...)
+	processed := step.Mine([]entity.File{}, []entity.Miner{}...)
 
 	assert.Equal(t, 0, len(processed))
 }
 
 func TestMine_OnFileWithNilAST_ShouldReturnMinersWithoutResults(t *testing.T) {
-	processed := step.Mine([]code.File{{Name: "main.go"}}, &miner{typ: entity.MinerType("empty")})
+	processed := step.Mine([]entity.File{{Name: "main.go"}}, &miner{typ: entity.MinerType("empty")})
 
 	assert.Equal(t, 1, len(processed))
 
@@ -64,14 +63,14 @@ func TestMine_OnTwoMiners_ShouldReturnResultsBothMiners(t *testing.T) {
 	testFileset := token.NewFileSet()
 
 	ast1, _ := parser.ParseFile(testFileset, "main.go", `package main`, parser.AllErrors)
-	file1 := code.File{
+	file1 := entity.File{
 		Name:    "main.go",
 		AST:     ast1,
 		FileSet: testFileset,
 	}
 
 	ast2, _ := parser.ParseFile(testFileset, "test.go", `package test`, parser.AllErrors)
-	file2 := code.File{
+	file2 := entity.File{
 		Name:    "test.go",
 		AST:     ast2,
 		FileSet: testFileset,
@@ -80,7 +79,7 @@ func TestMine_OnTwoMiners_ShouldReturnResultsBothMiners(t *testing.T) {
 	first := &miner{typ: entity.MinerType("first")}
 	second := &miner{typ: entity.MinerType("second")}
 
-	processed := step.Mine([]code.File{file1, file2}, first, second)
+	processed := step.Mine([]entity.File{file1, file2}, first, second)
 
 	assert.Equal(t, 2, len(processed))
 

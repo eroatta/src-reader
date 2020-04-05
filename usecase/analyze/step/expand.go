@@ -1,14 +1,13 @@
 package step
 
 import (
-	"github.com/eroatta/src-reader/code"
 	"github.com/eroatta/src-reader/entity"
 )
 
-// Expand returns a channel of code.Identifier where each element has been processed by
+// Expand returns a channel of entity.Identifier where each element has been processed by
 // every provided Expander.
-func Expand(identc <-chan code.Identifier, expanders ...entity.Expander) chan code.Identifier {
-	expandedc := make(chan code.Identifier)
+func Expand(identc <-chan entity.Identifier, expanders ...entity.Expander) chan entity.Identifier {
+	expandedc := make(chan entity.Identifier)
 	go func() {
 		for ident := range identc {
 			for _, expander := range expanders {

@@ -4,12 +4,12 @@ import (
 	"context"
 	"strings"
 
-	"github.com/eroatta/src-reader/code"
+	"github.com/eroatta/src-reader/entity"
 	"github.com/eroatta/src-reader/repository"
 )
 
 // Read filters only .go files and reads them.
-func Read(ctx context.Context, sc repository.SourceCodeRepository, location string, filenames []string) <-chan code.File {
+func Read(ctx context.Context, sc repository.SourceCodeRepository, location string, filenames []string) <-chan entity.File {
 	namesc := make(chan string)
 	go func() {
 		for _, f := range filenames {
@@ -23,12 +23,12 @@ func Read(ctx context.Context, sc repository.SourceCodeRepository, location stri
 		close(namesc)
 	}()
 
-	filesc := make(chan code.File)
+	filesc := make(chan entity.File)
 	go func() {
 		for n := range namesc {
 			rawFile, err := sc.Read(ctx, location, n)
 
-			file := code.File{
+			file := entity.File{
 				Name:  n,
 				Raw:   rawFile,
 				Error: err,

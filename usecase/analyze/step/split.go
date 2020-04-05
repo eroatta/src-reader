@@ -1,14 +1,13 @@
 package step
 
 import (
-	"github.com/eroatta/src-reader/code"
 	"github.com/eroatta/src-reader/entity"
 )
 
-// Split returns a channel of code.Identifier where each element has been processed by
+// Split returns a channel of entity.Identifier where each element has been processed by
 // every provided Splitter.
-func Split(identc <-chan code.Identifier, splitters ...entity.Splitter) chan code.Identifier {
-	splittedc := make(chan code.Identifier)
+func Split(identc <-chan entity.Identifier, splitters ...entity.Splitter) chan entity.Identifier {
+	splittedc := make(chan entity.Identifier)
 	go func() {
 		for ident := range identc {
 			for _, splitter := range splitters {

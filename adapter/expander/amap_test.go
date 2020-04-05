@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"github.com/eroatta/src-reader/adapter/expander"
-	"github.com/eroatta/src-reader/code"
 	"github.com/eroatta/src-reader/entity"
 	"github.com/eroatta/src-reader/miner"
 	"github.com/stretchr/testify/assert"
@@ -64,7 +63,7 @@ func TestExpand_OnAMAPWhenNoSplitsApplicable_ShouldReturnEmptyResults(t *testing
 	amap, _ := factory.Make(staticInputs, miningResults)
 
 	// TODO: miner.ScopedDecl should be moved to code.ScopedDecl
-	ident := code.Identifier{
+	ident := entity.Identifier{
 		Name: "str",
 		Splits: map[string][]string{
 			"gentest": []string{"str"},
@@ -84,7 +83,7 @@ func TestExpand_OnAMAPWhenNoDeclFound_ShouldReturnUnexpandedResults(t *testing.T
 
 	factory := expander.NewAMAPFactory()
 	amap, _ := factory.Make(staticInputs, miningResults)
-	ident := code.Identifier{
+	ident := entity.Identifier{
 		Name: "str",
 		Splits: map[string][]string{
 			"samurai": []string{"str"},
@@ -115,7 +114,7 @@ func TestExpand_OnAMAP_ShouldReturnExpandedResults(t *testing.T) {
 	factory := expander.NewAMAPFactory()
 	amap, _ := factory.Make(staticInputs, miningResults)
 
-	ident := code.Identifier{
+	ident := entity.Identifier{
 		Name: "sb",
 		Splits: map[string][]string{
 			"samurai": []string{"sb"},

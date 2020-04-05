@@ -4,7 +4,6 @@ import (
 	"testing"
 
 	"github.com/eroatta/src-reader/adapter/expander"
-	"github.com/eroatta/src-reader/code"
 	"github.com/eroatta/src-reader/entity"
 	"github.com/stretchr/testify/assert"
 )
@@ -44,7 +43,7 @@ func TestExpand_OnNoexpWhenNoSplitsApplicable_ShouldReturnEmptyResults(t *testin
 	factory := expander.NewNoExpansionFactory()
 	noexp, _ := factory.Make(staticInputs, miningResults)
 
-	ident := code.Identifier{
+	ident := entity.Identifier{
 		Name: "str",
 		Splits: map[string][]string{
 			"gentest": []string{"str"},
@@ -63,7 +62,7 @@ func TestExpand_OnNoexp_ShouldReturnSameSplittedValues(t *testing.T) {
 	factory := expander.NewNoExpansionFactory()
 	noexp, _ := factory.Make(staticInputs, miningResults)
 
-	ident := code.Identifier{
+	ident := entity.Identifier{
 		Name: "str",
 		Splits: map[string][]string{
 			"conserv": []string{"str"},

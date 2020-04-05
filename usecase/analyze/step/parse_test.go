@@ -3,13 +3,13 @@ package step_test
 import (
 	"testing"
 
-	"github.com/eroatta/src-reader/code"
+	"github.com/eroatta/src-reader/entity"
 	"github.com/eroatta/src-reader/usecase/analyze/step"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestParse_OnClosedChannel_ShouldSendNoElements(t *testing.T) {
-	filesc := make(chan code.File)
+	filesc := make(chan entity.File)
 	close(filesc)
 
 	parsedc := step.Parse(filesc)
@@ -23,9 +23,9 @@ func TestParse_OnClosedChannel_ShouldSendNoElements(t *testing.T) {
 }
 
 func TestParse_OnFileWithError_ShouldSendFileWithErrorMessage(t *testing.T) {
-	filesc := make(chan code.File)
+	filesc := make(chan entity.File)
 	go func() {
-		filesc <- code.File{
+		filesc <- entity.File{
 			Name: "failing.go",
 			Raw:  []byte("packaaage failing"),
 		}
@@ -34,7 +34,7 @@ func TestParse_OnFileWithError_ShouldSendFileWithErrorMessage(t *testing.T) {
 
 	parsedc := step.Parse(filesc)
 
-	files := make([]code.File, 0)
+	files := make([]entity.File, 0)
 	for file := range parsedc {
 		files = append(files, file)
 	}
@@ -44,14 +44,14 @@ func TestParse_OnFileWithError_ShouldSendFileWithErrorMessage(t *testing.T) {
 }
 
 func TestParse_OnTwoFiles_ShouldSendTwoParsedFilesWithSameFileset(t *testing.T) {
-	filesc := make(chan code.File)
+	filesc := make(chan entity.File)
 	go func() {
-		filesc <- code.File{
+		filesc <- entity.File{
 			Name: "main.go",
 			Raw:  []byte("package main"),
 		}
 
-		filesc <- code.File{
+		filesc <- entity.File{
 			Name: "test.go",
 			Raw:  []byte("package test"),
 		}
@@ -61,7 +61,7 @@ func TestParse_OnTwoFiles_ShouldSendTwoParsedFilesWithSameFileset(t *testing.T) 
 
 	parsedc := step.Parse(filesc)
 
-	files := make(map[string]code.File)
+	files := make(map[string]entity.File)
 	for file := range parsedc {
 		files[file.Name] = file
 	}
@@ -82,7 +82,7 @@ func TestParse_OnTwoFiles_ShouldSendTwoParsedFilesWithSameFileset(t *testing.T) 
 }
 
 func TestMerge_OnClosedChannel_ShouldReturnEmptyArray(t *testing.T) {
-	parsedc := make(chan code.File)
+	parsedc := make(chan entity.File)
 	close(parsedc)
 
 	got := step.Merge(parsedc)
@@ -91,10 +91,10 @@ func TestMerge_OnClosedChannel_ShouldReturnEmptyArray(t *testing.T) {
 }
 
 func TestMerge_OnTwoFiles_ShouldReturnTwoFiles(t *testing.T) {
-	parsedc := make(chan code.File)
+	parsedc := make(chan entity.File)
 	go func() {
-		parsedc <- code.File{}
-		parsedc <- code.File{}
+		parsedc <- entity.File{}
+		parsedc <- entity.File{}
 		close(parsedc)
 	}()
 

@@ -5,7 +5,6 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/eroatta/src-reader/code"
 	"github.com/eroatta/src-reader/entity"
 	"github.com/eroatta/src-reader/usecase/analyze/step"
 	"github.com/stretchr/testify/assert"
@@ -48,7 +47,7 @@ func TestClone_OnGolangRepository_ShouldReturnAllGolangFiles(t *testing.T) {
 
 	assert.NotNil(t, filesc)
 
-	files := make(map[string]code.File)
+	files := make(map[string]entity.File)
 	for file := range filesc {
 		files[file.Name] = file
 	}

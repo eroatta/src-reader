@@ -5,7 +5,6 @@ import (
 	"log"
 	"strings"
 
-	"github.com/eroatta/src-reader/code"
 	"github.com/eroatta/src-reader/entity"
 	"github.com/eroatta/src-reader/miner"
 	"github.com/eroatta/token/basic"
@@ -46,13 +45,13 @@ type basicExpander struct {
 	defaultWords expansion.Set
 }
 
-// Expand receives a code.Identifier and processes the available splits that
+// Expand receives a entity.Identifier and processes the available splits that
 // can be expanded with the current algorithm.
 // On Basic, we rely on the related declaration information for the identifier.
 // If no declaration information can be found, we avoid trying to expand the identifier
 // because results can be broad.
 // If a declaration is found but several expansions are found, we handle a subset of them.
-func (b basicExpander) Expand(ident code.Identifier) []string {
+func (b basicExpander) Expand(ident entity.Identifier) []string {
 	split, ok := ident.Splits[b.ApplicableOn()]
 	if !ok {
 		return []string{}

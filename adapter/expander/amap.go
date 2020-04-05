@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/eroatta/src-reader/code"
 	"github.com/eroatta/src-reader/entity"
 	"github.com/eroatta/src-reader/miner"
 	"github.com/eroatta/token/amap"
@@ -39,12 +38,12 @@ type amapExpander struct {
 	referenceText      []string
 }
 
-// Expand receives a code.Identifier and processes the available splits that
+// Expand receives a entity.Identifier and processes the available splits that
 // can be expanded with the current algorithm.
 // On AMAP, we rely on the related scoped declaration information for the identifier.
 // If no decalaration information can be found, we avoid trying to expand the identifier
 // because results can be broad.
-func (a amapExpander) Expand(ident code.Identifier) []string {
+func (a amapExpander) Expand(ident entity.Identifier) []string {
 	split, ok := ident.Splits[a.ApplicableOn()]
 	if !ok {
 		return []string{}

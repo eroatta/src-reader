@@ -4,14 +4,13 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/eroatta/src-reader/code"
 	"github.com/eroatta/src-reader/entity"
 	"github.com/eroatta/src-reader/usecase/analyze/step"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestSplit_OnClosedChannel_ShouldSendNoElements(t *testing.T) {
-	identc := make(chan code.Identifier)
+	identc := make(chan entity.Identifier)
 	close(identc)
 
 	splitc := step.Split(identc, splitter{})
@@ -25,9 +24,9 @@ func TestSplit_OnClosedChannel_ShouldSendNoElements(t *testing.T) {
 }
 
 func TestSplit_OnEmptySplitter_ShouldSendElementsWithoutSplits(t *testing.T) {
-	identc := make(chan code.Identifier)
+	identc := make(chan entity.Identifier)
 	go func() {
-		identc <- code.Identifier{
+		identc <- entity.Identifier{
 			Name:   "main",
 			Splits: make(map[string][]string),
 		}
@@ -36,7 +35,7 @@ func TestSplit_OnEmptySplitter_ShouldSendElementsWithoutSplits(t *testing.T) {
 
 	splitc := step.Split(identc, []entity.Splitter{}...)
 
-	splits := make([]code.Identifier, 0)
+	splits := make([]entity.Identifier, 0)
 	for ident := range splitc {
 		splits = append(splits, ident)
 	}
@@ -46,9 +45,9 @@ func TestSplit_OnEmptySplitter_ShouldSendElementsWithoutSplits(t *testing.T) {
 }
 
 func TestSplit_OnOneIdentifierAndTwoSplitters_ShouldSendElementsWithTwoSplits(t *testing.T) {
-	identc := make(chan code.Identifier)
+	identc := make(chan entity.Identifier)
 	go func() {
-		identc <- code.Identifier{
+		identc <- entity.Identifier{
 			Name:   "star_wars-II",
 			Splits: make(map[string][]string),
 		}
@@ -71,7 +70,7 @@ func TestSplit_OnOneIdentifierAndTwoSplitters_ShouldSendElementsWithTwoSplits(t 
 
 	splitc := step.Split(identc, byHyphen, byUnderscore)
 
-	splitidents := make([]code.Identifier, 0)
+	splitidents := make([]entity.Identifier, 0)
 	for ident := range splitc {
 		splitidents = append(splitidents, ident)
 	}

@@ -3,14 +3,13 @@ package step_test
 import (
 	"testing"
 
-	"github.com/eroatta/src-reader/code"
 	"github.com/eroatta/src-reader/entity"
 	"github.com/eroatta/src-reader/usecase/analyze/step"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestExpand_OnClosedChannel_ShouldSendNoElements(t *testing.T) {
-	identc := make(chan code.Identifier)
+	identc := make(chan entity.Identifier)
 	close(identc)
 
 	expandedc := step.Expand(identc, expander{})
@@ -24,9 +23,9 @@ func TestExpand_OnClosedChannel_ShouldSendNoElements(t *testing.T) {
 }
 
 func TestExpand_OnEmptyExpander_ShouldSendElementsWithoutExpansions(t *testing.T) {
-	identc := make(chan code.Identifier)
+	identc := make(chan entity.Identifier)
 	go func() {
-		identc <- code.Identifier{
+		identc <- entity.Identifier{
 			Name: "crtfile",
 			Splits: map[string][]string{
 				"test": []string{"crt", "file"},
@@ -38,7 +37,7 @@ func TestExpand_OnEmptyExpander_ShouldSendElementsWithoutExpansions(t *testing.T
 
 	expandedc := step.Expand(identc, []entity.Expander{}...)
 
-	expanded := make([]code.Identifier, 0)
+	expanded := make([]entity.Identifier, 0)
 	for ident := range expandedc {
 		expanded = append(expanded, ident)
 	}
@@ -48,9 +47,9 @@ func TestExpand_OnEmptyExpander_ShouldSendElementsWithoutExpansions(t *testing.T
 }
 
 func TestExpand_OnOneIdentifierAndTwoExpanders_ShouldSendElementsWithOneExpansion(t *testing.T) {
-	identc := make(chan code.Identifier)
+	identc := make(chan entity.Identifier)
 	go func() {
-		identc <- code.Identifier{
+		identc <- entity.Identifier{
 			Name: "ctrldel",
 			Splits: map[string][]string{
 				"custom": []string{"ctrl", "del"},
@@ -78,7 +77,7 @@ func TestExpand_OnOneIdentifierAndTwoExpanders_ShouldSendElementsWithOneExpansio
 
 	expandec := step.Expand(identc, custom, skipped)
 
-	expandidents := make([]code.Identifier, 0)
+	expandidents := make([]entity.Identifier, 0)
 	for ident := range expandec {
 		expandidents = append(expandidents, ident)
 	}
@@ -110,7 +109,7 @@ func (e expander) ApplicableOn() string {
 	return e.worksOn
 }
 
-func (e expander) Expand(ident code.Identifier) []string {
+func (e expander) Expand(ident entity.Identifier) []string {
 	if e.efunc != nil {
 		return e.efunc(ident.Splits[e.worksOn])
 	}

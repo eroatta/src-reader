@@ -2,8 +2,7 @@ package entity
 
 import (
 	"go/ast"
-
-	"github.com/eroatta/src-reader/code"
+	"go/token"
 )
 
 const (
@@ -43,7 +42,7 @@ type Extractor interface {
 	// Visit applies the extraction logic while traversing the Abstract Syntax Tree.
 	Visit(node ast.Node) ast.Visitor
 	// Identifiers returns the extracted identifiers.
-	Identifiers() []code.Identifier
+	Identifiers() []Identifier
 }
 
 // Splitter interface is used to define a custom splitter.
@@ -61,7 +60,7 @@ type Expander interface {
 	// ApplicableOn defines the name of splits used as input.
 	ApplicableOn() string
 	// Expand performs the expansion on the token as a whole.
-	Expand(ident code.Identifier) []string
+	Expand(ident Identifier) []string
 }
 
 type SplitterAbstractFactory interface {
@@ -78,4 +77,27 @@ type ExpanderAbstractFactory interface {
 
 type ExpanderFactory interface {
 	Make(staticInputs map[string]interface{}, miningResults map[MinerType]Miner) (Expander, error)
+}
+
+// File TODO
+type File struct {
+	Name    string
+	Raw     []byte
+	AST     *ast.File
+	FileSet *token.FileSet
+	Error   error
+}
+
+// Identifier TODO
+type Identifier struct {
+	File       string
+	Position   token.Pos
+	Name       string
+	Type       string
+	Parent     string
+	ParentPos  token.Pos
+	Node       *ast.Node
+	Splits     map[string][]string
+	Expansions map[string][]string
+	Error      error
 }

@@ -1,7 +1,6 @@
 package expander
 
 import (
-	"github.com/eroatta/src-reader/code"
 	"github.com/eroatta/src-reader/entity"
 )
 
@@ -22,7 +21,7 @@ type noexpExpander struct {
 	expander
 }
 
-func (e noexpExpander) Expand(ident code.Identifier) []string {
+func (e noexpExpander) Expand(ident entity.Identifier) []string {
 	split, ok := ident.Splits[e.ApplicableOn()]
 	if !ok {
 		return []string{}
