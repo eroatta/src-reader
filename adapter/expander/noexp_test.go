@@ -3,9 +3,9 @@ package expander_test
 import (
 	"testing"
 
+	"github.com/eroatta/src-reader/adapter/expander"
 	"github.com/eroatta/src-reader/code"
 	"github.com/eroatta/src-reader/entity"
-	"github.com/eroatta/src-reader/expander"
 	"github.com/stretchr/testify/assert"
 )
 
