@@ -105,3 +105,15 @@ type Identifier struct {
 	Expansions map[string][]string
 	Error      error
 }
+
+// ScopedDecl represents the related scope for a declaration.
+type ScopedDecl struct {
+	ID              string
+	DeclType        token.Token
+	Name            string
+	VariableDecls   []string
+	Statements      []string
+	BodyText        []string
+	Comments        []string
+	PackageComments []string
+}

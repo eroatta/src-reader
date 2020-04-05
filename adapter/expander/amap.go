@@ -34,7 +34,7 @@ func (f amapFactory) Make(staticInputs map[entity.InputType]interface{}, miningR
 
 type amapExpander struct {
 	expander
-	scopedDeclarations map[string]miner.ScopedDecl
+	scopedDeclarations map[string]entity.ScopedDecl
 	referenceText      []string
 }
 

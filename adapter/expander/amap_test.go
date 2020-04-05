@@ -101,8 +101,8 @@ func TestExpand_OnAMAP_ShouldReturnExpandedResults(t *testing.T) {
 
 	miningResults := map[entity.MinerType]entity.Miner{
 		entity.MinerScopedDeclarations: miner.Scope{
-			Scopes: map[string]miner.ScopedDecl{
-				"sb": miner.ScopedDecl{
+			Scopes: map[string]entity.ScopedDecl{
+				"sb": entity.ScopedDecl{
 					ID:       "sb",
 					DeclType: token.FUNC,
 					Comments: []string{"string buffer"},

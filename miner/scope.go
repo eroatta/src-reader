@@ -17,32 +17,20 @@ type Scope struct {
 	PackageComments []string
 	Comments        []*ast.CommentGroup
 	Included        []ast.Decl
-	Scopes          map[string]ScopedDecl
+	Scopes          map[string]entity.ScopedDecl
 }
 
 // NewScope initializes a new scopes miner.
 func NewScope(filename string) Scope {
 	return Scope{
 		Filename:        filename,
-		Scopes:          make(map[string]ScopedDecl),
+		Scopes:          make(map[string]entity.ScopedDecl),
 		PackageComments: make([]string, 0),
 	}
 }
 
-// ScopedDecl represents the related scope for a declaration.
-type ScopedDecl struct {
-	ID              string
-	DeclType        token.Token
-	Name            string
-	VariableDecls   []string
-	Statements      []string
-	BodyText        []string
-	Comments        []string
-	PackageComments []string
-}
-
-func newScopedDecl(pkg string, name string, declType token.Token) ScopedDecl {
-	return ScopedDecl{
+func newScopedDecl(pkg string, name string, declType token.Token) entity.ScopedDecl {
+	return entity.ScopedDecl{
 		ID:              declID(pkg, declType, name),
 		DeclType:        declType,
 		Name:            name,
@@ -297,6 +285,6 @@ func (m Scope) shouldMine(elem *ast.GenDecl) bool {
 }
 
 // ScopedDeclarations returns a map of declaration IDs and the mined scope for each declaration.
-func (m Scope) ScopedDeclarations() map[string]ScopedDecl {
+func (m Scope) ScopedDeclarations() map[string]entity.ScopedDecl {
 	return m.Scopes
 }

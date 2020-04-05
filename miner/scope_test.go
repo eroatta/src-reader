@@ -38,8 +38,8 @@ func TestVisit_OnScopeWithPlainFuncDecl_ShouldReturnScopedDeclaration(t *testing
 		}
 	`
 
-	expected := map[string]miner.ScopedDecl{
-		"main++func::main": miner.ScopedDecl{
+	expected := map[string]entity.ScopedDecl{
+		"main++func::main": entity.ScopedDecl{
 			ID:              "main++func::main",
 			DeclType:        token.FUNC,
 			Name:            "main",
@@ -73,8 +73,8 @@ func TestVisit_OnScopeWithFuncDeclWithComments_ShouldReturnScopedDeclaration(t *
 		}
 	`
 
-	expected := map[string]miner.ScopedDecl{
-		"main++func::main": miner.ScopedDecl{
+	expected := map[string]entity.ScopedDecl{
+		"main++func::main": entity.ScopedDecl{
 			ID:            "main++func::main",
 			DeclType:      token.FUNC,
 			Name:          "main",
@@ -118,8 +118,8 @@ func TestVisit_OnScopeWithMultipleFuncDeclWithComments_ShouldReturnScopedDeclara
 		}
 	`
 
-	expected := map[string]miner.ScopedDecl{
-		"main++func::main": miner.ScopedDecl{
+	expected := map[string]entity.ScopedDecl{
+		"main++func::main": entity.ScopedDecl{
 			ID:            "main++func::main",
 			DeclType:      token.FUNC,
 			Name:          "main",
@@ -134,7 +134,7 @@ func TestVisit_OnScopeWithMultipleFuncDeclWithComments_ShouldReturnScopedDeclara
 				"package comment line 2",
 			},
 		},
-		"main++func::another": miner.ScopedDecl{
+		"main++func::another": entity.ScopedDecl{
 			ID:            "main++func::another",
 			DeclType:      token.FUNC,
 			Name:          "another",
@@ -184,8 +184,8 @@ func TestVisit_OnScopeWithMultipleFuncDeclWithFullBody_ShouldReturnScopedDeclara
 		}
 	`
 
-	expected := map[string]miner.ScopedDecl{
-		"main++func::main": miner.ScopedDecl{
+	expected := map[string]entity.ScopedDecl{
+		"main++func::main": entity.ScopedDecl{
 			ID:            "main++func::main",
 			DeclType:      token.FUNC,
 			Name:          "main",
@@ -200,7 +200,7 @@ func TestVisit_OnScopeWithMultipleFuncDeclWithFullBody_ShouldReturnScopedDeclara
 				"package comment line 2",
 			},
 		},
-		"main++func::another": miner.ScopedDecl{
+		"main++func::another": entity.ScopedDecl{
 			ID:            "main++func::another",
 			DeclType:      token.FUNC,
 			Name:          "another",
@@ -216,7 +216,7 @@ func TestVisit_OnScopeWithMultipleFuncDeclWithFullBody_ShouldReturnScopedDeclara
 				"package comment line 2",
 			},
 		},
-		"main++func::apply": miner.ScopedDecl{
+		"main++func::apply": entity.ScopedDecl{
 			ID:       "main++func::apply",
 			DeclType: token.FUNC,
 			Name:     "apply",
@@ -254,8 +254,8 @@ func TestVisit_OnScopeWithPlainVarDecl_ShouldReturnScopedDeclaration(t *testing.
 		var Common string
 	`
 
-	expected := map[string]miner.ScopedDecl{
-		"main++var::Common": miner.ScopedDecl{
+	expected := map[string]entity.ScopedDecl{
+		"main++var::Common": entity.ScopedDecl{
 			ID:              "main++var::Common",
 			DeclType:        token.VAR,
 			Name:            "Common",
@@ -286,8 +286,8 @@ func TestVisit_OnScopeWithFullyCommentedVarDecl_ShouldReturnScopedDeclaration(t 
 		var Common string // inner comment
 	`
 
-	expected := map[string]miner.ScopedDecl{
-		"main++var::Common": miner.ScopedDecl{
+	expected := map[string]entity.ScopedDecl{
+		"main++var::Common": entity.ScopedDecl{
 			ID:            "main++var::Common",
 			DeclType:      token.VAR,
 			Name:          "Common",
@@ -324,8 +324,8 @@ func TestVisit_OnScopeWithVarBlockDecl_ShouldReturnScopedDeclaration(t *testing.
 		)
 	`
 
-	expected := map[string]miner.ScopedDecl{
-		"main++var::common": miner.ScopedDecl{
+	expected := map[string]entity.ScopedDecl{
+		"main++var::common": entity.ScopedDecl{
 			ID:              "main++var::common",
 			DeclType:        token.VAR,
 			Name:            "common",
@@ -335,7 +335,7 @@ func TestVisit_OnScopeWithVarBlockDecl_ShouldReturnScopedDeclaration(t *testing.
 			Comments:        []string{"outer comment"},
 			PackageComments: make([]string, 0),
 		},
-		"main++var::regular": miner.ScopedDecl{
+		"main++var::regular": entity.ScopedDecl{
 			ID:              "main++var::regular",
 			DeclType:        token.VAR,
 			Name:            "regular",
@@ -345,7 +345,7 @@ func TestVisit_OnScopeWithVarBlockDecl_ShouldReturnScopedDeclaration(t *testing.
 			Comments:        []string{"outer comment"},
 			PackageComments: make([]string, 0),
 		},
-		"main++var::nrzXXZ": miner.ScopedDecl{
+		"main++var::nrzXXZ": entity.ScopedDecl{
 			ID:              "main++var::nrzXXZ",
 			DeclType:        token.VAR,
 			Name:            "nrzXXZ",
@@ -374,8 +374,8 @@ func TestVisit_OnScopeWithPlainConstDecl_ShouldReturnScopedDeclaration(t *testin
 		const Common string = "valid"
 	`
 
-	expected := map[string]miner.ScopedDecl{
-		"main++const::Common": miner.ScopedDecl{
+	expected := map[string]entity.ScopedDecl{
+		"main++const::Common": entity.ScopedDecl{
 			ID:              "main++const::Common",
 			DeclType:        token.CONST,
 			Name:            "Common",
@@ -406,8 +406,8 @@ func TestVisit_OnScopeWithFullyCommentedConstDecl_ShouldReturnScopedDeclaration(
 		const Common string = "valid" // inner comment
 	`
 
-	expected := map[string]miner.ScopedDecl{
-		"main++const::Common": miner.ScopedDecl{
+	expected := map[string]entity.ScopedDecl{
+		"main++const::Common": entity.ScopedDecl{
 			ID:            "main++const::Common",
 			DeclType:      token.CONST,
 			Name:          "Common",
@@ -444,8 +444,8 @@ func TestVisit_OnScopeWithConstBlockDecl_ShouldReturnScopedDeclaration(t *testin
 		)
 	`
 
-	expected := map[string]miner.ScopedDecl{
-		"main++const::common": miner.ScopedDecl{
+	expected := map[string]entity.ScopedDecl{
+		"main++const::common": entity.ScopedDecl{
 			ID:              "main++const::common",
 			DeclType:        token.CONST,
 			Name:            "common",
@@ -455,7 +455,7 @@ func TestVisit_OnScopeWithConstBlockDecl_ShouldReturnScopedDeclaration(t *testin
 			Comments:        []string{"outer comment"},
 			PackageComments: make([]string, 0),
 		},
-		"main++const::regular": miner.ScopedDecl{
+		"main++const::regular": entity.ScopedDecl{
 			ID:              "main++const::regular",
 			DeclType:        token.CONST,
 			Name:            "regular",
@@ -465,7 +465,7 @@ func TestVisit_OnScopeWithConstBlockDecl_ShouldReturnScopedDeclaration(t *testin
 			Comments:        []string{"outer comment"},
 			PackageComments: make([]string, 0),
 		},
-		"main++const::notRegular": miner.ScopedDecl{
+		"main++const::notRegular": entity.ScopedDecl{
 			ID:              "main++const::notRegular",
 			DeclType:        token.CONST,
 			Name:            "notRegular",
@@ -475,7 +475,7 @@ func TestVisit_OnScopeWithConstBlockDecl_ShouldReturnScopedDeclaration(t *testin
 			Comments:        []string{"outer comment"},
 			PackageComments: make([]string, 0),
 		},
-		"main++const::nrzXXZ": miner.ScopedDecl{
+		"main++const::nrzXXZ": entity.ScopedDecl{
 			ID:              "main++const::nrzXXZ",
 			DeclType:        token.CONST,
 			Name:            "nrzXXZ",
@@ -504,8 +504,8 @@ func TestVisit_OnScopeWithPlainStructDecl_ShouldReturnScopedDeclaration(t *testi
 		type selector struct{}
 	`
 
-	expected := map[string]miner.ScopedDecl{
-		"main++struct::selector": miner.ScopedDecl{
+	expected := map[string]entity.ScopedDecl{
+		"main++struct::selector": entity.ScopedDecl{
 			ID:              "main++struct::selector",
 			DeclType:        token.STRUCT,
 			Name:            "selector",
@@ -539,8 +539,8 @@ func TestVisit_OnScopeWithFullyCommentedStructDecl_ShouldReturnScopedDeclaration
 		}
 	`
 
-	expected := map[string]miner.ScopedDecl{
-		"main++struct::selector": miner.ScopedDecl{
+	expected := map[string]entity.ScopedDecl{
+		"main++struct::selector": entity.ScopedDecl{
 			ID:            "main++struct::selector",
 			DeclType:      token.STRUCT,
 			Name:          "selector",
@@ -586,8 +586,8 @@ func TestVisit_OnScopeWithStructBlockDecl_ShouldReturnScopedDeclaration(t *testi
 		)
 	`
 
-	expected := map[string]miner.ScopedDecl{
-		"main++struct::selector": miner.ScopedDecl{
+	expected := map[string]entity.ScopedDecl{
+		"main++struct::selector": entity.ScopedDecl{
 			ID:            "main++struct::selector",
 			DeclType:      token.STRUCT,
 			Name:          "selector",
@@ -601,7 +601,7 @@ func TestVisit_OnScopeWithStructBlockDecl_ShouldReturnScopedDeclaration(t *testi
 			},
 			PackageComments: []string{"package comment"},
 		},
-		"main++struct::httpClient": miner.ScopedDecl{
+		"main++struct::httpClient": entity.ScopedDecl{
 			ID:       "main++struct::httpClient",
 			DeclType: token.STRUCT,
 			Name:     "httpClient",
@@ -636,8 +636,8 @@ func TestVisit_OnScopeWithPlainInterfaceDecl_ShouldReturnScopedDeclaration(t *te
 		type selector interface{}
 	`
 
-	expected := map[string]miner.ScopedDecl{
-		"main++interface::selector": miner.ScopedDecl{
+	expected := map[string]entity.ScopedDecl{
+		"main++interface::selector": entity.ScopedDecl{
 			ID:              "main++interface::selector",
 			DeclType:        token.INTERFACE,
 			Name:            "selector",
@@ -671,8 +671,8 @@ func TestVisit_OnScopeWithFullyCommentedInterfaceDecl_ShouldReturnScopedDeclarat
 		}
 	`
 
-	expected := map[string]miner.ScopedDecl{
-		"main++interface::selector": miner.ScopedDecl{
+	expected := map[string]entity.ScopedDecl{
+		"main++interface::selector": entity.ScopedDecl{
 			ID:            "main++interface::selector",
 			DeclType:      token.INTERFACE,
 			Name:          "selector",
@@ -718,8 +718,8 @@ func TestVisit_OnScopeWithInterfaceBlockDecl_ShouldReturnScopedDeclaration(t *te
 		)
 	`
 
-	expected := map[string]miner.ScopedDecl{
-		"main++interface::selector": miner.ScopedDecl{
+	expected := map[string]entity.ScopedDecl{
+		"main++interface::selector": entity.ScopedDecl{
 			ID:            "main++interface::selector",
 			DeclType:      token.INTERFACE,
 			Name:          "selector",
@@ -733,7 +733,7 @@ func TestVisit_OnScopeWithInterfaceBlockDecl_ShouldReturnScopedDeclaration(t *te
 			},
 			PackageComments: []string{"package comment"},
 		},
-		"main++interface::httpClient": miner.ScopedDecl{
+		"main++interface::httpClient": entity.ScopedDecl{
 			ID:            "main++interface::httpClient",
 			DeclType:      token.INTERFACE,
 			Name:          "httpClient",
