@@ -10,6 +10,7 @@ import (
 	"github.com/eroatta/src-reader/entity"
 	"github.com/eroatta/token/conserv"
 	"github.com/eroatta/token/lists"
+	log "github.com/sirupsen/logrus"
 )
 
 func newDecl(ID string, declType token.Token) entity.Decl {
@@ -277,13 +278,12 @@ func extractWordAndPhrasesFromComment(functionText entity.Decl, comment string, 
 		}
 	}
 
-	if phrases, err := nounphrases.Find(cleanComment); err == nil {
-		for _, phr := range phrases {
-			functionText.Phrases[phr] = struct{}{}
-		}
-	} else {
-		// TODO: improve logging
-		fmt.Println(err)
+	phrases, err := nounphrases.Find(cleanComment)
+	if err != nil {
+		log.WithError(err).Error(fmt.Sprintf("unable to retrieve phrases from comment \"%s\"", cleanComment))
+	}
+	for _, phr := range phrases {
+		functionText.Phrases[phr] = struct{}{}
 	}
 
 	return functionText
