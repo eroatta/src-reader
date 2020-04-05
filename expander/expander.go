@@ -10,7 +10,7 @@ import (
 func NewExpanderFactory() entity.ExpanderAbstractFactory {
 	return &expanderFactory{
 		factories: map[string]entity.ExpanderFactory{
-			/*"noexp": NewNoExpansionFactory(),*/
+			"noexp": NewNoExpansionFactory(),
 			"basic": NewBasicFactory(),
 			"amap":  NewAMAPFactory(),
 		},
