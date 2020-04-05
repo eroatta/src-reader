@@ -11,16 +11,8 @@ const (
 	MinerDeclarations       MinerType = "Declarations"
 )
 
-const (
-	InputGlobalFrequencyTable InputType = "GlobalFrequencyTable"
-	InputDefaultExpansions    InputType = "DefaultExpansions"
-)
-
-type InputType string
-
 // AnalysisConfig defines the configuration options for an analysis execution.
 type AnalysisConfig struct {
-	StaticInputs              map[InputType]interface{}
 	Miners                    []Miner
 	ExtractorFactory          ExtractorFactory
 	SplittingAlgorithmFactory SplitterAbstractFactory
@@ -72,7 +64,7 @@ type SplitterAbstractFactory interface {
 }
 
 type SplitterFactory interface {
-	Make(staticInputs map[InputType]interface{}, miningResults map[MinerType]Miner) (Splitter, error)
+	Make(miningResults map[MinerType]Miner) (Splitter, error)
 }
 
 type ExpanderAbstractFactory interface {
@@ -80,7 +72,7 @@ type ExpanderAbstractFactory interface {
 }
 
 type ExpanderFactory interface {
-	Make(staticInputs map[InputType]interface{}, miningResults map[MinerType]Miner) (Expander, error)
+	Make(miningResults map[MinerType]Miner) (Expander, error)
 }
 
 // File TODO

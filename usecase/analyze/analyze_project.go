@@ -71,7 +71,7 @@ func (uc analyzeProjectUsecase) Analyze(ctx context.Context, project entity.Proj
 			continue
 		}
 
-		splitter, err := factory.Make(config.StaticInputs, miningResults)
+		splitter, err := factory.Make(miningResults)
 		if err != nil {
 			log.WithError(err).Error(fmt.Sprintf("unable to make splitting algorithm for %s", name))
 			continue
@@ -93,7 +93,7 @@ func (uc analyzeProjectUsecase) Analyze(ctx context.Context, project entity.Proj
 			continue
 		}
 
-		expander, err := factory.Make(config.StaticInputs, miningResults)
+		expander, err := factory.Make(miningResults)
 		if err != nil {
 			log.WithError(err).Error(fmt.Sprintf("unable to make expansion algorithm for %s", name))
 			continue

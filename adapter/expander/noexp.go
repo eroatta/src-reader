@@ -11,7 +11,7 @@ func NewNoExpansionFactory() entity.ExpanderFactory {
 
 type noexpFactory struct{}
 
-func (f noexpFactory) Make(map[entity.InputType]interface{}, map[entity.MinerType]entity.Miner) (entity.Expander, error) {
+func (f noexpFactory) Make(map[entity.MinerType]entity.Miner) (entity.Expander, error) {
 	return noexpExpander{
 		expander: expander{"noexp"},
 	}, nil

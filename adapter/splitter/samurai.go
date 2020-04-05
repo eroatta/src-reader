@@ -17,7 +17,7 @@ func NewSamuraiFactory() entity.SplitterFactory {
 
 type samuraiFactory struct{}
 
-func (f samuraiFactory) Make(staticInputs map[entity.InputType]interface{}, miningResults map[entity.MinerType]entity.Miner) (entity.Splitter, error) {
+func (f samuraiFactory) Make(miningResults map[entity.MinerType]entity.Miner) (entity.Splitter, error) {
 	// build local frequency table from word count
 	wordsMiner, ok := miningResults[entity.MinerWordCount]
 	if !ok {
@@ -39,11 +39,11 @@ func (f samuraiFactory) Make(staticInputs map[entity.InputType]interface{}, mini
 	}
 
 	// extract global frequency table
-	val, ok := staticInputs[entity.InputGlobalFrequencyTable]
+	/*val, ok := staticInputs[entity.InputGlobalFrequencyTable]
 	if !ok {
 		return nil, fmt.Errorf("unable to retrieve input from %s", entity.InputGlobalFrequencyTable)
-	}
-	global := val.(*samurai.FrequencyTable)
+	}*/
+	global := local // val.(*samurai.FrequencyTable)
 
 	return samuraiSplitter{
 		splitter: splitter{"samurai"},

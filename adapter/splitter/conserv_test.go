@@ -15,7 +15,7 @@ func TestNewConservFactory_ShouldReturnConservSplitterFactory(t *testing.T) {
 
 func TestSplit_OnConserv_ShouldReturnAnArrayOfStrings(t *testing.T) {
 	factory := splitter.NewConservFactory()
-	splitter, _ := factory.Make(nil, nil)
+	splitter, _ := factory.Make(nil)
 
 	got := splitter.Split("car")
 

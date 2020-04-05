@@ -12,7 +12,7 @@ func NewConservFactory() entity.SplitterFactory {
 
 type conservFactory struct{}
 
-func (f conservFactory) Make(staticInputs map[entity.InputType]interface{}, miningResults map[entity.MinerType]entity.Miner) (entity.Splitter, error) {
+func (f conservFactory) Make(miningResults map[entity.MinerType]entity.Miner) (entity.Splitter, error) {
 	return conservSplitter{
 		splitter: splitter{"conserv"},
 	}, nil

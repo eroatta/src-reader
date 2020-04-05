@@ -5,8 +5,6 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/eroatta/token/samurai"
-
 	"github.com/eroatta/src-reader/adapter/splitter"
 	"github.com/eroatta/src-reader/entity"
 	"github.com/eroatta/src-reader/miner"
@@ -19,41 +17,22 @@ func TestNewSamuraiFactory_ShouldReturnSamuraiSplitterFactory(t *testing.T) {
 }
 
 func TestMake_OnSamuraiFactory_WhenMissingLocalFrequencyTable_ShouldReturnError(t *testing.T) {
-	staticInputs := map[entity.InputType]interface{}{
-		entity.InputGlobalFrequencyTable: samurai.NewFrequencyTable(),
-	}
 	miningResults := map[entity.MinerType]entity.Miner{}
 
 	factory := splitter.NewSamuraiFactory()
-	splitter, err := factory.Make(staticInputs, miningResults)
-
-	assert.Nil(t, splitter)
-	assert.Error(t, err)
-}
-
-func TestMake_OnSamuariFactory_WhenMissingGlobalFrequencyTable_ShouldReturnError(t *testing.T) {
-	staticInputs := map[entity.InputType]interface{}{}
-	miningResults := map[entity.MinerType]entity.Miner{
-		entity.MinerWordCount: miner.NewWordCount(),
-	}
-
-	factory := splitter.NewSamuraiFactory()
-	splitter, err := factory.Make(staticInputs, miningResults)
+	splitter, err := factory.Make(miningResults)
 
 	assert.Nil(t, splitter)
 	assert.Error(t, err)
 }
 
 func TestSplit_OnSamurai_ShouldReturnAnArrayOfStrings(t *testing.T) {
-	staticInputs := map[entity.InputType]interface{}{
-		entity.InputGlobalFrequencyTable: samurai.NewFrequencyTable(),
-	}
 	miningResults := map[entity.MinerType]entity.Miner{
 		entity.MinerWordCount: miner.NewWordCount(),
 	}
 
 	factory := splitter.NewSamuraiFactory()
-	splitter, _ := factory.Make(staticInputs, miningResults)
+	splitter, _ := factory.Make(miningResults)
 	got := splitter.Split("car")
 
 	assert.Equal(t, "samurai", splitter.Name())

@@ -7,7 +7,6 @@ import (
 	"github.com/eroatta/src-reader/adapter/expander"
 	"github.com/eroatta/src-reader/entity"
 	"github.com/eroatta/src-reader/miner"
-	"github.com/eroatta/token/expansion"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -18,41 +17,22 @@ func TestNewBasicFactory_ShouldReturnBasicExpanderFactory(t *testing.T) {
 }
 
 func TestMake_OnBasicFactory_WhenMissingVariableDeclarations_ShouldReturnError(t *testing.T) {
-	staticInputs := map[entity.InputType]interface{}{
-		entity.InputDefaultExpansions: expansion.NewSetBuilder().Build(),
-	}
 	miningResults := map[entity.MinerType]entity.Miner{}
 
 	factory := expander.NewBasicFactory()
-	basic, err := factory.Make(staticInputs, miningResults)
-
-	assert.Nil(t, basic)
-	assert.Error(t, err)
-}
-
-func TestMake_OnBasicFactory_WhenMissingDefaultExpansions_ShouldReturnError(t *testing.T) {
-	staticInputs := map[entity.InputType]interface{}{}
-	miningResults := map[entity.MinerType]entity.Miner{
-		entity.MinerDeclarations: miner.NewDeclaration(nil),
-	}
-
-	factory := expander.NewBasicFactory()
-	basic, err := factory.Make(staticInputs, miningResults)
+	basic, err := factory.Make(miningResults)
 
 	assert.Nil(t, basic)
 	assert.Error(t, err)
 }
 
 func TestApplicableOn_OnBasic_ShouldReturnGreedy(t *testing.T) {
-	staticInputs := map[entity.InputType]interface{}{
-		entity.InputDefaultExpansions: expansion.NewSetBuilder().Build(),
-	}
 	miningResults := map[entity.MinerType]entity.Miner{
 		entity.MinerDeclarations: miner.NewDeclaration(nil),
 	}
 
 	factory := expander.NewBasicFactory()
-	basic, err := factory.Make(staticInputs, miningResults)
+	basic, err := factory.Make(miningResults)
 
 	assert.NotNil(t, basic)
 	assert.Equal(t, "greedy", basic.ApplicableOn())
@@ -60,15 +40,12 @@ func TestApplicableOn_OnBasic_ShouldReturnGreedy(t *testing.T) {
 }
 
 func TestExpand_OnBasicWhenNoSplitsApplicable_ShouldReturnEmptyResults(t *testing.T) {
-	staticInputs := map[entity.InputType]interface{}{
-		entity.InputDefaultExpansions: expansion.NewSetBuilder().Build(),
-	}
 	miningResults := map[entity.MinerType]entity.Miner{
 		entity.MinerDeclarations: miner.NewDeclaration(nil),
 	}
 
 	factory := expander.NewBasicFactory()
-	basic, _ := factory.Make(staticInputs, miningResults)
+	basic, _ := factory.Make(miningResults)
 
 	ident := entity.Identifier{
 		Name: "str",
@@ -83,15 +60,12 @@ func TestExpand_OnBasicWhenNoSplitsApplicable_ShouldReturnEmptyResults(t *testin
 }
 
 func TestExpand_OnBasicWhenNoDeclFound_ShouldReturnUnexpandedResults(t *testing.T) {
-	staticInputs := map[entity.InputType]interface{}{
-		entity.InputDefaultExpansions: expansion.NewSetBuilder().Build(),
-	}
 	miningResults := map[entity.MinerType]entity.Miner{
 		entity.MinerDeclarations: miner.NewDeclaration(nil),
 	}
 
 	factory := expander.NewBasicFactory()
-	basic, _ := factory.Make(staticInputs, miningResults)
+	basic, _ := factory.Make(miningResults)
 
 	ident := entity.Identifier{
 		Name: "str",
@@ -107,9 +81,6 @@ func TestExpand_OnBasicWhenNoDeclFound_ShouldReturnUnexpandedResults(t *testing.
 }
 
 func TestExpand_OnBasic_ShouldReturnExpandedResultsFromWords(t *testing.T) {
-	staticInputs := map[entity.InputType]interface{}{
-		entity.InputDefaultExpansions: expansion.NewSetBuilder().Build(),
-	}
 	miningResults := map[entity.MinerType]entity.Miner{
 		entity.MinerDeclarations: miner.Declaration{
 			Decls: map[string]entity.Decl{
@@ -127,7 +98,7 @@ func TestExpand_OnBasic_ShouldReturnExpandedResultsFromWords(t *testing.T) {
 	}
 
 	factory := expander.NewBasicFactory()
-	basic, _ := factory.Make(staticInputs, miningResults)
+	basic, _ := factory.Make(miningResults)
 
 	ident := entity.Identifier{
 		Name: "strbuff",
@@ -143,9 +114,6 @@ func TestExpand_OnBasic_ShouldReturnExpandedResultsFromWords(t *testing.T) {
 }
 
 func TestExpand_OnBasic_ShouldReturnExpandedResultsFromPhrases(t *testing.T) {
-	staticInputs := map[entity.InputType]interface{}{
-		entity.InputDefaultExpansions: expansion.NewSetBuilder().Build(),
-	}
 	miningResults := map[entity.MinerType]entity.Miner{
 		entity.MinerDeclarations: miner.Declaration{
 			Decls: map[string]entity.Decl{
@@ -162,7 +130,7 @@ func TestExpand_OnBasic_ShouldReturnExpandedResultsFromPhrases(t *testing.T) {
 	}
 
 	factory := expander.NewBasicFactory()
-	basic, _ := factory.Make(staticInputs, miningResults)
+	basic, _ := factory.Make(miningResults)
 
 	ident := entity.Identifier{
 		Name: "sb",

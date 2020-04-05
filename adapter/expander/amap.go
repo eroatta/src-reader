@@ -16,7 +16,7 @@ func NewAMAPFactory() entity.ExpanderFactory {
 
 type amapFactory struct{}
 
-func (f amapFactory) Make(staticInputs map[entity.InputType]interface{}, miningResults map[entity.MinerType]entity.Miner) (entity.Expander, error) {
+func (f amapFactory) Make(miningResults map[entity.MinerType]entity.Miner) (entity.Expander, error) {
 	declarationsMiner, ok := miningResults[entity.MinerScopedDeclarations]
 	if !ok {
 		return nil, fmt.Errorf("unable to retrieve input from %s", entity.MinerScopedDeclarations)

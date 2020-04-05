@@ -18,30 +18,22 @@ func NewBasicFactory() entity.ExpanderFactory {
 
 type basicFactory struct{}
 
-func (f basicFactory) Make(staticInputs map[entity.InputType]interface{}, miningResults map[entity.MinerType]entity.Miner) (entity.Expander, error) {
+func (f basicFactory) Make(miningResults map[entity.MinerType]entity.Miner) (entity.Expander, error) {
 	declarationsMiner, ok := miningResults[entity.MinerDeclarations]
 	if !ok {
 		return nil, fmt.Errorf("unable to retrieve input from %s", entity.MinerDeclarations)
 	}
 	declarations := declarationsMiner.(miner.Declaration).Declarations()
 
-	exps, ok := staticInputs[entity.InputDefaultExpansions]
-	if !ok {
-		return nil, fmt.Errorf("unable to retrieve input from %s", entity.InputDefaultExpansions)
-	}
-	defaultWords := exps.(expansion.Set)
-
 	return &basicExpander{
 		expander:     expander{"amap"},
 		declarations: declarations,
-		defaultWords: defaultWords,
 	}, nil
 }
 
 type basicExpander struct {
 	expander
 	declarations map[string]entity.Decl
-	defaultWords expansion.Set
 }
 
 // Expand receives a entity.Identifier and processes the available splits that
@@ -80,7 +72,7 @@ func (b basicExpander) Expand(ident entity.Identifier) []string {
 
 	var expanded []string
 	for _, token := range split {
-		expansions := basic.Expand(token, words, phrases, b.defaultWords)
+		expansions := basic.Expand(token, words, phrases, basic.DefaultExpansions)
 		if len(expansions) == 0 {
 			expansions = []string{token}
 		}

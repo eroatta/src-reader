@@ -15,33 +15,30 @@ func TestNewNoExpansionFactory_ShouldReturnExpanderFactory(t *testing.T) {
 }
 
 func TestMake_OnNoExpansionFactory_ShouldReturnExpander(t *testing.T) {
-	staticInputs := map[entity.InputType]interface{}{}
 	miningResults := map[entity.MinerType]entity.Miner{}
 
 	factory := expander.NewNoExpansionFactory()
-	noexp, err := factory.Make(staticInputs, miningResults)
+	noexp, err := factory.Make(miningResults)
 
 	assert.NotNil(t, noexp)
 	assert.NoError(t, err)
 }
 
 func TestApplicableOn_OnNoExpansion_ShouldReturnConserv(t *testing.T) {
-	staticInputs := map[entity.InputType]interface{}{}
 	miningResults := map[entity.MinerType]entity.Miner{}
 
 	factory := expander.NewNoExpansionFactory()
-	noexp, _ := factory.Make(staticInputs, miningResults)
+	noexp, _ := factory.Make(miningResults)
 
 	assert.NotNil(t, noexp)
 	assert.Equal(t, "conserv", noexp.ApplicableOn())
 }
 
 func TestExpand_OnNoexpWhenNoSplitsApplicable_ShouldReturnEmptyResults(t *testing.T) {
-	staticInputs := map[entity.InputType]interface{}{}
 	miningResults := map[entity.MinerType]entity.Miner{}
 
 	factory := expander.NewNoExpansionFactory()
-	noexp, _ := factory.Make(staticInputs, miningResults)
+	noexp, _ := factory.Make(miningResults)
 
 	ident := entity.Identifier{
 		Name: "str",
@@ -56,11 +53,10 @@ func TestExpand_OnNoexpWhenNoSplitsApplicable_ShouldReturnEmptyResults(t *testin
 }
 
 func TestExpand_OnNoexp_ShouldReturnSameSplittedValues(t *testing.T) {
-	staticInputs := map[entity.InputType]interface{}{}
 	miningResults := map[entity.MinerType]entity.Miner{}
 
 	factory := expander.NewNoExpansionFactory()
-	noexp, _ := factory.Make(staticInputs, miningResults)
+	noexp, _ := factory.Make(miningResults)
 
 	ident := entity.Identifier{
 		Name: "str",

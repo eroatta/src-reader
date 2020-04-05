@@ -16,7 +16,7 @@ func TestNewGreedyFactory_ShouldReturnGreedySplitterFactory(t *testing.T) {
 
 func TestSplit_OnGreedy_ShouldReturnAnArrayOfStrings(t *testing.T) {
 	factory := splitter.NewGreedyFactory()
-	splitter, _ := factory.Make(nil, nil)
+	splitter, _ := factory.Make(nil)
 
 	got := splitter.Split("car")
 
