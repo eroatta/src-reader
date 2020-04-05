@@ -12,25 +12,25 @@ import (
 
 var cleaner = regexp.MustCompile("[^a-zA-Z0-9]")
 
-// Count handles the word count mining process.
-type Count struct {
+// WordCount handles the word count mining process.
+type WordCount struct {
 	words map[string]int
 }
 
-// NewCount creates a new Count miner.
-func NewCount() Count {
-	return Count{
+// NewWordCount creates a new Count miner.
+func NewWordCount() WordCount {
+	return WordCount{
 		words: map[string]int{},
 	}
 }
 
 // Type returns the miner type.
-func (m Count) Type() entity.MinerType {
-	return entity.Words
+func (m WordCount) Type() entity.MinerType {
+	return entity.WordCount
 }
 
 // Visit implements the ast.Visitor interface and handles the logic for the data extraction.
-func (m Count) Visit(node ast.Node) ast.Visitor {
+func (m WordCount) Visit(node ast.Node) ast.Visitor {
 	if node == nil {
 		return nil
 	}
@@ -215,6 +215,6 @@ func countOnFile(elem *ast.File) []string {
 }
 
 // Results returns the word count.
-func (m Count) Results() map[string]int {
+func (m WordCount) Results() map[string]int {
 	return m.words
 }

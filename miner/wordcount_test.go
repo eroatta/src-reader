@@ -11,27 +11,27 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestNewCount_ShouldReturnNewCountMiner(t *testing.T) {
-	miner := NewCount()
+func TestNewWordCount_ShouldReturnNewWordCountMiner(t *testing.T) {
+	miner := NewWordCount()
 
 	assert.NotNil(t, miner)
-	assert.IsType(t, Count{}, miner)
+	assert.IsType(t, WordCount{}, miner)
 }
 
-func TestGetType_OnCount_ShouldReturnCount(t *testing.T) {
-	miner := NewCount()
+func TestGetType_OnWordCount_ShouldReturnCount(t *testing.T) {
+	miner := NewWordCount()
 
-	assert.Equal(t, entity.Words, miner.Type())
+	assert.Equal(t, entity.WordCount, miner.Type())
 }
 
-func TestVisit_OnCountWithNilNode_ShouldReturnNil(t *testing.T) {
-	miner := NewCount()
+func TestVisit_OnWordCountWithNilNode_ShouldReturnNil(t *testing.T) {
+	miner := NewWordCount()
 
 	assert.Nil(t, miner.Visit(nil))
 }
 
-func TestVisit_OnCountWithValidNode_ShouldReturnVisitor(t *testing.T) {
-	miner := NewCount()
+func TestVisit_OnWordCountWithValidNode_ShouldReturnVisitor(t *testing.T) {
+	miner := NewWordCount()
 
 	node, _ := parser.ParseExpr("a + b")
 	got := miner.Visit(node)
@@ -39,7 +39,7 @@ func TestVisit_OnCountWithValidNode_ShouldReturnVisitor(t *testing.T) {
 	assert.NotNil(t, got)
 }
 
-func TestVisit_OnCount_ShouldSplitTheIdentifiers(t *testing.T) {
+func TestVisit_OnWordCount_ShouldSplitTheIdentifiers(t *testing.T) {
 	var tests = []struct {
 		name        string
 		src         string
@@ -389,7 +389,7 @@ func TestVisit_OnCount_ShouldSplitTheIdentifiers(t *testing.T) {
 			fs := token.NewFileSet()
 			node, _ := parser.ParseFile(fs, "", []byte(fixture.src), parser.ParseComments)
 
-			count := NewCount()
+			count := NewWordCount()
 			ast.Walk(count, node)
 
 			assert.NotEmpty(t, count.words)
@@ -401,7 +401,7 @@ func TestVisit_OnCount_ShouldSplitTheIdentifiers(t *testing.T) {
 	}
 }
 
-func TestVisit_OnCountWithFullFile_ShouldSplitCommentsAndIdentifiers(t *testing.T) {
+func TestVisit_OnWordCountWithFullFile_ShouldSplitCommentsAndIdentifiers(t *testing.T) {
 	src := `
 		// Copyright 2014 Manu Martinez-Almeida.  All rights reserved.
 		// Use of this source code is governed by a MIT style
@@ -817,7 +817,7 @@ func TestVisit_OnCountWithFullFile_ShouldSplitCommentsAndIdentifiers(t *testing.
 	fs := token.NewFileSet()
 	node, _ := parser.ParseFile(fs, "", []byte(src), parser.ParseComments)
 
-	count := NewCount()
+	count := NewWordCount()
 	ast.Walk(count, node)
 
 	assert.NotEmpty(t, count.words)
@@ -828,13 +828,13 @@ func TestVisit_OnCountWithFullFile_ShouldSplitCommentsAndIdentifiers(t *testing.
 }
 
 func TestResults_OnEmptyCount_ShouldReturnEmptyWordCount(t *testing.T) {
-	count := NewCount()
+	count := NewWordCount()
 
 	got := count.Results()
 	assert.Empty(t, got, fmt.Sprintf("frequency table should be empty: %v", got))
 }
 
-func TestResults_OnCountExtractorAfterExtraction_ShouldReturnWordCount(t *testing.T) {
+func TestResults_OnWordCountExtractorAfterExtraction_ShouldReturnWordCount(t *testing.T) {
 	src := `
 		package main
 
@@ -844,7 +844,7 @@ func TestResults_OnCountExtractorAfterExtraction_ShouldReturnWordCount(t *testin
 	fs := token.NewFileSet()
 	node, _ := parser.ParseFile(fs, "", []byte(src), parser.ParseComments)
 
-	count := NewCount()
+	count := NewWordCount()
 	ast.Walk(count, node)
 
 	wordCount := count.Results()

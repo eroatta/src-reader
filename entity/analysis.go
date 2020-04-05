@@ -6,7 +6,7 @@ import (
 )
 
 const (
-	Words                MinerType = "Words"
+	WordCount            MinerType = "WordCount"
 	Phrases              MinerType = "Phrases"
 	LocalFrequencyTable  MinerType = "Local Frequency Table"
 	GlobalFrequencyTable MinerType = "Global Frequency Table"

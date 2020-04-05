@@ -19,13 +19,13 @@ type samuraiFactory struct{}
 
 func (f samuraiFactory) Make(staticInputs map[string]interface{}, miningResults map[entity.MinerType]entity.Miner) (entity.Splitter, error) {
 	// build local frequency table from word count
-	wordsMiner, ok := miningResults[entity.Words]
+	wordsMiner, ok := miningResults[entity.WordCount]
 	if !ok {
-		return nil, fmt.Errorf("unable to retrieve input from %s", entity.Words)
+		return nil, fmt.Errorf("unable to retrieve input from %s", entity.WordCount)
 	}
 
 	local := samurai.NewFrequencyTable()
-	frequencies := wordsMiner.(miner.Count).Results()
+	frequencies := wordsMiner.(miner.WordCount).Results()
 	for token, count := range frequencies {
 		if len(token) == 1 {
 			continue
