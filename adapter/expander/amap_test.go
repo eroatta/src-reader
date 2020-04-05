@@ -62,7 +62,6 @@ func TestExpand_OnAMAPWhenNoSplitsApplicable_ShouldReturnEmptyResults(t *testing
 	factory := expander.NewAMAPFactory()
 	amap, _ := factory.Make(staticInputs, miningResults)
 
-	// TODO: miner.ScopedDecl should be moved to code.ScopedDecl
 	ident := entity.Identifier{
 		Name: "str",
 		Splits: map[string][]string{

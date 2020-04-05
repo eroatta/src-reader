@@ -60,7 +60,6 @@ func TestApplicableOn_OnBasic_ShouldReturnGreedy(t *testing.T) {
 }
 
 func TestExpand_OnBasicWhenNoSplitsApplicable_ShouldReturnEmptyResults(t *testing.T) {
-	// TODO: miner.Decl should be moved to code.Decl
 	staticInputs := map[entity.InputType]interface{}{
 		entity.InputDefaultExpansions: expansion.NewSetBuilder().Build(),
 	}
