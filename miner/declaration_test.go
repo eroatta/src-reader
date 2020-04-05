@@ -57,19 +57,19 @@ func TestVisit_OnDeclarationWithFunctions_ShouldReturnDecls(t *testing.T) {
 	tests := []struct {
 		name     string
 		src      string
-		expected map[string]miner.Decl
+		expected map[string]entity.Decl
 	}{
-		{"no_functions", "package main", make(map[string]miner.Decl)},
-		{"functions_without_text_or_comments", srcWithoutTextOrComments, map[string]miner.Decl{
-			"main++func::main": miner.Decl{
+		{"no_functions", "package main", make(map[string]entity.Decl)},
+		{"functions_without_text_or_comments", srcWithoutTextOrComments, map[string]entity.Decl{
+			"main++func::main": entity.Decl{
 				ID:       "main++func::main",
 				DeclType: token.FUNC,
 				Words:    map[string]struct{}{"main": struct{}{}},
 				Phrases:  make(map[string]struct{}),
 			},
 		}},
-		{"functions_with_text_and_comments", srcWithTextAndComments, map[string]miner.Decl{
-			"main++func::main": miner.Decl{
+		{"functions_with_text_and_comments", srcWithTextAndComments, map[string]entity.Decl{
+			"main++func::main": entity.Decl{
 				ID:       "main++func::main",
 				DeclType: token.FUNC,
 				Words: map[string]struct{}{
@@ -89,14 +89,14 @@ func TestVisit_OnDeclarationWithFunctions_ShouldReturnDecls(t *testing.T) {
 				},
 			},
 		}},
-		{"functions_with_multiple_functions", srcWithMultipleFunctions, map[string]miner.Decl{
-			"main++func::main": miner.Decl{
+		{"functions_with_multiple_functions", srcWithMultipleFunctions, map[string]entity.Decl{
+			"main++func::main": entity.Decl{
 				ID:       "main++func::main",
 				DeclType: token.FUNC,
 				Words:    map[string]struct{}{"main": struct{}{}},
 				Phrases:  make(map[string]struct{}),
 			},
-			"main++func::another": miner.Decl{
+			"main++func::another": entity.Decl{
 				ID:       "main++func::another",
 				DeclType: token.FUNC,
 				Words: map[string]struct{}{
@@ -165,17 +165,17 @@ func TestVisit_OnDeclarationWithVarDecl_ShouldReturnWordsAndPhrases(t *testing.T
 	tests := []struct {
 		name     string
 		src      string
-		expected map[string]miner.Decl
+		expected map[string]entity.Decl
 	}{
-		{"variable_without_comments", srcVarWithoutComments, map[string]miner.Decl{
-			"main++var::Common": miner.Decl{
+		{"variable_without_comments", srcVarWithoutComments, map[string]entity.Decl{
+			"main++var::Common": entity.Decl{
 				ID:       "main++var::Common",
 				DeclType: token.VAR,
 				Words:    map[string]struct{}{"common": struct{}{}},
 				Phrases:  make(map[string]struct{}),
 			}}},
-		{"variable_with_doc_comments", srcVarWithDocComments, map[string]miner.Decl{
-			"main++var::Common": miner.Decl{
+		{"variable_with_doc_comments", srcVarWithDocComments, map[string]entity.Decl{
+			"main++var::Common": entity.Decl{
 				ID:       "main++var::Common",
 				DeclType: token.VAR,
 				Words: map[string]struct{}{
@@ -187,8 +187,8 @@ func TestVisit_OnDeclarationWithVarDecl_ShouldReturnWordsAndPhrases(t *testing.T
 					"outer comment": struct{}{},
 				},
 			}}},
-		{"variable_with_doc_and_ignored_line_comments", srcVarWithDocAndLineComments, map[string]miner.Decl{
-			"main++var::Common": miner.Decl{
+		{"variable_with_doc_and_ignored_line_comments", srcVarWithDocAndLineComments, map[string]entity.Decl{
+			"main++var::Common": entity.Decl{
 				ID:       "main++var::Common",
 				DeclType: token.VAR,
 				Words: map[string]struct{}{
@@ -200,8 +200,8 @@ func TestVisit_OnDeclarationWithVarDecl_ShouldReturnWordsAndPhrases(t *testing.T
 					"outer comment": struct{}{},
 				},
 			}}},
-		{"multiple_variables_same_line", srcMultipleVarSpecs, map[string]miner.Decl{
-			"main++var::common": miner.Decl{
+		{"multiple_variables_same_line", srcMultipleVarSpecs, map[string]entity.Decl{
+			"main++var::common": entity.Decl{
 				ID:       "main++var::common",
 				DeclType: token.VAR,
 				Words: map[string]struct{}{
@@ -212,7 +212,7 @@ func TestVisit_OnDeclarationWithVarDecl_ShouldReturnWordsAndPhrases(t *testing.T
 				Phrases: map[string]struct{}{
 					"outer comment": struct{}{},
 				}},
-			"main++var::regular": miner.Decl{
+			"main++var::regular": entity.Decl{
 				ID:       "main++var::regular",
 				DeclType: token.VAR,
 				Words: map[string]struct{}{
@@ -224,8 +224,8 @@ func TestVisit_OnDeclarationWithVarDecl_ShouldReturnWordsAndPhrases(t *testing.T
 					"outer comment": struct{}{},
 				},
 			}}},
-		{"var_block", srcVarBlock, map[string]miner.Decl{
-			"main++var::common": miner.Decl{
+		{"var_block", srcVarBlock, map[string]entity.Decl{
+			"main++var::common": entity.Decl{
 				ID:       "main++var::common",
 				DeclType: token.VAR,
 				Words: map[string]struct{}{
@@ -236,7 +236,7 @@ func TestVisit_OnDeclarationWithVarDecl_ShouldReturnWordsAndPhrases(t *testing.T
 				Phrases: map[string]struct{}{
 					"outer comment": struct{}{},
 				}},
-			"main++var::regular": miner.Decl{
+			"main++var::regular": entity.Decl{
 				ID:       "main++var::regular",
 				DeclType: token.VAR,
 				Words: map[string]struct{}{
@@ -248,7 +248,7 @@ func TestVisit_OnDeclarationWithVarDecl_ShouldReturnWordsAndPhrases(t *testing.T
 				Phrases: map[string]struct{}{
 					"outer comment": struct{}{},
 				}},
-			"main++var::nrzXXZ": miner.Decl{
+			"main++var::nrzXXZ": entity.Decl{
 				ID:       "main++var::nrzXXZ",
 				DeclType: token.VAR,
 				Words: map[string]struct{}{
@@ -317,10 +317,10 @@ func TestVisit_OnDeclarationWithConstDecl_ShouldReturnWordsAndPhrases(t *testing
 	tests := []struct {
 		name     string
 		src      string
-		expected map[string]miner.Decl
+		expected map[string]entity.Decl
 	}{
-		{"constant_without_comments", srcConstWithoutComments, map[string]miner.Decl{
-			"main++const::Common": miner.Decl{
+		{"constant_without_comments", srcConstWithoutComments, map[string]entity.Decl{
+			"main++const::Common": entity.Decl{
 				ID:       "main++const::Common",
 				DeclType: token.CONST,
 				Words: map[string]struct{}{
@@ -329,8 +329,8 @@ func TestVisit_OnDeclarationWithConstDecl_ShouldReturnWordsAndPhrases(t *testing
 				},
 				Phrases: make(map[string]struct{}),
 			}}},
-		{"constant_with_doc_comments", srcConstWithDocComments, map[string]miner.Decl{
-			"main++const::Common": miner.Decl{
+		{"constant_with_doc_comments", srcConstWithDocComments, map[string]entity.Decl{
+			"main++const::Common": entity.Decl{
 				ID:       "main++const::Common",
 				DeclType: token.CONST,
 				Words: map[string]struct{}{
@@ -343,8 +343,8 @@ func TestVisit_OnDeclarationWithConstDecl_ShouldReturnWordsAndPhrases(t *testing
 					"outer comment": struct{}{},
 				},
 			}}},
-		{"constant_with_doc_and_ignored_line_comments", srcConstWithDocAndLineComments, map[string]miner.Decl{
-			"main++const::Common": miner.Decl{
+		{"constant_with_doc_and_ignored_line_comments", srcConstWithDocAndLineComments, map[string]entity.Decl{
+			"main++const::Common": entity.Decl{
 				ID:       "main++const::Common",
 				DeclType: token.CONST,
 				Words: map[string]struct{}{
@@ -357,8 +357,8 @@ func TestVisit_OnDeclarationWithConstDecl_ShouldReturnWordsAndPhrases(t *testing
 					"outer comment": struct{}{},
 				},
 			}}},
-		{"multiple_constants_same_line", srcMultipleConstSpecs, map[string]miner.Decl{
-			"main++const::common": miner.Decl{
+		{"multiple_constants_same_line", srcMultipleConstSpecs, map[string]entity.Decl{
+			"main++const::common": entity.Decl{
 				ID:       "main++const::common",
 				DeclType: token.CONST,
 				Words: map[string]struct{}{
@@ -370,7 +370,7 @@ func TestVisit_OnDeclarationWithConstDecl_ShouldReturnWordsAndPhrases(t *testing
 				Phrases: map[string]struct{}{
 					"outer comment": struct{}{},
 				}},
-			"main++const::regular": miner.Decl{
+			"main++const::regular": entity.Decl{
 				ID:       "main++const::regular",
 				DeclType: token.CONST,
 				Words: map[string]struct{}{
@@ -383,8 +383,8 @@ func TestVisit_OnDeclarationWithConstDecl_ShouldReturnWordsAndPhrases(t *testing
 					"outer comment": struct{}{},
 				},
 			}}},
-		{"const_block", srcConstBlock, map[string]miner.Decl{
-			"main++const::common": miner.Decl{
+		{"const_block", srcConstBlock, map[string]entity.Decl{
+			"main++const::common": entity.Decl{
 				ID:       "main++const::common",
 				DeclType: token.CONST,
 				Words: map[string]struct{}{
@@ -397,7 +397,7 @@ func TestVisit_OnDeclarationWithConstDecl_ShouldReturnWordsAndPhrases(t *testing
 					"common value":  struct{}{},
 					"outer comment": struct{}{},
 				}},
-			"main++const::regular": miner.Decl{
+			"main++const::regular": entity.Decl{
 				ID:       "main++const::regular",
 				DeclType: token.CONST,
 				Words: map[string]struct{}{
@@ -409,7 +409,7 @@ func TestVisit_OnDeclarationWithConstDecl_ShouldReturnWordsAndPhrases(t *testing
 				Phrases: map[string]struct{}{
 					"outer comment": struct{}{},
 				}},
-			"main++const::nrzXXZ": miner.Decl{
+			"main++const::nrzXXZ": entity.Decl{
 				ID:       "main++const::nrzXXZ",
 				DeclType: token.CONST,
 				Words: map[string]struct{}{
@@ -500,10 +500,10 @@ func TestVisit_OnDeclarationWithTypeDecl_ShouldReturnWordsAndPhrases(t *testing.
 	tests := []struct {
 		name     string
 		src      string
-		expected map[string]miner.Decl
+		expected map[string]entity.Decl
 	}{
-		{"empty_struct", srcStructWithoutFields, map[string]miner.Decl{
-			"main++struct::selector": miner.Decl{
+		{"empty_struct", srcStructWithoutFields, map[string]entity.Decl{
+			"main++struct::selector": entity.Decl{
 				ID:       "main++struct::selector",
 				DeclType: token.STRUCT,
 				Words: map[string]struct{}{
@@ -511,8 +511,8 @@ func TestVisit_OnDeclarationWithTypeDecl_ShouldReturnWordsAndPhrases(t *testing.
 				},
 				Phrases: map[string]struct{}{}},
 		}},
-		{"struct_with_comments", srcStructWithComments, map[string]miner.Decl{
-			"main++struct::selector": miner.Decl{
+		{"struct_with_comments", srcStructWithComments, map[string]entity.Decl{
+			"main++struct::selector": entity.Decl{
 				ID:       "main++struct::selector",
 				DeclType: token.STRUCT,
 				Words: map[string]struct{}{
@@ -524,8 +524,8 @@ func TestVisit_OnDeclarationWithTypeDecl_ShouldReturnWordsAndPhrases(t *testing.
 					"type comment": struct{}{},
 				}},
 		}},
-		{"struct_with_fields", srcStructWithFields, map[string]miner.Decl{
-			"main++struct::selector": miner.Decl{
+		{"struct_with_fields", srcStructWithFields, map[string]entity.Decl{
+			"main++struct::selector": entity.Decl{
 				ID:       "main++struct::selector",
 				DeclType: token.STRUCT,
 				Words: map[string]struct{}{
@@ -538,8 +538,8 @@ func TestVisit_OnDeclarationWithTypeDecl_ShouldReturnWordsAndPhrases(t *testing.
 					"type comment": struct{}{},
 				}},
 		}},
-		{"struct_with_fields_and_comments", srcStructWithFieldsAndComments, map[string]miner.Decl{
-			"main++struct::selector": miner.Decl{
+		{"struct_with_fields_and_comments", srcStructWithFieldsAndComments, map[string]entity.Decl{
+			"main++struct::selector": entity.Decl{
 				ID:       "main++struct::selector",
 				DeclType: token.STRUCT,
 				Words: map[string]struct{}{
@@ -554,8 +554,8 @@ func TestVisit_OnDeclarationWithTypeDecl_ShouldReturnWordsAndPhrases(t *testing.
 					"type comment":  struct{}{},
 				}},
 		}},
-		{"struct_block_decl", srcStructBlock, map[string]miner.Decl{
-			"main++struct::selector": miner.Decl{
+		{"struct_block_decl", srcStructBlock, map[string]entity.Decl{
+			"main++struct::selector": entity.Decl{
 				ID:       "main++struct::selector",
 				DeclType: token.STRUCT,
 				Words: map[string]struct{}{
@@ -571,7 +571,7 @@ func TestVisit_OnDeclarationWithTypeDecl_ShouldReturnWordsAndPhrases(t *testing.
 					"global comment": struct{}{},
 					"local comment":  struct{}{},
 				}},
-			"main++struct::picker": miner.Decl{
+			"main++struct::picker": entity.Decl{
 				ID:       "main++struct::picker",
 				DeclType: token.STRUCT,
 				Words: map[string]struct{}{
@@ -586,8 +586,8 @@ func TestVisit_OnDeclarationWithTypeDecl_ShouldReturnWordsAndPhrases(t *testing.
 					"global comment": struct{}{},
 				}},
 		}},
-		{"struct_with_hardwords", srcStructWithHardwords, map[string]miner.Decl{
-			"main++struct::httpClient": miner.Decl{
+		{"struct_with_hardwords", srcStructWithHardwords, map[string]entity.Decl{
+			"main++struct::httpClient": entity.Decl{
 				ID:       "main++struct::httpClient",
 				DeclType: token.STRUCT,
 				Words: map[string]struct{}{
@@ -679,10 +679,10 @@ func TestVisit_OnDeclarationWithInterfaceDecl_ShouldReturnWordsAndPhrases(t *tes
 	tests := []struct {
 		name     string
 		src      string
-		expected map[string]miner.Decl
+		expected map[string]entity.Decl
 	}{
-		{"empty_interface", srcInterfaceWithoutMethods, map[string]miner.Decl{
-			"main++interface::selector": miner.Decl{
+		{"empty_interface", srcInterfaceWithoutMethods, map[string]entity.Decl{
+			"main++interface::selector": entity.Decl{
 				ID:       "main++interface::selector",
 				DeclType: token.INTERFACE,
 				Words: map[string]struct{}{
@@ -690,8 +690,8 @@ func TestVisit_OnDeclarationWithInterfaceDecl_ShouldReturnWordsAndPhrases(t *tes
 				},
 				Phrases: map[string]struct{}{}},
 		}},
-		{"interface_with_comments", srcInterfaceWithComments, map[string]miner.Decl{
-			"main++interface::selector": miner.Decl{
+		{"interface_with_comments", srcInterfaceWithComments, map[string]entity.Decl{
+			"main++interface::selector": entity.Decl{
 				ID:       "main++interface::selector",
 				DeclType: token.INTERFACE,
 				Words: map[string]struct{}{
@@ -703,8 +703,8 @@ func TestVisit_OnDeclarationWithInterfaceDecl_ShouldReturnWordsAndPhrases(t *tes
 					"interface comment": struct{}{},
 				}},
 		}},
-		{"interface_with_methods", srcInterfaceWithMethods, map[string]miner.Decl{
-			"main++interface::selector": miner.Decl{
+		{"interface_with_methods", srcInterfaceWithMethods, map[string]entity.Decl{
+			"main++interface::selector": entity.Decl{
 				ID:       "main++interface::selector",
 				DeclType: token.INTERFACE,
 				Words: map[string]struct{}{
@@ -717,8 +717,8 @@ func TestVisit_OnDeclarationWithInterfaceDecl_ShouldReturnWordsAndPhrases(t *tes
 					"interface comment": struct{}{},
 				}},
 		}},
-		{"interface_with_methods_and_comments", srcInterfaceWithMethodsAndComments, map[string]miner.Decl{
-			"main++interface::selector": miner.Decl{
+		{"interface_with_methods_and_comments", srcInterfaceWithMethodsAndComments, map[string]entity.Decl{
+			"main++interface::selector": entity.Decl{
 				ID:       "main++interface::selector",
 				DeclType: token.INTERFACE,
 				Words: map[string]struct{}{
@@ -733,8 +733,8 @@ func TestVisit_OnDeclarationWithInterfaceDecl_ShouldReturnWordsAndPhrases(t *tes
 					"interface comment": struct{}{},
 				}},
 		}},
-		{"interface_block_decl", srcInterfaceBlock, map[string]miner.Decl{
-			"main++interface::selector": miner.Decl{
+		{"interface_block_decl", srcInterfaceBlock, map[string]entity.Decl{
+			"main++interface::selector": entity.Decl{
 				ID:       "main++interface::selector",
 				DeclType: token.INTERFACE,
 				Words: map[string]struct{}{
@@ -750,7 +750,7 @@ func TestVisit_OnDeclarationWithInterfaceDecl_ShouldReturnWordsAndPhrases(t *tes
 					"global comment":    struct{}{},
 					"interface comment": struct{}{},
 				}},
-			"main++interface::picker": miner.Decl{
+			"main++interface::picker": entity.Decl{
 				ID:       "main++interface::picker",
 				DeclType: token.INTERFACE,
 				Words: map[string]struct{}{
@@ -765,8 +765,8 @@ func TestVisit_OnDeclarationWithInterfaceDecl_ShouldReturnWordsAndPhrases(t *tes
 					"global comment": struct{}{},
 				}},
 		}},
-		{"interface_with_hardwords", srcInterfaceWithHardwords, map[string]miner.Decl{
-			"main++interface::httpClient": miner.Decl{
+		{"interface_with_hardwords", srcInterfaceWithHardwords, map[string]entity.Decl{
+			"main++interface::httpClient": entity.Decl{
 				ID:       "main++interface::httpClient",
 				DeclType: token.INTERFACE,
 				Words: map[string]struct{}{

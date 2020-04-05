@@ -117,3 +117,11 @@ type ScopedDecl struct {
 	Comments        []string
 	PackageComments []string
 }
+
+// Decl contains the mined text (words and phrases) related to a declaration.
+type Decl struct {
+	ID       string
+	DeclType token.Token
+	Words    map[string]struct{}
+	Phrases  map[string]struct{}
+}

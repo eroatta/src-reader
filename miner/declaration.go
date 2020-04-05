@@ -12,16 +12,8 @@ import (
 	"github.com/eroatta/token/lists"
 )
 
-// Decl contains the mined text (words and phrases) related to a declaration.
-type Decl struct {
-	ID       string
-	DeclType token.Token
-	Words    map[string]struct{}
-	Phrases  map[string]struct{}
-}
-
-func newDecl(ID string, declType token.Token) Decl {
-	return Decl{
+func newDecl(ID string, declType token.Token) entity.Decl {
+	return entity.Decl{
 		ID:       ID,
 		DeclType: declType,
 		Words:    make(map[string]struct{}),
@@ -36,14 +28,14 @@ type Declaration struct {
 	PackageName string
 	Comments    []*ast.CommentGroup
 	Included    []ast.Decl
-	Decls       map[string]Decl
+	Decls       map[string]entity.Decl
 }
 
 // NewDeclaration initializes a new declarations miner.
 func NewDeclaration(dict lists.List) Declaration {
 	return Declaration{
 		Dict:  dict,
-		Decls: make(map[string]Decl),
+		Decls: make(map[string]entity.Decl),
 	}
 }
 
@@ -157,7 +149,7 @@ func (m Declaration) shouldMine(elem *ast.GenDecl) bool {
 	return shouldMine
 }
 
-func extractDeclFromFunction(elem *ast.FuncDecl, m Declaration) Decl {
+func extractDeclFromFunction(elem *ast.FuncDecl, m Declaration) entity.Decl {
 	name := elem.Name.String()
 	functionText := newDecl(declID(m.PackageName, token.FUNC, name), token.FUNC)
 
@@ -185,7 +177,7 @@ func extractDeclFromFunction(elem *ast.FuncDecl, m Declaration) Decl {
 	return functionText
 }
 
-func extractDeclFromValue(declText Decl, valSpec *ast.ValueSpec, name string, index int, list lists.List) Decl {
+func extractDeclFromValue(declText entity.Decl, valSpec *ast.ValueSpec, name string, index int, list lists.List) entity.Decl {
 	for _, part := range conserv.Split(name) {
 		if list.Contains(part) {
 			declText.Words[strings.ToLower(part)] = struct{}{}
@@ -212,7 +204,7 @@ func extractDeclFromValue(declText Decl, valSpec *ast.ValueSpec, name string, in
 	return declText
 }
 
-func extractDeclFromStruct(declText Decl, structType *ast.StructType, list lists.List) Decl {
+func extractDeclFromStruct(declText entity.Decl, structType *ast.StructType, list lists.List) entity.Decl {
 	if structType.Fields != nil && structType.Fields.List != nil {
 		for _, field := range structType.Fields.List {
 			for _, fname := range field.Names {
@@ -234,7 +226,7 @@ func extractDeclFromStruct(declText Decl, structType *ast.StructType, list lists
 	return declText
 }
 
-func extractDeclFromInterface(declText Decl, interfaceType *ast.InterfaceType, list lists.List) Decl {
+func extractDeclFromInterface(declText entity.Decl, interfaceType *ast.InterfaceType, list lists.List) entity.Decl {
 	if interfaceType.Methods != nil && interfaceType.Methods.List != nil {
 		for _, method := range interfaceType.Methods.List {
 			for _, mname := range method.Names {
@@ -256,7 +248,7 @@ func extractDeclFromInterface(declText Decl, interfaceType *ast.InterfaceType, l
 	return declText
 }
 
-func merge(a Decl, b Decl) Decl {
+func merge(a entity.Decl, b entity.Decl) entity.Decl {
 	for k, v := range b.Words {
 		a.Words[k] = v
 	}
@@ -276,7 +268,7 @@ func cleanComment(text string) string {
 	return strings.TrimSpace(cleanComment)
 }
 
-func extractWordAndPhrasesFromComment(functionText Decl, comment string, list lists.List) Decl {
+func extractWordAndPhrasesFromComment(functionText entity.Decl, comment string, list lists.List) entity.Decl {
 	cleanComment := cleanComment(comment)
 	for _, word := range strings.Split(cleanComment, " ") {
 		word = cleaner.ReplaceAllString(word, "")
@@ -302,6 +294,6 @@ func declID(pkg string, declType token.Token, name string) string {
 }
 
 // Declarations returns a map of declaration IDs and the mined text for each declaration.
-func (m Declaration) Declarations() map[string]Decl {
+func (m Declaration) Declarations() map[string]entity.Decl {
 	return m.Decls
 }

@@ -113,8 +113,8 @@ func TestExpand_OnBasic_ShouldReturnExpandedResultsFromWords(t *testing.T) {
 	}
 	miningResults := map[entity.MinerType]entity.Miner{
 		entity.MinerDeclarations: miner.Declaration{
-			Decls: map[string]miner.Decl{
-				"strbuff": miner.Decl{
+			Decls: map[string]entity.Decl{
+				"strbuff": entity.Decl{
 					ID:       "strbuff",
 					DeclType: token.FUNC,
 					Words: map[string]struct{}{
@@ -149,8 +149,8 @@ func TestExpand_OnBasic_ShouldReturnExpandedResultsFromPhrases(t *testing.T) {
 	}
 	miningResults := map[entity.MinerType]entity.Miner{
 		entity.MinerDeclarations: miner.Declaration{
-			Decls: map[string]miner.Decl{
-				"sb": miner.Decl{
+			Decls: map[string]entity.Decl{
+				"sb": entity.Decl{
 					ID:       "sb",
 					DeclType: token.FUNC,
 					Words:    map[string]struct{}{},

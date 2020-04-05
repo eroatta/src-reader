@@ -40,7 +40,7 @@ func (f basicFactory) Make(staticInputs map[entity.InputType]interface{}, mining
 
 type basicExpander struct {
 	expander
-	declarations map[string]miner.Decl
+	declarations map[string]entity.Decl
 	defaultWords expansion.Set
 }
 
