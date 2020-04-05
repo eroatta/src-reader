@@ -1,4 +1,4 @@
-package miner
+package miner_test
 
 import (
 	"fmt"
@@ -8,30 +8,30 @@ import (
 	"testing"
 
 	"github.com/eroatta/src-reader/entity"
+	"github.com/eroatta/src-reader/miner"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestNewWordCount_ShouldReturnNewWordCountMiner(t *testing.T) {
-	miner := NewWordCount()
+	miner := miner.NewWordCount()
 
 	assert.NotNil(t, miner)
-	assert.IsType(t, WordCount{}, miner)
 }
 
-func TestGetType_OnWordCount_ShouldReturnCount(t *testing.T) {
-	miner := NewWordCount()
+func TestType_OnWordCount_ShouldReturnCount(t *testing.T) {
+	miner := miner.NewWordCount()
 
 	assert.Equal(t, entity.MinerWordCount, miner.Type())
 }
 
 func TestVisit_OnWordCountWithNilNode_ShouldReturnNil(t *testing.T) {
-	miner := NewWordCount()
+	miner := miner.NewWordCount()
 
 	assert.Nil(t, miner.Visit(nil))
 }
 
 func TestVisit_OnWordCountWithValidNode_ShouldReturnVisitor(t *testing.T) {
-	miner := NewWordCount()
+	miner := miner.NewWordCount()
 
 	node, _ := parser.ParseExpr("a + b")
 	got := miner.Visit(node)
@@ -389,13 +389,13 @@ func TestVisit_OnWordCount_ShouldSplitTheIdentifiers(t *testing.T) {
 			fs := token.NewFileSet()
 			node, _ := parser.ParseFile(fs, "", []byte(fixture.src), parser.ParseComments)
 
-			count := NewWordCount()
+			count := miner.NewWordCount()
 			ast.Walk(count, node)
 
-			assert.NotEmpty(t, count.words)
-			assert.Equal(t, fixture.uniqueWords, len(count.words))
+			assert.NotEmpty(t, count.Results())
+			assert.Equal(t, fixture.uniqueWords, len(count.Results()))
 			for key, value := range fixture.expected {
-				assert.Equal(t, value, count.words[key], fmt.Sprintf("invalid number of occurrencies for element: %s", key))
+				assert.Equal(t, value, count.Results()[key], fmt.Sprintf("invalid number of occurrencies for element: %s", key))
 			}
 		})
 	}
@@ -817,18 +817,18 @@ func TestVisit_OnWordCountWithFullFile_ShouldSplitCommentsAndIdentifiers(t *test
 	fs := token.NewFileSet()
 	node, _ := parser.ParseFile(fs, "", []byte(src), parser.ParseComments)
 
-	count := NewWordCount()
+	count := miner.NewWordCount()
 	ast.Walk(count, node)
 
-	assert.NotEmpty(t, count.words)
-	assert.Equal(t, len(expectedWords), len(count.words))
+	assert.NotEmpty(t, count.Results())
+	assert.Equal(t, len(expectedWords), len(count.Results()))
 	for key, value := range expectedWords {
-		assert.Equal(t, value, count.words[key], fmt.Sprintf("invalid number of occurrencies for element: %s", key))
+		assert.Equal(t, value, count.Results()[key], fmt.Sprintf("invalid number of occurrencies for element: %s", key))
 	}
 }
 
 func TestResults_OnEmptyCount_ShouldReturnEmptyWordCount(t *testing.T) {
-	count := NewWordCount()
+	count := miner.NewWordCount()
 
 	got := count.Results()
 	assert.Empty(t, got, fmt.Sprintf("frequency table should be empty: %v", got))
@@ -844,7 +844,7 @@ func TestResults_OnWordCountExtractorAfterExtraction_ShouldReturnWordCount(t *te
 	fs := token.NewFileSet()
 	node, _ := parser.ParseFile(fs, "", []byte(src), parser.ParseComments)
 
-	count := NewWordCount()
+	count := miner.NewWordCount()
 	ast.Walk(count, node)
 
 	wordCount := count.Results()
