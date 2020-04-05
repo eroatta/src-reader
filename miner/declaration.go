@@ -49,7 +49,7 @@ func NewDeclaration(dict lists.List) Declaration {
 
 // Type returns the specific entity.MinerType for the miner.
 func (m Declaration) Type() entity.MinerType {
-	return entity.Declarations
+	return entity.MinerDeclarations
 }
 
 // Visit implements the ast.Visitor interface and handles the logic for the data extraction.

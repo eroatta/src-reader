@@ -230,7 +230,7 @@ func (e expanderAbstractFactoryMock) Get(name string) (entity.ExpanderFactory, e
 
 type expanderFactoryMock struct{}
 
-func (e expanderFactoryMock) Make(staticInputs map[string]interface{}, miningResults map[entity.MinerType]entity.Miner) (entity.Expander, error) {
+func (e expanderFactoryMock) Make(staticInputs map[entity.InputType]interface{}, miningResults map[entity.MinerType]entity.Miner) (entity.Expander, error) {
 	return expanderMock{}, nil
 }
 

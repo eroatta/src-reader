@@ -17,7 +17,7 @@ func TestNewAMAPFactory_ShouldReturnExpanderFactory(t *testing.T) {
 }
 
 func TestMake_OnAMAPFactory_WhenMissingScopedDeclarations_ShouldReturnError(t *testing.T) {
-	staticInputs := map[string]interface{}{}
+	staticInputs := map[entity.InputType]interface{}{}
 	miningResults := map[entity.MinerType]entity.Miner{}
 
 	factory := expander.NewAMAPFactory()
@@ -28,9 +28,9 @@ func TestMake_OnAMAPFactory_WhenMissingScopedDeclarations_ShouldReturnError(t *t
 }
 
 func TestMake_OnAMAPFactory_WhenMissingReferenceText_ShouldReturnError(t *testing.T) {
-	staticInputs := map[string]interface{}{}
+	staticInputs := map[entity.InputType]interface{}{}
 	miningResults := map[entity.MinerType]entity.Miner{
-		entity.ScopedDeclarations: miner.NewScope("test"),
+		entity.MinerScopedDeclarations: miner.NewScope("test"),
 	}
 
 	factory := expander.NewAMAPFactory()
@@ -41,9 +41,9 @@ func TestMake_OnAMAPFactory_WhenMissingReferenceText_ShouldReturnError(t *testin
 }
 
 func TestApplicableOn_OnAMAP_ShouldReturnSamurai(t *testing.T) {
-	staticInputs := map[string]interface{}{}
+	staticInputs := map[entity.InputType]interface{}{}
 	miningResults := map[entity.MinerType]entity.Miner{
-		entity.ScopedDeclarations: miner.NewScope("test"),
+		entity.MinerScopedDeclarations: miner.NewScope("test"),
 	}
 
 	factory := expander.NewAMAPFactory()
@@ -54,9 +54,9 @@ func TestApplicableOn_OnAMAP_ShouldReturnSamurai(t *testing.T) {
 }
 
 func TestExpand_OnAMAPWhenNoSplitsApplicable_ShouldReturnEmptyResults(t *testing.T) {
-	staticInputs := map[string]interface{}{}
+	staticInputs := map[entity.InputType]interface{}{}
 	miningResults := map[entity.MinerType]entity.Miner{
-		entity.ScopedDeclarations: miner.NewScope("test"),
+		entity.MinerScopedDeclarations: miner.NewScope("test"),
 	}
 
 	factory := expander.NewAMAPFactory()
@@ -76,9 +76,9 @@ func TestExpand_OnAMAPWhenNoSplitsApplicable_ShouldReturnEmptyResults(t *testing
 }
 
 func TestExpand_OnAMAPWhenNoDeclFound_ShouldReturnUnexpandedResults(t *testing.T) {
-	staticInputs := map[string]interface{}{}
+	staticInputs := map[entity.InputType]interface{}{}
 	miningResults := map[entity.MinerType]entity.Miner{
-		entity.ScopedDeclarations: miner.NewScope("test"),
+		entity.MinerScopedDeclarations: miner.NewScope("test"),
 	}
 
 	factory := expander.NewAMAPFactory()
@@ -97,10 +97,10 @@ func TestExpand_OnAMAPWhenNoDeclFound_ShouldReturnUnexpandedResults(t *testing.T
 }
 
 func TestExpand_OnAMAP_ShouldReturnExpandedResults(t *testing.T) {
-	staticInputs := map[string]interface{}{}
+	staticInputs := map[entity.InputType]interface{}{}
 
 	miningResults := map[entity.MinerType]entity.Miner{
-		entity.ScopedDeclarations: miner.Scope{
+		entity.MinerScopedDeclarations: miner.Scope{
 			Scopes: map[string]miner.ScopedDecl{
 				"sb": miner.ScopedDecl{
 					ID:       "sb",

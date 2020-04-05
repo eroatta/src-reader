@@ -18,8 +18,8 @@ func TestNewBasicFactory_ShouldReturnBasicExpanderFactory(t *testing.T) {
 }
 
 func TestMake_OnBasicFactory_WhenMissingVariableDeclarations_ShouldReturnError(t *testing.T) {
-	staticInputs := map[string]interface{}{
-		"DefaultExpansions": expansion.NewSetBuilder().Build(),
+	staticInputs := map[entity.InputType]interface{}{
+		entity.InputDefaultExpansions: expansion.NewSetBuilder().Build(),
 	}
 	miningResults := map[entity.MinerType]entity.Miner{}
 
@@ -31,9 +31,9 @@ func TestMake_OnBasicFactory_WhenMissingVariableDeclarations_ShouldReturnError(t
 }
 
 func TestMake_OnBasicFactory_WhenMissingDefaultExpansions_ShouldReturnError(t *testing.T) {
-	staticInputs := map[string]interface{}{}
+	staticInputs := map[entity.InputType]interface{}{}
 	miningResults := map[entity.MinerType]entity.Miner{
-		entity.Declarations: miner.NewDeclaration(nil),
+		entity.MinerDeclarations: miner.NewDeclaration(nil),
 	}
 
 	factory := expander.NewBasicFactory()
@@ -44,11 +44,11 @@ func TestMake_OnBasicFactory_WhenMissingDefaultExpansions_ShouldReturnError(t *t
 }
 
 func TestApplicableOn_OnBasic_ShouldReturnGreedy(t *testing.T) {
-	staticInputs := map[string]interface{}{
-		"DefaultExpansions": expansion.NewSetBuilder().Build(),
+	staticInputs := map[entity.InputType]interface{}{
+		entity.InputDefaultExpansions: expansion.NewSetBuilder().Build(),
 	}
 	miningResults := map[entity.MinerType]entity.Miner{
-		entity.Declarations: miner.NewDeclaration(nil),
+		entity.MinerDeclarations: miner.NewDeclaration(nil),
 	}
 
 	factory := expander.NewBasicFactory()
@@ -61,11 +61,11 @@ func TestApplicableOn_OnBasic_ShouldReturnGreedy(t *testing.T) {
 
 func TestExpand_OnBasicWhenNoSplitsApplicable_ShouldReturnEmptyResults(t *testing.T) {
 	// TODO: miner.Decl should be moved to code.Decl
-	staticInputs := map[string]interface{}{
-		"DefaultExpansions": expansion.NewSetBuilder().Build(),
+	staticInputs := map[entity.InputType]interface{}{
+		entity.InputDefaultExpansions: expansion.NewSetBuilder().Build(),
 	}
 	miningResults := map[entity.MinerType]entity.Miner{
-		entity.Declarations: miner.NewDeclaration(nil),
+		entity.MinerDeclarations: miner.NewDeclaration(nil),
 	}
 
 	factory := expander.NewBasicFactory()
@@ -84,11 +84,11 @@ func TestExpand_OnBasicWhenNoSplitsApplicable_ShouldReturnEmptyResults(t *testin
 }
 
 func TestExpand_OnBasicWhenNoDeclFound_ShouldReturnUnexpandedResults(t *testing.T) {
-	staticInputs := map[string]interface{}{
-		"DefaultExpansions": expansion.NewSetBuilder().Build(),
+	staticInputs := map[entity.InputType]interface{}{
+		entity.InputDefaultExpansions: expansion.NewSetBuilder().Build(),
 	}
 	miningResults := map[entity.MinerType]entity.Miner{
-		entity.Declarations: miner.NewDeclaration(nil),
+		entity.MinerDeclarations: miner.NewDeclaration(nil),
 	}
 
 	factory := expander.NewBasicFactory()
@@ -108,11 +108,11 @@ func TestExpand_OnBasicWhenNoDeclFound_ShouldReturnUnexpandedResults(t *testing.
 }
 
 func TestExpand_OnBasic_ShouldReturnExpandedResultsFromWords(t *testing.T) {
-	staticInputs := map[string]interface{}{
-		"DefaultExpansions": expansion.NewSetBuilder().Build(),
+	staticInputs := map[entity.InputType]interface{}{
+		entity.InputDefaultExpansions: expansion.NewSetBuilder().Build(),
 	}
 	miningResults := map[entity.MinerType]entity.Miner{
-		entity.Declarations: miner.Declaration{
+		entity.MinerDeclarations: miner.Declaration{
 			Decls: map[string]miner.Decl{
 				"strbuff": miner.Decl{
 					ID:       "strbuff",
@@ -144,11 +144,11 @@ func TestExpand_OnBasic_ShouldReturnExpandedResultsFromWords(t *testing.T) {
 }
 
 func TestExpand_OnBasic_ShouldReturnExpandedResultsFromPhrases(t *testing.T) {
-	staticInputs := map[string]interface{}{
-		"DefaultExpansions": expansion.NewSetBuilder().Build(),
+	staticInputs := map[entity.InputType]interface{}{
+		entity.InputDefaultExpansions: expansion.NewSetBuilder().Build(),
 	}
 	miningResults := map[entity.MinerType]entity.Miner{
-		entity.Declarations: miner.Declaration{
+		entity.MinerDeclarations: miner.Declaration{
 			Decls: map[string]miner.Decl{
 				"sb": miner.Decl{
 					ID:       "sb",

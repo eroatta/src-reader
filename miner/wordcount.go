@@ -26,7 +26,7 @@ func NewWordCount() WordCount {
 
 // Type returns the miner type.
 func (m WordCount) Type() entity.MinerType {
-	return entity.WordCount
+	return entity.MinerWordCount
 }
 
 // Visit implements the ast.Visitor interface and handles the logic for the data extraction.

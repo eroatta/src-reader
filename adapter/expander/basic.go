@@ -18,17 +18,16 @@ func NewBasicFactory() entity.ExpanderFactory {
 
 type basicFactory struct{}
 
-func (f basicFactory) Make(staticInputs map[string]interface{}, miningResults map[entity.MinerType]entity.Miner) (entity.Expander, error) {
-	declarationsMiner, ok := miningResults[entity.Declarations]
+func (f basicFactory) Make(staticInputs map[entity.InputType]interface{}, miningResults map[entity.MinerType]entity.Miner) (entity.Expander, error) {
+	declarationsMiner, ok := miningResults[entity.MinerDeclarations]
 	if !ok {
-		return nil, fmt.Errorf("unable to retrieve input from %s", entity.Declarations)
+		return nil, fmt.Errorf("unable to retrieve input from %s", entity.MinerDeclarations)
 	}
 	declarations := declarationsMiner.(miner.Declaration).Declarations()
 
-	exps, ok := staticInputs["DefaultExpansions"]
+	exps, ok := staticInputs[entity.InputDefaultExpansions]
 	if !ok {
-		// TODO: improve
-		return nil, fmt.Errorf("unable to retrieve input from DefaultExpansions")
+		return nil, fmt.Errorf("unable to retrieve input from %s", entity.InputDefaultExpansions)
 	}
 	defaultWords := exps.(expansion.Set)
 

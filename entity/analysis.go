@@ -6,17 +6,21 @@ import (
 )
 
 const (
-	WordCount            MinerType = "WordCount"
-	Phrases              MinerType = "Phrases"
-	LocalFrequencyTable  MinerType = "Local Frequency Table"
-	GlobalFrequencyTable MinerType = "Global Frequency Table"
-	ScopedDeclarations   MinerType = "Scoped Declarations"
-	Declarations         MinerType = "Declarations"
+	MinerWordCount          MinerType = "WordCount"
+	MinerScopedDeclarations MinerType = "Scoped Declarations"
+	MinerDeclarations       MinerType = "Declarations"
 )
+
+const (
+	InputGlobalFrequencyTable InputType = "GlobalFrequencyTable"
+	InputDefaultExpansions    InputType = "DefaultExpansions"
+)
+
+type InputType string
 
 // AnalysisConfig defines the configuration options for an analysis execution.
 type AnalysisConfig struct {
-	StaticInputs              map[string]interface{}
+	StaticInputs              map[InputType]interface{}
 	Miners                    []Miner
 	ExtractorFactory          ExtractorFactory
 	SplittingAlgorithmFactory SplitterAbstractFactory
@@ -68,7 +72,7 @@ type SplitterAbstractFactory interface {
 }
 
 type SplitterFactory interface {
-	Make(staticInputs map[string]interface{}, miningResults map[MinerType]Miner) (Splitter, error)
+	Make(staticInputs map[InputType]interface{}, miningResults map[MinerType]Miner) (Splitter, error)
 }
 
 type ExpanderAbstractFactory interface {
@@ -76,7 +80,7 @@ type ExpanderAbstractFactory interface {
 }
 
 type ExpanderFactory interface {
-	Make(staticInputs map[string]interface{}, miningResults map[MinerType]Miner) (Expander, error)
+	Make(staticInputs map[InputType]interface{}, miningResults map[MinerType]Miner) (Expander, error)
 }
 
 // File TODO

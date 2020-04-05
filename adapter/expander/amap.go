@@ -16,10 +16,10 @@ func NewAMAPFactory() entity.ExpanderFactory {
 
 type amapFactory struct{}
 
-func (f amapFactory) Make(staticInputs map[string]interface{}, miningResults map[entity.MinerType]entity.Miner) (entity.Expander, error) {
-	declarationsMiner, ok := miningResults[entity.ScopedDeclarations]
+func (f amapFactory) Make(staticInputs map[entity.InputType]interface{}, miningResults map[entity.MinerType]entity.Miner) (entity.Expander, error) {
+	declarationsMiner, ok := miningResults[entity.MinerScopedDeclarations]
 	if !ok {
-		return nil, fmt.Errorf("unable to retrieve input from %s", entity.ScopedDeclarations)
+		return nil, fmt.Errorf("unable to retrieve input from %s", entity.MinerScopedDeclarations)
 	}
 
 	scopedDeclarations := declarationsMiner.(miner.Scope).ScopedDeclarations()

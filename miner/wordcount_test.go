@@ -21,7 +21,7 @@ func TestNewWordCount_ShouldReturnNewWordCountMiner(t *testing.T) {
 func TestGetType_OnWordCount_ShouldReturnCount(t *testing.T) {
 	miner := NewWordCount()
 
-	assert.Equal(t, entity.WordCount, miner.Type())
+	assert.Equal(t, entity.MinerWordCount, miner.Type())
 }
 
 func TestVisit_OnWordCountWithNilNode_ShouldReturnNil(t *testing.T) {

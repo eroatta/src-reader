@@ -19,8 +19,8 @@ func TestNewSamuraiFactory_ShouldReturnSamuraiSplitterFactory(t *testing.T) {
 }
 
 func TestMake_OnSamuraiFactory_WhenMissingLocalFrequencyTable_ShouldReturnError(t *testing.T) {
-	staticInputs := map[string]interface{}{
-		"GlobalFrequencyTable": samurai.NewFrequencyTable(),
+	staticInputs := map[entity.InputType]interface{}{
+		entity.InputGlobalFrequencyTable: samurai.NewFrequencyTable(),
 	}
 	miningResults := map[entity.MinerType]entity.Miner{}
 
@@ -32,9 +32,9 @@ func TestMake_OnSamuraiFactory_WhenMissingLocalFrequencyTable_ShouldReturnError(
 }
 
 func TestMake_OnSamuariFactory_WhenMissingGlobalFrequencyTable_ShouldReturnError(t *testing.T) {
-	staticInputs := map[string]interface{}{}
+	staticInputs := map[entity.InputType]interface{}{}
 	miningResults := map[entity.MinerType]entity.Miner{
-		entity.WordCount: miner.NewWordCount(),
+		entity.MinerWordCount: miner.NewWordCount(),
 	}
 
 	factory := splitter.NewSamuraiFactory()
@@ -45,11 +45,11 @@ func TestMake_OnSamuariFactory_WhenMissingGlobalFrequencyTable_ShouldReturnError
 }
 
 func TestSplit_OnSamurai_ShouldReturnAnArrayOfStrings(t *testing.T) {
-	staticInputs := map[string]interface{}{
-		"GlobalFrequencyTable": samurai.NewFrequencyTable(),
+	staticInputs := map[entity.InputType]interface{}{
+		entity.InputGlobalFrequencyTable: samurai.NewFrequencyTable(),
 	}
 	miningResults := map[entity.MinerType]entity.Miner{
-		entity.WordCount: miner.NewWordCount(),
+		entity.MinerWordCount: miner.NewWordCount(),
 	}
 
 	factory := splitter.NewSamuraiFactory()

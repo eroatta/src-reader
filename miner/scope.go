@@ -56,7 +56,7 @@ func newScopedDecl(pkg string, name string, declType token.Token) ScopedDecl {
 
 // Type returns the specific entity.MinerType for the miner.
 func (m Scope) Type() entity.MinerType {
-	return entity.ScopedDeclarations
+	return entity.MinerScopedDeclarations
 }
 
 // Visit implements the ast.Visitor interface and handles the logic for the data extraction.

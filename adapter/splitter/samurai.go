@@ -17,11 +17,11 @@ func NewSamuraiFactory() entity.SplitterFactory {
 
 type samuraiFactory struct{}
 
-func (f samuraiFactory) Make(staticInputs map[string]interface{}, miningResults map[entity.MinerType]entity.Miner) (entity.Splitter, error) {
+func (f samuraiFactory) Make(staticInputs map[entity.InputType]interface{}, miningResults map[entity.MinerType]entity.Miner) (entity.Splitter, error) {
 	// build local frequency table from word count
-	wordsMiner, ok := miningResults[entity.WordCount]
+	wordsMiner, ok := miningResults[entity.MinerWordCount]
 	if !ok {
-		return nil, fmt.Errorf("unable to retrieve input from %s", entity.WordCount)
+		return nil, fmt.Errorf("unable to retrieve input from %s", entity.MinerWordCount)
 	}
 
 	local := samurai.NewFrequencyTable()
@@ -39,9 +39,9 @@ func (f samuraiFactory) Make(staticInputs map[string]interface{}, miningResults 
 	}
 
 	// extract global frequency table
-	val, ok := staticInputs["GlobalFrequencyTable"] // TODO: use consts?
+	val, ok := staticInputs[entity.InputGlobalFrequencyTable]
 	if !ok {
-		return nil, fmt.Errorf("unable to retrieve input from %s", entity.GlobalFrequencyTable)
+		return nil, fmt.Errorf("unable to retrieve input from %s", entity.InputGlobalFrequencyTable)
 	}
 	global := val.(*samurai.FrequencyTable)
 

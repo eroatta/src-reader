@@ -21,7 +21,7 @@ func TestNewDeclaration_ShouldReturnDeclarationMiner(t *testing.T) {
 func TestGetName_OnDeclaration_ShouldReturnDeclaration(t *testing.T) {
 	miner := miner.NewDeclaration(nil)
 
-	assert.Equal(t, entity.Declarations, miner.Type())
+	assert.Equal(t, entity.MinerDeclarations, miner.Type())
 }
 
 func TestVisit_OnDeclarationWithFunctions_ShouldReturnDecls(t *testing.T) {

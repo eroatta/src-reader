@@ -15,7 +15,7 @@ func TestNewNoExpansionFactory_ShouldReturnExpanderFactory(t *testing.T) {
 }
 
 func TestMake_OnNoExpansionFactory_ShouldReturnExpander(t *testing.T) {
-	staticInputs := map[string]interface{}{}
+	staticInputs := map[entity.InputType]interface{}{}
 	miningResults := map[entity.MinerType]entity.Miner{}
 
 	factory := expander.NewNoExpansionFactory()
@@ -26,7 +26,7 @@ func TestMake_OnNoExpansionFactory_ShouldReturnExpander(t *testing.T) {
 }
 
 func TestApplicableOn_OnNoExpansion_ShouldReturnConserv(t *testing.T) {
-	staticInputs := map[string]interface{}{}
+	staticInputs := map[entity.InputType]interface{}{}
 	miningResults := map[entity.MinerType]entity.Miner{}
 
 	factory := expander.NewNoExpansionFactory()
@@ -37,7 +37,7 @@ func TestApplicableOn_OnNoExpansion_ShouldReturnConserv(t *testing.T) {
 }
 
 func TestExpand_OnNoexpWhenNoSplitsApplicable_ShouldReturnEmptyResults(t *testing.T) {
-	staticInputs := map[string]interface{}{}
+	staticInputs := map[entity.InputType]interface{}{}
 	miningResults := map[entity.MinerType]entity.Miner{}
 
 	factory := expander.NewNoExpansionFactory()
@@ -56,7 +56,7 @@ func TestExpand_OnNoexpWhenNoSplitsApplicable_ShouldReturnEmptyResults(t *testin
 }
 
 func TestExpand_OnNoexp_ShouldReturnSameSplittedValues(t *testing.T) {
-	staticInputs := map[string]interface{}{}
+	staticInputs := map[entity.InputType]interface{}{}
 	miningResults := map[entity.MinerType]entity.Miner{}
 
 	factory := expander.NewNoExpansionFactory()

@@ -20,7 +20,7 @@ func TestNewScopes_ShouldReturnScopesMiner(t *testing.T) {
 func TestGetName_OnScope_ShouldReturnScope(t *testing.T) {
 	miner := miner.NewScope("testfile")
 
-	assert.Equal(t, entity.ScopedDeclarations, miner.Type())
+	assert.Equal(t, entity.MinerScopedDeclarations, miner.Type())
 }
 
 func TestScopedDeclarations_OnScope_ShouldReturnScopes(t *testing.T) {
