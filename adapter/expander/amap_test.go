@@ -41,6 +41,7 @@ func TestMake_OnAMAPFactory_WhenMissingReferenceText_ShouldReturnError(t *testin
 func TestApplicableOn_OnAMAP_ShouldReturnSamurai(t *testing.T) {
 	miningResults := map[entity.MinerType]entity.Miner{
 		entity.MinerScopedDeclarations: miner.NewScope("test"),
+		entity.MinerComments:           miner.NewComments(),
 	}
 
 	factory := expander.NewAMAPFactory()
@@ -53,6 +54,7 @@ func TestApplicableOn_OnAMAP_ShouldReturnSamurai(t *testing.T) {
 func TestExpand_OnAMAPWhenNoSplitsApplicable_ShouldReturnEmptyResults(t *testing.T) {
 	miningResults := map[entity.MinerType]entity.Miner{
 		entity.MinerScopedDeclarations: miner.NewScope("test"),
+		entity.MinerComments:           miner.NewComments(),
 	}
 
 	factory := expander.NewAMAPFactory()
@@ -73,6 +75,7 @@ func TestExpand_OnAMAPWhenNoSplitsApplicable_ShouldReturnEmptyResults(t *testing
 func TestExpand_OnAMAPWhenNoDeclFound_ShouldReturnUnexpandedResults(t *testing.T) {
 	miningResults := map[entity.MinerType]entity.Miner{
 		entity.MinerScopedDeclarations: miner.NewScope("test"),
+		entity.MinerComments:           miner.NewComments(),
 	}
 
 	factory := expander.NewAMAPFactory()
@@ -101,6 +104,7 @@ func TestExpand_OnAMAP_ShouldReturnExpandedResults(t *testing.T) {
 				},
 			},
 		},
+		entity.MinerComments: miner.NewComments(),
 	}
 
 	factory := expander.NewAMAPFactory()

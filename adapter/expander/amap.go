@@ -21,9 +21,13 @@ func (f amapFactory) Make(miningResults map[entity.MinerType]entity.Miner) (enti
 	if !ok {
 		return nil, fmt.Errorf("unable to retrieve input from %s", entity.MinerScopedDeclarations)
 	}
-
 	scopedDeclarations := declarationsMiner.(miner.Scope).ScopedDeclarations()
-	referenceText := []string{} // TODO: add reference text
+
+	commentsMiner, ok := miningResults[entity.MinerComments]
+	if !ok {
+		return nil, fmt.Errorf("unable to retrieve input from %s", entity.MinerComments)
+	}
+	referenceText := commentsMiner.(*miner.Comments).Collected()
 
 	return &amapExpander{
 		expander:           expander{"amap"},
