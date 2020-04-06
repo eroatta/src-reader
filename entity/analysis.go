@@ -6,10 +6,11 @@ import (
 )
 
 const (
-	MinerWordCount          MinerType = "WordCount"
-	MinerScopedDeclarations MinerType = "Scoped Declarations"
-	MinerDeclarations       MinerType = "Declarations"
-	MinerComments           MinerType = "Comments"
+	MinerWordCount            MinerType = "WordCount"
+	MinerScopedDeclarations   MinerType = "Scoped Declarations"
+	MinerDeclarations         MinerType = "Declarations"
+	MinerComments             MinerType = "Comments"
+	MinerGlobalFrequencyTable MinerType = "Global Frequency Table"
 )
 
 // AnalysisConfig defines the configuration options for an analysis execution.
