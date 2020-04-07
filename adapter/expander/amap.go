@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/eroatta/src-reader/adapter/miner"
 	"github.com/eroatta/src-reader/entity"
-	"github.com/eroatta/src-reader/miner"
 	"github.com/eroatta/token/amap"
 )
 

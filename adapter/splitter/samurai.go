@@ -3,8 +3,8 @@ package splitter
 import (
 	"fmt"
 
+	"github.com/eroatta/src-reader/adapter/miner"
 	"github.com/eroatta/src-reader/entity"
-	"github.com/eroatta/src-reader/miner"
 	"github.com/eroatta/token/lists"
 	"github.com/eroatta/token/samurai"
 	log "github.com/sirupsen/logrus"
