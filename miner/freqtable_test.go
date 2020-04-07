@@ -6,26 +6,26 @@ import (
 	"go/token"
 	"testing"
 
-	"github.com/eroatta/token-splitex/samurai"
+	"github.com/eroatta/token/samurai"
 
 	"github.com/eroatta/src-reader/entity"
 	"github.com/eroatta/src-reader/miner"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestNewGlobalFrequencyTable_ShouldReturnNewGlobalFrequencyTableMiner(t *testing.T) {
-	miner := miner.NewGlobalFrequencyTable(nil)
+func TestNewGlobalFreqTable_ShouldReturnNewGlobalFreqTableMiner(t *testing.T) {
+	miner := miner.NewGlobalFreqTable(nil)
 
 	assert.NotNil(t, miner)
 }
 
-func TestType_OnGlobalFrequencyTable_ShouldReturnMinerType(t *testing.T) {
-	miner := miner.NewGlobalFrequencyTable(nil)
+func TestType_OnGlobalFreqTable_ShouldReturnMinerType(t *testing.T) {
+	miner := miner.NewGlobalFreqTable(nil)
 
 	assert.Equal(t, entity.MinerGlobalFrequencyTable, miner.Type())
 }
 
-func TestVisit_OnGlobalFrequencyTable_ShouldReturnCleanComments(t *testing.T) {
+func TestVisit_OnGlobalFreqTable_ShouldReturnCleanComments(t *testing.T) {
 	src := `
 		// package comment
 		// package comment 2
@@ -48,8 +48,8 @@ func TestVisit_OnGlobalFrequencyTable_ShouldReturnCleanComments(t *testing.T) {
 	fs := token.NewFileSet()
 	node, _ := parser.ParseFile(fs, "testfile", []byte(src), parser.ParseComments)
 
-	ft := samurai.NewFrequenctyTable()
-	miner := miner.NewGlobalFrequencyTable(ft)
+	ft := samurai.NewFrequencyTable()
+	miner := miner.NewGlobalFreqTable(ft)
 	ast.Walk(miner, node)
 
 	gft := miner.Table()

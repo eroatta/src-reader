@@ -21,7 +21,7 @@ func (g GlobalFreqTable) Type() entity.MinerType {
 	return entity.MinerGlobalFrequencyTable
 }
 
-func (g GlobalFreqTable) Visit(node *ast.Node) ast.Visitor {
+func (g GlobalFreqTable) Visit(node ast.Node) ast.Visitor {
 	return nil
 }
 
