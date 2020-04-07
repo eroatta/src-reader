@@ -8,6 +8,7 @@ import (
 	"github.com/eroatta/src-reader/adapter/splitter"
 	"github.com/eroatta/src-reader/entity"
 	"github.com/eroatta/src-reader/miner"
+	"github.com/eroatta/token/samurai"
 )
 
 func TestNewSamuraiFactory_ShouldReturnSamuraiSplitterFactory(t *testing.T) {
@@ -17,7 +18,21 @@ func TestNewSamuraiFactory_ShouldReturnSamuraiSplitterFactory(t *testing.T) {
 }
 
 func TestMake_OnSamuraiFactory_WhenMissingLocalFrequencyTable_ShouldReturnError(t *testing.T) {
-	miningResults := map[entity.MinerType]entity.Miner{}
+	miningResults := map[entity.MinerType]entity.Miner{
+		entity.MinerGlobalFrequencyTable: miner.NewGlobalFreqTable(nil),
+	}
+
+	factory := splitter.NewSamuraiFactory()
+	splitter, err := factory.Make(miningResults)
+
+	assert.Nil(t, splitter)
+	assert.Error(t, err)
+}
+
+func TestMake_OnSamuraiFactory_WhenMissingGlobalFrequencyTable_ShouldReturnError(t *testing.T) {
+	miningResults := map[entity.MinerType]entity.Miner{
+		entity.MinerWordCount: miner.NewWordCount(),
+	}
 
 	factory := splitter.NewSamuraiFactory()
 	splitter, err := factory.Make(miningResults)
@@ -28,7 +43,8 @@ func TestMake_OnSamuraiFactory_WhenMissingLocalFrequencyTable_ShouldReturnError(
 
 func TestSplit_OnSamurai_ShouldReturnAnArrayOfStrings(t *testing.T) {
 	miningResults := map[entity.MinerType]entity.Miner{
-		entity.MinerWordCount: miner.NewWordCount(),
+		entity.MinerWordCount:            miner.NewWordCount(),
+		entity.MinerGlobalFrequencyTable: miner.NewGlobalFreqTable(samurai.NewFrequencyTable()),
 	}
 
 	factory := splitter.NewSamuraiFactory()

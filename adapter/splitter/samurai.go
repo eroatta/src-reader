@@ -39,11 +39,11 @@ func (f samuraiFactory) Make(miningResults map[entity.MinerType]entity.Miner) (e
 	}
 
 	// extract global frequency table
-	/*val, ok := staticInputs[entity.InputGlobalFrequencyTable]
+	globalFreqTableMiner, ok := miningResults[entity.MinerGlobalFrequencyTable]
 	if !ok {
-		return nil, fmt.Errorf("unable to retrieve input from %s", entity.InputGlobalFrequencyTable)
-	}*/
-	global := local // val.(*samurai.FrequencyTable)
+		return nil, fmt.Errorf("unable to retrieve input from %s", entity.MinerGlobalFrequencyTable)
+	}
+	global := globalFreqTableMiner.(miner.GlobalFreqTable).Table()
 
 	return samuraiSplitter{
 		splitter: splitter{"samurai"},
