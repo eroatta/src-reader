@@ -35,19 +35,22 @@ func TestVisit_OnExtractorWithFuncDecl_ShouldReturnFoundIdentifiers(t *testing.T
 
 	expected := []entity.Identifier{
 		{
-			File:       "testfile",
+			ID:         "filename:testfile.go+++pkg:main+++declType:func+++name:iterate",
+			File:       "testfile.go",
 			Position:   20,
 			Name:       "iterate",
-			Type:       "FuncDecl",
+			Type:       token.FUNC,
 			Splits:     make(map[string][]string),
 			Expansions: make(map[string][]string),
+			Parent:     "",
 		},
 		{
-			File:       "testfile",
+			ID:         "filename:testfile.go+++pkg:main+++declType::=+++name:handlerFunc+++local:154",
+			File:       "testfile.go",
 			Position:   154,
 			Name:       "handlerFunc",
-			Type:       "AssignStmt",
-			Parent:     "iterate",
+			Type:       token.DEFINE,
+			Parent:     "filename:testfile.go+++pkg:main+++declType:func+++name:iterate",
 			ParentPos:  20,
 			Splits:     make(map[string][]string),
 			Expansions: make(map[string][]string),
@@ -55,10 +58,10 @@ func TestVisit_OnExtractorWithFuncDecl_ShouldReturnFoundIdentifiers(t *testing.T
 	}
 
 	fs := token.NewFileSet()
-	node, _ := parser.ParseFile(fs, "testfile", []byte(src), parser.ParseComments)
+	node, _ := parser.ParseFile(fs, "testfile.go", []byte(src), parser.ParseComments)
 
-	e := extractor.New("testfile")
-	ast.Walk(e, node.Decls[0])
+	e := extractor.New("testfile.go")
+	ast.Walk(e, node)
 
 	identifiers := e.Identifiers()
 	assert.Equal(t, expected, identifiers)
@@ -85,36 +88,42 @@ func TestVisit_OnExtractorWithVarDecl_ShouldReturnFoundIdentifiers(t *testing.T)
 
 	expected := []entity.Identifier{
 		{
-			File:       "testfile",
+			ID:         "filename:testfile.go+++pkg:main+++declType:var+++name:common",
+			File:       "testfile.go",
 			Position:   31,
 			Name:       "common",
-			Type:       "VarDecl",
+			Type:       token.VAR,
 			Splits:     make(map[string][]string),
 			Expansions: make(map[string][]string),
+			Parent:     "",
 		},
 		{
-			File:       "testfile",
+			ID:         "filename:testfile.go+++pkg:main+++declType:var+++name:regular",
+			File:       "testfile.go",
 			Position:   48,
 			Name:       "regular",
-			Type:       "VarDecl",
+			Type:       token.VAR,
 			Splits:     make(map[string][]string),
 			Expansions: make(map[string][]string),
+			Parent:     "",
 		},
 		{
-			File:       "testfile",
+			ID:         "filename:testfile.go+++pkg:main+++declType:var+++name:nrzXXZ",
+			File:       "testfile.go",
 			Position:   76,
 			Name:       "nrzXXZ",
-			Type:       "VarDecl",
+			Type:       token.VAR,
 			Splits:     make(map[string][]string),
 			Expansions: make(map[string][]string),
+			Parent:     "",
 		},
 	}
 
 	fs := token.NewFileSet()
-	node, _ := parser.ParseFile(fs, "testfile", []byte(src), parser.ParseComments)
+	node, _ := parser.ParseFile(fs, "testfile.go", []byte(src), parser.ParseComments)
 
-	e := extractor.New("testfile")
-	ast.Walk(e, node.Decls[0])
+	e := extractor.New("testfile.go")
+	ast.Walk(e, node)
 
 	identifiers := e.Identifiers()
 	assert.Equal(t, expected, identifiers)
@@ -134,44 +143,52 @@ func TestVisit_OnExtractorWithConstDecl_ShouldReturnFoundIdentifiers(t *testing.
 
 	expected := []entity.Identifier{
 		{
-			File:       "testfile",
+			ID:         "filename:testfile.go+++pkg:main+++declType:const+++name:common",
+			File:       "testfile.go",
 			Position:   52,
 			Name:       "common",
-			Type:       "ConstDecl",
+			Type:       token.CONST,
 			Splits:     make(map[string][]string),
 			Expansions: make(map[string][]string),
+			Parent:     "",
 		},
 		{
-			File:       "testfile",
+			ID:         "filename:testfile.go+++pkg:main+++declType:const+++name:regular",
+			File:       "testfile.go",
 			Position:   80,
 			Name:       "regular",
-			Type:       "ConstDecl",
+			Type:       token.CONST,
 			Splits:     make(map[string][]string),
 			Expansions: make(map[string][]string),
+			Parent:     "",
 		},
 		{
-			File:       "testfile",
+			ID:         "filename:testfile.go+++pkg:main+++declType:const+++name:notRegular",
+			File:       "testfile.go",
 			Position:   89,
 			Name:       "notRegular",
-			Type:       "ConstDecl",
+			Type:       token.CONST,
 			Splits:     make(map[string][]string),
 			Expansions: make(map[string][]string),
+			Parent:     "",
 		},
 		{
-			File:       "testfile",
+			ID:         "filename:testfile.go+++pkg:main+++declType:const+++name:nrzXXZ",
+			File:       "testfile.go",
 			Position:   131,
 			Name:       "nrzXXZ",
-			Type:       "ConstDecl",
+			Type:       token.CONST,
 			Splits:     make(map[string][]string),
 			Expansions: make(map[string][]string),
+			Parent:     "",
 		},
 	}
 
 	fs := token.NewFileSet()
-	node, _ := parser.ParseFile(fs, "testfile", []byte(src), parser.ParseComments)
+	node, _ := parser.ParseFile(fs, "testfile.go", []byte(src), parser.ParseComments)
 
-	e := extractor.New("testfile")
-	ast.Walk(e, node.Decls[0])
+	e := extractor.New("testfile.go")
+	ast.Walk(e, node)
 
 	identifiers := e.Identifiers()
 	assert.Equal(t, expected, identifiers)
@@ -196,28 +213,32 @@ func TestVisit_OnExtractorWithStructDecl_ShouldReturnFoundIdentifiers(t *testing
 
 	expected := []entity.Identifier{
 		{
-			File:       "testfile",
+			ID:         "filename:testfile.go+++pkg:main+++declType:struct+++name:selector",
+			File:       "testfile.go",
 			Position:   52,
 			Name:       "selector",
-			Type:       "StructDecl",
+			Type:       token.STRUCT,
 			Splits:     make(map[string][]string),
 			Expansions: make(map[string][]string),
+			Parent:     "",
 		},
 		{
-			File:       "testfile",
+			ID:         "filename:testfile.go+++pkg:main+++declType:struct+++name:httpClient",
+			File:       "testfile.go",
 			Position:   97,
 			Name:       "httpClient",
-			Type:       "StructDecl",
+			Type:       token.STRUCT,
 			Splits:     make(map[string][]string),
 			Expansions: make(map[string][]string),
+			Parent:     "",
 		},
 	}
 
 	fs := token.NewFileSet()
-	node, _ := parser.ParseFile(fs, "testfile", []byte(src), parser.ParseComments)
+	node, _ := parser.ParseFile(fs, "testfile.go", []byte(src), parser.ParseComments)
 
-	e := extractor.New("testfile")
-	ast.Walk(e, node.Decls[0])
+	e := extractor.New("testfile.go")
+	ast.Walk(e, node)
 
 	identifiers := e.Identifiers()
 	assert.Equal(t, expected, identifiers)
@@ -242,28 +263,32 @@ func TestVisit_OnExtractorWithInterfaceDecl_ShouldReturnFoundIdentifiers(t *test
 
 	expected := []entity.Identifier{
 		{
-			File:       "testfile",
+			ID:         "filename:testfile.go+++pkg:main+++declType:interface+++name:selector",
+			File:       "testfile.go",
 			Position:   52,
 			Name:       "selector",
-			Type:       "InterfaceDecl",
+			Type:       token.INTERFACE,
 			Splits:     make(map[string][]string),
 			Expansions: make(map[string][]string),
+			Parent:     "",
 		},
 		{
-			File:       "testfile",
+			ID:         "filename:testfile.go+++pkg:main+++declType:interface+++name:httpClient",
+			File:       "testfile.go",
 			Position:   102,
 			Name:       "httpClient",
-			Type:       "InterfaceDecl",
+			Type:       token.INTERFACE,
 			Splits:     make(map[string][]string),
 			Expansions: make(map[string][]string),
+			Parent:     "",
 		},
 	}
 
 	fs := token.NewFileSet()
-	node, _ := parser.ParseFile(fs, "testfile", []byte(src), parser.ParseComments)
+	node, _ := parser.ParseFile(fs, "testfile.go", []byte(src), parser.ParseComments)
 
-	e := extractor.New("testfile")
-	ast.Walk(e, node.Decls[0])
+	e := extractor.New("testfile.go")
+	ast.Walk(e, node)
 
 	identifiers := e.Identifiers()
 	assert.Equal(t, expected, identifiers)

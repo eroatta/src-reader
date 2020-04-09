@@ -92,10 +92,11 @@ type File struct {
 
 // Identifier TODO
 type Identifier struct {
+	ID         string
 	File       string
 	Position   token.Pos
 	Name       string
-	Type       string
+	Type       token.Token
 	Parent     string
 	ParentPos  token.Pos
 	Node       *ast.Node

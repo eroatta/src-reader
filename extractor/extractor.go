@@ -1,23 +1,16 @@
 package extractor
 
 import (
+	"fmt"
 	"go/ast"
 	"go/token"
 
 	"github.com/eroatta/src-reader/entity"
 )
 
-var types = map[token.Token]string{
-	token.CONST:     "ConstDecl",
-	token.DEFINE:    "AssignStmt",
-	token.FUNC:      "FuncDecl",
-	token.INTERFACE: "InterfaceDecl",
-	token.STRUCT:    "StructDecl",
-	token.VAR:       "VarDecl",
-}
-
 type Extractor struct {
 	filename      string
+	packageName   string
 	currentLoc    string
 	currentLocPos token.Pos
 	identifiers   []entity.Identifier
@@ -38,12 +31,29 @@ func (e *Extractor) Visit(node ast.Node) ast.Visitor {
 	}
 
 	switch elem := node.(type) {
+	case *ast.File:
+		e.packageName = elem.Name.String()
+
 	case *ast.FuncDecl:
 		name := elem.Name.String()
-		e.currentLoc = name
-		e.currentLocPos = elem.Pos()
 
-		e.identifiers = append(e.identifiers, newIdentifier(e.filename, elem.Pos(), name, types[token.FUNC]))
+		recv := ""
+		if elem.Recv != nil && elem.Recv.NumFields() > 0 {
+			for _, r := range elem.Recv.List {
+				typ, ok := r.Type.(*ast.Ident)
+				if ok {
+					recv = typ.Name
+				}
+			}
+		}
+
+		id := entity.NewDeclarationIDBuilder().WithFilename(e.filename).
+			WithPackage(e.packageName).WithReceiver(recv).WithName(name).WithType(token.FUNC).Build()
+		e.identifiers = append(e.identifiers, newIdentifier(id, e.filename, elem.Pos(), name, token.FUNC))
+
+		// set current location at the beginning of each function
+		e.currentLoc = id
+		e.currentLocPos = elem.Pos()
 
 	case *ast.AssignStmt:
 		if elem.Tok != token.DEFINE {
@@ -60,9 +70,11 @@ func (e *Extractor) Visit(node ast.Node) ast.Visitor {
 				continue
 			}
 
+			id := entity.NewDeclarationIDBuilder().WithFilename(e.filename).
+				WithPackage(e.packageName).WithName(ident.Name).WithType(token.DEFINE).Build()
 			if ident.Obj != nil && ident.Obj.Pos() == ident.Pos() {
 				e.identifiers = append(e.identifiers,
-					newChildIdentifier(e.filename, ident.Pos(), ident.Name, types[elem.Tok], e.currentLoc, e.currentLocPos))
+					newChildIdentifier(id, e.filename, ident.Pos(), ident.Name, token.DEFINE, e.currentLoc, e.currentLocPos))
 			}
 		}
 
@@ -70,9 +82,9 @@ func (e *Extractor) Visit(node ast.Node) ast.Visitor {
 		for _, spec := range elem.Specs {
 			switch decl := spec.(type) {
 			case *ast.ValueSpec:
-				e.identifiers = append(e.identifiers, fromValueSpec(e.filename, elem.Tok, decl)...)
+				e.identifiers = append(e.identifiers, e.fromValueSpec(e.filename, elem.Tok, decl)...)
 			case *ast.TypeSpec:
-				e.identifiers = append(e.identifiers, fromTypeSpec(e.filename, decl)...)
+				e.identifiers = append(e.identifiers, e.fromTypeSpec(e.filename, decl)...)
 			}
 		}
 	}
@@ -80,40 +92,45 @@ func (e *Extractor) Visit(node ast.Node) ast.Visitor {
 	return e
 }
 
-func fromValueSpec(filename string, token token.Token, decl *ast.ValueSpec) []entity.Identifier {
+func (e *Extractor) fromValueSpec(filename string, token token.Token, decl *ast.ValueSpec) []entity.Identifier {
 	identifiers := []entity.Identifier{}
 	for _, name := range decl.Names {
 		if name.Name == "_" {
 			continue
 		}
 
+		id := entity.NewDeclarationIDBuilder().WithFilename(e.filename).
+			WithPackage(e.packageName).WithName(name.String()).WithType(token).Build()
 		identifiers = append(identifiers,
-			newIdentifier(filename, name.Pos(), name.String(), types[token]))
+			newIdentifier(id, filename, name.Pos(), name.String(), token))
 	}
 
 	return identifiers
 }
 
-func fromTypeSpec(filename string, decl *ast.TypeSpec) []entity.Identifier {
-	var identifierType string
+func (e *Extractor) fromTypeSpec(filename string, decl *ast.TypeSpec) []entity.Identifier {
+	var identifierType token.Token
 	switch decl.Type.(type) {
 	case *ast.StructType:
-		identifierType = types[token.STRUCT]
+		identifierType = token.STRUCT
 	case *ast.InterfaceType:
-		identifierType = types[token.INTERFACE]
+		identifierType = token.INTERFACE
 	default:
 		return []entity.Identifier{}
 	}
 
+	id := entity.NewDeclarationIDBuilder().WithFilename(e.filename).
+		WithPackage(e.packageName).WithName(decl.Name.String()).WithType(identifierType).Build()
 	identifiers := []entity.Identifier{
-		newIdentifier(filename, decl.Name.Pos(), decl.Name.String(), identifierType),
+		newIdentifier(id, filename, decl.Name.Pos(), decl.Name.String(), identifierType),
 	}
 
 	return identifiers
 }
 
-func newIdentifier(filename string, pos token.Pos, name string, identifierType string) entity.Identifier {
+func newIdentifier(id string, filename string, pos token.Pos, name string, identifierType token.Token) entity.Identifier {
 	return entity.Identifier{
+		ID:         id,
 		File:       filename,
 		Position:   pos,
 		Name:       name,
@@ -123,8 +140,9 @@ func newIdentifier(filename string, pos token.Pos, name string, identifierType s
 	}
 }
 
-func newChildIdentifier(filename string, pos token.Pos, name string, identifierType string, parent string, parentPos token.Pos) entity.Identifier {
-	i := newIdentifier(filename, pos, name, identifierType)
+func newChildIdentifier(id string, filename string, pos token.Pos, name string, identifierType token.Token, parent string, parentPos token.Pos) entity.Identifier {
+	id = fmt.Sprintf("%s+++local:%v", id, pos)
+	i := newIdentifier(id, filename, pos, name, identifierType)
 	i.Parent = parent
 	i.ParentPos = parentPos
 
