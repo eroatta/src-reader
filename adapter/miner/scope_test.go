@@ -39,8 +39,8 @@ func TestVisit_OnScopeWithPlainFuncDecl_ShouldReturnScopedDeclaration(t *testing
 	`
 
 	expected := map[string]entity.ScopedDecl{
-		"main++func::main": entity.ScopedDecl{
-			ID:              "main++func::main",
+		"filename:testfile.go+++pkg:main+++declType:func+++name:main": entity.ScopedDecl{
+			ID:              "filename:testfile.go+++pkg:main+++declType:func+++name:main",
 			DeclType:        token.FUNC,
 			Name:            "main",
 			VariableDecls:   make([]string, 0),
@@ -52,9 +52,9 @@ func TestVisit_OnScopeWithPlainFuncDecl_ShouldReturnScopedDeclaration(t *testing
 	}
 
 	fs := token.NewFileSet()
-	node, _ := parser.ParseFile(fs, "testfile", []byte(src), parser.ParseComments)
+	node, _ := parser.ParseFile(fs, "testfile.go", []byte(src), parser.ParseComments)
 
-	m := miner.NewScope("testfile")
+	m := miner.NewScope("testfile.go")
 	ast.Walk(m, node)
 
 	scopedDecls := m.ScopedDeclarations()
@@ -74,8 +74,8 @@ func TestVisit_OnScopeWithFuncDeclWithComments_ShouldReturnScopedDeclaration(t *
 	`
 
 	expected := map[string]entity.ScopedDecl{
-		"main++func::main": entity.ScopedDecl{
-			ID:            "main++func::main",
+		"filename:testfile.go+++pkg:main+++declType:func+++name:main": entity.ScopedDecl{
+			ID:            "filename:testfile.go+++pkg:main+++declType:func+++name:main",
 			DeclType:      token.FUNC,
 			Name:          "main",
 			VariableDecls: make([]string, 0),
@@ -92,9 +92,9 @@ func TestVisit_OnScopeWithFuncDeclWithComments_ShouldReturnScopedDeclaration(t *
 	}
 
 	fs := token.NewFileSet()
-	node, _ := parser.ParseFile(fs, "testfile", []byte(src), parser.ParseComments)
+	node, _ := parser.ParseFile(fs, "testfile.go", []byte(src), parser.ParseComments)
 
-	m := miner.NewScope("testfile")
+	m := miner.NewScope("testfile.go")
 	ast.Walk(m, node)
 
 	scopedDecls := m.ScopedDeclarations()
@@ -119,8 +119,8 @@ func TestVisit_OnScopeWithMultipleFuncDeclWithComments_ShouldReturnScopedDeclara
 	`
 
 	expected := map[string]entity.ScopedDecl{
-		"main++func::main": entity.ScopedDecl{
-			ID:            "main++func::main",
+		"filename:testfile.go+++pkg:main+++declType:func+++name:main": entity.ScopedDecl{
+			ID:            "filename:testfile.go+++pkg:main+++declType:func+++name:main",
 			DeclType:      token.FUNC,
 			Name:          "main",
 			VariableDecls: make([]string, 0),
@@ -134,8 +134,8 @@ func TestVisit_OnScopeWithMultipleFuncDeclWithComments_ShouldReturnScopedDeclara
 				"package comment line 2",
 			},
 		},
-		"main++func::another": entity.ScopedDecl{
-			ID:            "main++func::another",
+		"filename:testfile.go+++pkg:main+++declType:func+++name:another": entity.ScopedDecl{
+			ID:            "filename:testfile.go+++pkg:main+++declType:func+++name:another",
 			DeclType:      token.FUNC,
 			Name:          "another",
 			VariableDecls: make([]string, 0),
@@ -152,9 +152,9 @@ func TestVisit_OnScopeWithMultipleFuncDeclWithComments_ShouldReturnScopedDeclara
 	}
 
 	fs := token.NewFileSet()
-	node, _ := parser.ParseFile(fs, "testfile", []byte(src), parser.ParseComments)
+	node, _ := parser.ParseFile(fs, "testfile.go", []byte(src), parser.ParseComments)
 
-	m := miner.NewScope("testfile")
+	m := miner.NewScope("testfile.go")
 	ast.Walk(m, node)
 
 	scopedDecls := m.ScopedDeclarations()
@@ -185,8 +185,8 @@ func TestVisit_OnScopeWithMultipleFuncDeclWithFullBody_ShouldReturnScopedDeclara
 	`
 
 	expected := map[string]entity.ScopedDecl{
-		"main++func::main": entity.ScopedDecl{
-			ID:            "main++func::main",
+		"filename:testfile.go+++pkg:main+++declType:func+++name:main": entity.ScopedDecl{
+			ID:            "filename:testfile.go+++pkg:main+++declType:func+++name:main",
 			DeclType:      token.FUNC,
 			Name:          "main",
 			VariableDecls: make([]string, 0),
@@ -200,8 +200,8 @@ func TestVisit_OnScopeWithMultipleFuncDeclWithFullBody_ShouldReturnScopedDeclara
 				"package comment line 2",
 			},
 		},
-		"main++func::another": entity.ScopedDecl{
-			ID:            "main++func::another",
+		"filename:testfile.go+++pkg:main+++declType:func+++name:another": entity.ScopedDecl{
+			ID:            "filename:testfile.go+++pkg:main+++declType:func+++name:another",
 			DeclType:      token.FUNC,
 			Name:          "another",
 			VariableDecls: make([]string, 0),
@@ -216,8 +216,8 @@ func TestVisit_OnScopeWithMultipleFuncDeclWithFullBody_ShouldReturnScopedDeclara
 				"package comment line 2",
 			},
 		},
-		"main++func::apply": entity.ScopedDecl{
-			ID:       "main++func::apply",
+		"filename:testfile.go+++pkg:main+++declType:func+++name:Miner.apply": entity.ScopedDecl{
+			ID:       "filename:testfile.go+++pkg:main+++declType:func+++name:Miner.apply",
 			DeclType: token.FUNC,
 			Name:     "apply",
 			VariableDecls: []string{
@@ -238,9 +238,9 @@ func TestVisit_OnScopeWithMultipleFuncDeclWithFullBody_ShouldReturnScopedDeclara
 	}
 
 	fs := token.NewFileSet()
-	node, _ := parser.ParseFile(fs, "testfile", []byte(src), parser.ParseComments)
+	node, _ := parser.ParseFile(fs, "testfile.go", []byte(src), parser.ParseComments)
 
-	m := miner.NewScope("testfile")
+	m := miner.NewScope("testfile.go")
 	ast.Walk(m, node)
 
 	scopedDecls := m.ScopedDeclarations()
@@ -255,8 +255,8 @@ func TestVisit_OnScopeWithPlainVarDecl_ShouldReturnScopedDeclaration(t *testing.
 	`
 
 	expected := map[string]entity.ScopedDecl{
-		"main++var::Common": entity.ScopedDecl{
-			ID:              "main++var::Common",
+		"filename:testfile.go+++pkg:main+++declType:var+++name:Common": entity.ScopedDecl{
+			ID:              "filename:testfile.go+++pkg:main+++declType:var+++name:Common",
 			DeclType:        token.VAR,
 			Name:            "Common",
 			VariableDecls:   make([]string, 0),
@@ -268,9 +268,9 @@ func TestVisit_OnScopeWithPlainVarDecl_ShouldReturnScopedDeclaration(t *testing.
 	}
 
 	fs := token.NewFileSet()
-	node, _ := parser.ParseFile(fs, "testfile", []byte(src), parser.ParseComments)
+	node, _ := parser.ParseFile(fs, "testfile.go", []byte(src), parser.ParseComments)
 
-	m := miner.NewScope("testfile")
+	m := miner.NewScope("testfile.go")
 	ast.Walk(m, node)
 
 	scopedDecls := m.ScopedDeclarations()
@@ -287,8 +287,8 @@ func TestVisit_OnScopeWithFullyCommentedVarDecl_ShouldReturnScopedDeclaration(t 
 	`
 
 	expected := map[string]entity.ScopedDecl{
-		"main++var::Common": entity.ScopedDecl{
-			ID:            "main++var::Common",
+		"filename:testfile.go+++pkg:main+++declType:var+++name:Common": entity.ScopedDecl{
+			ID:            "filename:testfile.go+++pkg:main+++declType:var+++name:Common",
 			DeclType:      token.VAR,
 			Name:          "Common",
 			VariableDecls: make([]string, 0),
@@ -303,9 +303,9 @@ func TestVisit_OnScopeWithFullyCommentedVarDecl_ShouldReturnScopedDeclaration(t 
 	}
 
 	fs := token.NewFileSet()
-	node, _ := parser.ParseFile(fs, "testfile", []byte(src), parser.ParseComments)
+	node, _ := parser.ParseFile(fs, "testfile.go", []byte(src), parser.ParseComments)
 
-	m := miner.NewScope("testfile")
+	m := miner.NewScope("testfile.go")
 	ast.Walk(m, node)
 
 	scopedDecls := m.ScopedDeclarations()
@@ -325,8 +325,8 @@ func TestVisit_OnScopeWithVarBlockDecl_ShouldReturnScopedDeclaration(t *testing.
 	`
 
 	expected := map[string]entity.ScopedDecl{
-		"main++var::common": entity.ScopedDecl{
-			ID:              "main++var::common",
+		"filename:testfile.go+++pkg:main+++declType:var+++name:common": entity.ScopedDecl{
+			ID:              "filename:testfile.go+++pkg:main+++declType:var+++name:common",
 			DeclType:        token.VAR,
 			Name:            "common",
 			VariableDecls:   make([]string, 0),
@@ -335,8 +335,8 @@ func TestVisit_OnScopeWithVarBlockDecl_ShouldReturnScopedDeclaration(t *testing.
 			Comments:        []string{"outer comment"},
 			PackageComments: make([]string, 0),
 		},
-		"main++var::regular": entity.ScopedDecl{
-			ID:              "main++var::regular",
+		"filename:testfile.go+++pkg:main+++declType:var+++name:regular": entity.ScopedDecl{
+			ID:              "filename:testfile.go+++pkg:main+++declType:var+++name:regular",
 			DeclType:        token.VAR,
 			Name:            "regular",
 			VariableDecls:   make([]string, 0),
@@ -345,8 +345,8 @@ func TestVisit_OnScopeWithVarBlockDecl_ShouldReturnScopedDeclaration(t *testing.
 			Comments:        []string{"outer comment"},
 			PackageComments: make([]string, 0),
 		},
-		"main++var::nrzXXZ": entity.ScopedDecl{
-			ID:              "main++var::nrzXXZ",
+		"filename:testfile.go+++pkg:main+++declType:var+++name:nrzXXZ": entity.ScopedDecl{
+			ID:              "filename:testfile.go+++pkg:main+++declType:var+++name:nrzXXZ",
 			DeclType:        token.VAR,
 			Name:            "nrzXXZ",
 			VariableDecls:   make([]string, 0),
@@ -358,9 +358,9 @@ func TestVisit_OnScopeWithVarBlockDecl_ShouldReturnScopedDeclaration(t *testing.
 	}
 
 	fs := token.NewFileSet()
-	node, _ := parser.ParseFile(fs, "testfile", []byte(src), parser.ParseComments)
+	node, _ := parser.ParseFile(fs, "testfile.go", []byte(src), parser.ParseComments)
 
-	m := miner.NewScope("testfile")
+	m := miner.NewScope("testfile.go")
 	ast.Walk(m, node)
 
 	scopedDecls := m.ScopedDeclarations()
@@ -375,8 +375,8 @@ func TestVisit_OnScopeWithPlainConstDecl_ShouldReturnScopedDeclaration(t *testin
 	`
 
 	expected := map[string]entity.ScopedDecl{
-		"main++const::Common": entity.ScopedDecl{
-			ID:              "main++const::Common",
+		"filename:testfile.go+++pkg:main+++declType:const+++name:Common": entity.ScopedDecl{
+			ID:              "filename:testfile.go+++pkg:main+++declType:const+++name:Common",
 			DeclType:        token.CONST,
 			Name:            "Common",
 			VariableDecls:   make([]string, 0),
@@ -388,9 +388,9 @@ func TestVisit_OnScopeWithPlainConstDecl_ShouldReturnScopedDeclaration(t *testin
 	}
 
 	fs := token.NewFileSet()
-	node, _ := parser.ParseFile(fs, "testfile", []byte(src), parser.ParseComments)
+	node, _ := parser.ParseFile(fs, "testfile.go", []byte(src), parser.ParseComments)
 
-	m := miner.NewScope("testfile")
+	m := miner.NewScope("testfile.go")
 	ast.Walk(m, node)
 
 	scopedDecls := m.ScopedDeclarations()
@@ -407,8 +407,8 @@ func TestVisit_OnScopeWithFullyCommentedConstDecl_ShouldReturnScopedDeclaration(
 	`
 
 	expected := map[string]entity.ScopedDecl{
-		"main++const::Common": entity.ScopedDecl{
-			ID:            "main++const::Common",
+		"filename:testfile.go+++pkg:main+++declType:const+++name:Common": entity.ScopedDecl{
+			ID:            "filename:testfile.go+++pkg:main+++declType:const+++name:Common",
 			DeclType:      token.CONST,
 			Name:          "Common",
 			VariableDecls: make([]string, 0),
@@ -423,9 +423,9 @@ func TestVisit_OnScopeWithFullyCommentedConstDecl_ShouldReturnScopedDeclaration(
 	}
 
 	fs := token.NewFileSet()
-	node, _ := parser.ParseFile(fs, "testfile", []byte(src), parser.ParseComments)
+	node, _ := parser.ParseFile(fs, "testfile.go", []byte(src), parser.ParseComments)
 
-	m := miner.NewScope("testfile")
+	m := miner.NewScope("testfile.go")
 	ast.Walk(m, node)
 
 	scopedDecls := m.ScopedDeclarations()
@@ -445,8 +445,8 @@ func TestVisit_OnScopeWithConstBlockDecl_ShouldReturnScopedDeclaration(t *testin
 	`
 
 	expected := map[string]entity.ScopedDecl{
-		"main++const::common": entity.ScopedDecl{
-			ID:              "main++const::common",
+		"filename:testfile.go+++pkg:main+++declType:const+++name:common": entity.ScopedDecl{
+			ID:              "filename:testfile.go+++pkg:main+++declType:const+++name:common",
 			DeclType:        token.CONST,
 			Name:            "common",
 			VariableDecls:   make([]string, 0),
@@ -455,8 +455,8 @@ func TestVisit_OnScopeWithConstBlockDecl_ShouldReturnScopedDeclaration(t *testin
 			Comments:        []string{"outer comment"},
 			PackageComments: make([]string, 0),
 		},
-		"main++const::regular": entity.ScopedDecl{
-			ID:              "main++const::regular",
+		"filename:testfile.go+++pkg:main+++declType:const+++name:regular": entity.ScopedDecl{
+			ID:              "filename:testfile.go+++pkg:main+++declType:const+++name:regular",
 			DeclType:        token.CONST,
 			Name:            "regular",
 			VariableDecls:   make([]string, 0),
@@ -465,8 +465,8 @@ func TestVisit_OnScopeWithConstBlockDecl_ShouldReturnScopedDeclaration(t *testin
 			Comments:        []string{"outer comment"},
 			PackageComments: make([]string, 0),
 		},
-		"main++const::notRegular": entity.ScopedDecl{
-			ID:              "main++const::notRegular",
+		"filename:testfile.go+++pkg:main+++declType:const+++name:notRegular": entity.ScopedDecl{
+			ID:              "filename:testfile.go+++pkg:main+++declType:const+++name:notRegular",
 			DeclType:        token.CONST,
 			Name:            "notRegular",
 			VariableDecls:   make([]string, 0),
@@ -475,8 +475,8 @@ func TestVisit_OnScopeWithConstBlockDecl_ShouldReturnScopedDeclaration(t *testin
 			Comments:        []string{"outer comment"},
 			PackageComments: make([]string, 0),
 		},
-		"main++const::nrzXXZ": entity.ScopedDecl{
-			ID:              "main++const::nrzXXZ",
+		"filename:testfile.go+++pkg:main+++declType:const+++name:nrzXXZ": entity.ScopedDecl{
+			ID:              "filename:testfile.go+++pkg:main+++declType:const+++name:nrzXXZ",
 			DeclType:        token.CONST,
 			Name:            "nrzXXZ",
 			VariableDecls:   make([]string, 0),
@@ -488,9 +488,9 @@ func TestVisit_OnScopeWithConstBlockDecl_ShouldReturnScopedDeclaration(t *testin
 	}
 
 	fs := token.NewFileSet()
-	node, _ := parser.ParseFile(fs, "testfile", []byte(src), parser.ParseComments)
+	node, _ := parser.ParseFile(fs, "testfile.go", []byte(src), parser.ParseComments)
 
-	m := miner.NewScope("testfile")
+	m := miner.NewScope("testfile.go")
 	ast.Walk(m, node)
 
 	scopedDecls := m.ScopedDeclarations()
@@ -505,8 +505,8 @@ func TestVisit_OnScopeWithPlainStructDecl_ShouldReturnScopedDeclaration(t *testi
 	`
 
 	expected := map[string]entity.ScopedDecl{
-		"main++struct::selector": entity.ScopedDecl{
-			ID:              "main++struct::selector",
+		"filename:testfile.go+++pkg:main+++declType:struct+++name:selector": entity.ScopedDecl{
+			ID:              "filename:testfile.go+++pkg:main+++declType:struct+++name:selector",
 			DeclType:        token.STRUCT,
 			Name:            "selector",
 			VariableDecls:   make([]string, 0),
@@ -518,9 +518,9 @@ func TestVisit_OnScopeWithPlainStructDecl_ShouldReturnScopedDeclaration(t *testi
 	}
 
 	fs := token.NewFileSet()
-	node, _ := parser.ParseFile(fs, "testfile", []byte(src), parser.ParseComments)
+	node, _ := parser.ParseFile(fs, "testfile.go", []byte(src), parser.ParseComments)
 
-	m := miner.NewScope("testfile")
+	m := miner.NewScope("testfile.go")
 	ast.Walk(m, node)
 
 	scopedDecls := m.ScopedDeclarations()
@@ -540,8 +540,8 @@ func TestVisit_OnScopeWithFullyCommentedStructDecl_ShouldReturnScopedDeclaration
 	`
 
 	expected := map[string]entity.ScopedDecl{
-		"main++struct::selector": entity.ScopedDecl{
-			ID:            "main++struct::selector",
+		"filename:testfile.go+++pkg:main+++declType:struct+++name:selector": entity.ScopedDecl{
+			ID:            "filename:testfile.go+++pkg:main+++declType:struct+++name:selector",
 			DeclType:      token.STRUCT,
 			Name:          "selector",
 			VariableDecls: []string{"pick string"},
@@ -556,9 +556,9 @@ func TestVisit_OnScopeWithFullyCommentedStructDecl_ShouldReturnScopedDeclaration
 	}
 
 	fs := token.NewFileSet()
-	node, _ := parser.ParseFile(fs, "testfile", []byte(src), parser.ParseComments)
+	node, _ := parser.ParseFile(fs, "testfile.go", []byte(src), parser.ParseComments)
 
-	m := miner.NewScope("testfile")
+	m := miner.NewScope("testfile.go")
 	ast.Walk(m, node)
 
 	scopedDecls := m.ScopedDeclarations()
@@ -584,11 +584,14 @@ func TestVisit_OnScopeWithStructBlockDecl_ShouldReturnScopedDeclaration(t *testi
 				url string
 			}
 		)
+
+		// func on struct comment
+		func (s selector) print() {}
 	`
 
 	expected := map[string]entity.ScopedDecl{
-		"main++struct::selector": entity.ScopedDecl{
-			ID:            "main++struct::selector",
+		"filename:testfile.go+++pkg:main+++declType:struct+++name:selector": entity.ScopedDecl{
+			ID:            "filename:testfile.go+++pkg:main+++declType:struct+++name:selector",
 			DeclType:      token.STRUCT,
 			Name:          "selector",
 			VariableDecls: []string{"pick string"},
@@ -601,8 +604,8 @@ func TestVisit_OnScopeWithStructBlockDecl_ShouldReturnScopedDeclaration(t *testi
 			},
 			PackageComments: []string{"package comment"},
 		},
-		"main++struct::httpClient": entity.ScopedDecl{
-			ID:       "main++struct::httpClient",
+		"filename:testfile.go+++pkg:main+++declType:struct+++name:httpClient": entity.ScopedDecl{
+			ID:       "filename:testfile.go+++pkg:main+++declType:struct+++name:httpClient",
 			DeclType: token.STRUCT,
 			Name:     "httpClient",
 			VariableDecls: []string{
@@ -617,12 +620,24 @@ func TestVisit_OnScopeWithStructBlockDecl_ShouldReturnScopedDeclaration(t *testi
 			},
 			PackageComments: []string{"package comment"},
 		},
+		"filename:testfile.go+++pkg:main+++declType:func+++name:selector.print": entity.ScopedDecl{
+			ID:            "filename:testfile.go+++pkg:main+++declType:func+++name:selector.print",
+			DeclType:      token.FUNC,
+			Name:          "print",
+			VariableDecls: []string{},
+			Statements:    make([]string, 0),
+			BodyText:      make([]string, 0),
+			Comments: []string{
+				"func on struct comment",
+			},
+			PackageComments: []string{"package comment"},
+		},
 	}
 
 	fs := token.NewFileSet()
-	node, _ := parser.ParseFile(fs, "testfile", []byte(src), parser.ParseComments)
+	node, _ := parser.ParseFile(fs, "testfile.go", []byte(src), parser.ParseComments)
 
-	m := miner.NewScope("testfile")
+	m := miner.NewScope("testfile.go")
 	ast.Walk(m, node)
 
 	scopedDecls := m.ScopedDeclarations()
@@ -637,8 +652,8 @@ func TestVisit_OnScopeWithPlainInterfaceDecl_ShouldReturnScopedDeclaration(t *te
 	`
 
 	expected := map[string]entity.ScopedDecl{
-		"main++interface::selector": entity.ScopedDecl{
-			ID:              "main++interface::selector",
+		"filename:testfile.go+++pkg:main+++declType:interface+++name:selector": entity.ScopedDecl{
+			ID:              "filename:testfile.go+++pkg:main+++declType:interface+++name:selector",
 			DeclType:        token.INTERFACE,
 			Name:            "selector",
 			VariableDecls:   make([]string, 0),
@@ -650,9 +665,9 @@ func TestVisit_OnScopeWithPlainInterfaceDecl_ShouldReturnScopedDeclaration(t *te
 	}
 
 	fs := token.NewFileSet()
-	node, _ := parser.ParseFile(fs, "testfile", []byte(src), parser.ParseComments)
+	node, _ := parser.ParseFile(fs, "testfile.go", []byte(src), parser.ParseComments)
 
-	m := miner.NewScope("testfile")
+	m := miner.NewScope("testfile.go")
 	ast.Walk(m, node)
 
 	scopedDecls := m.ScopedDeclarations()
@@ -672,8 +687,8 @@ func TestVisit_OnScopeWithFullyCommentedInterfaceDecl_ShouldReturnScopedDeclarat
 	`
 
 	expected := map[string]entity.ScopedDecl{
-		"main++interface::selector": entity.ScopedDecl{
-			ID:            "main++interface::selector",
+		"filename:testfile.go+++pkg:main+++declType:interface+++name:selector": entity.ScopedDecl{
+			ID:            "filename:testfile.go+++pkg:main+++declType:interface+++name:selector",
 			DeclType:      token.INTERFACE,
 			Name:          "selector",
 			VariableDecls: make([]string, 0),
@@ -688,9 +703,9 @@ func TestVisit_OnScopeWithFullyCommentedInterfaceDecl_ShouldReturnScopedDeclarat
 	}
 
 	fs := token.NewFileSet()
-	node, _ := parser.ParseFile(fs, "testfile", []byte(src), parser.ParseComments)
+	node, _ := parser.ParseFile(fs, "testfile.go", []byte(src), parser.ParseComments)
 
-	m := miner.NewScope("testfile")
+	m := miner.NewScope("testfile.go")
 	ast.Walk(m, node)
 
 	scopedDecls := m.ScopedDeclarations()
@@ -719,8 +734,8 @@ func TestVisit_OnScopeWithInterfaceBlockDecl_ShouldReturnScopedDeclaration(t *te
 	`
 
 	expected := map[string]entity.ScopedDecl{
-		"main++interface::selector": entity.ScopedDecl{
-			ID:            "main++interface::selector",
+		"filename:testfile.go+++pkg:main+++declType:interface+++name:selector": entity.ScopedDecl{
+			ID:            "filename:testfile.go+++pkg:main+++declType:interface+++name:selector",
 			DeclType:      token.INTERFACE,
 			Name:          "selector",
 			VariableDecls: make([]string, 0),
@@ -733,8 +748,8 @@ func TestVisit_OnScopeWithInterfaceBlockDecl_ShouldReturnScopedDeclaration(t *te
 			},
 			PackageComments: []string{"package comment"},
 		},
-		"main++interface::httpClient": entity.ScopedDecl{
-			ID:            "main++interface::httpClient",
+		"filename:testfile.go+++pkg:main+++declType:interface+++name:httpClient": entity.ScopedDecl{
+			ID:            "filename:testfile.go+++pkg:main+++declType:interface+++name:httpClient",
 			DeclType:      token.INTERFACE,
 			Name:          "httpClient",
 			VariableDecls: make([]string, 0),
@@ -752,9 +767,9 @@ func TestVisit_OnScopeWithInterfaceBlockDecl_ShouldReturnScopedDeclaration(t *te
 	}
 
 	fs := token.NewFileSet()
-	node, _ := parser.ParseFile(fs, "testfile", []byte(src), parser.ParseComments)
+	node, _ := parser.ParseFile(fs, "testfile.go", []byte(src), parser.ParseComments)
 
-	m := miner.NewScope("testfile")
+	m := miner.NewScope("testfile.go")
 	ast.Walk(m, node)
 
 	scopedDecls := m.ScopedDeclarations()

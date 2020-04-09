@@ -29,9 +29,17 @@ func NewScope(filename string) Scope {
 	}
 }
 
-func newScopedDecl(pkg string, name string, declType token.Token) entity.ScopedDecl {
+func newScopedDecl(filename string, pkg string, receiver string, name string, declType token.Token) entity.ScopedDecl {
+	id := entity.NewDeclarationIDBuilder().
+		WithFilename(filename).
+		WithPackage(pkg).
+		WithReceiver(receiver).
+		WithName(name).
+		WithType(declType).
+		Build()
+
 	return entity.ScopedDecl{
-		ID:              declID(pkg, declType, name),
+		ID:              id,
 		DeclType:        declType,
 		Name:            name,
 		VariableDecls:   make([]string, 0),
@@ -67,7 +75,17 @@ func (m Scope) Visit(node ast.Node) ast.Visitor {
 
 	case *ast.FuncDecl:
 		name := elem.Name.String()
-		funcScopedDecl := newScopedDecl(m.PackageName, name, token.FUNC)
+		receiver := ""
+		if elem.Recv != nil && elem.Recv.NumFields() > 0 {
+			for _, r := range elem.Recv.List {
+				typ, ok := r.Type.(*ast.Ident)
+				if ok {
+					receiver = typ.Name
+				}
+			}
+		}
+
+		funcScopedDecl := newScopedDecl(m.Filename, m.PackageName, receiver, name, token.FUNC)
 
 		// inbound and outbound parameters as variable declarations
 		variableDecls := make([]string, 0)
@@ -192,7 +210,8 @@ func (m Scope) Visit(node ast.Node) ast.Visitor {
 						continue
 					}
 
-					varScopedDecl := newScopedDecl(m.PackageName, name.String(), elem.Tok)
+					varScopedDecl := newScopedDecl(m.Filename, m.PackageName, "", name.String(), elem.Tok)
+
 					if valSpec.Values != nil {
 						if val, ok := valSpec.Values[j].(*ast.BasicLit); ok && val.Kind == token.STRING {
 							valStr := strings.Replace(val.Value, "\"", "", -1)
@@ -217,7 +236,7 @@ func (m Scope) Visit(node ast.Node) ast.Visitor {
 				name := typeSpec.Name.String()
 
 				if structType, ok := typeSpec.Type.(*ast.StructType); ok {
-					structScopedDecl := newScopedDecl(m.PackageName, name, token.STRUCT)
+					structScopedDecl := newScopedDecl(m.Filename, m.PackageName, "", name, token.STRUCT)
 
 					if structType.Fields != nil && structType.Fields.List != nil {
 						variableDecls := make([]string, 0)
@@ -243,7 +262,7 @@ func (m Scope) Visit(node ast.Node) ast.Visitor {
 				}
 
 				if interfaceType, ok := typeSpec.Type.(*ast.InterfaceType); ok {
-					interfaceScopedDecl := newScopedDecl(m.PackageName, name, token.INTERFACE)
+					interfaceScopedDecl := newScopedDecl(m.Filename, m.PackageName, "", name, token.INTERFACE)
 
 					if interfaceType.Methods != nil && interfaceType.Methods.List != nil {
 						statements := make([]string, 0)
