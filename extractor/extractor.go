@@ -130,11 +130,14 @@ func (e *Extractor) fromTypeSpec(filename string, decl *ast.TypeSpec) []entity.I
 
 	id := entity.NewDeclarationIDBuilder().WithFilename(e.filename).
 		WithPackage(e.packageName).WithName(decl.Name.String()).WithType(identifierType).Build()
-	identifiers := []entity.Identifier{
-		newIdentifier(id, filename, decl.Name.Pos(), decl.Name.String(), identifierType),
+
+	if obj, ok := e.scopes[decl.Name.String()]; ok && obj.Pos() == decl.Pos() {
+		return []entity.Identifier{
+			newIdentifier(id, filename, decl.Pos(), decl.Name.String(), identifierType)}
 	}
 
-	return identifiers
+	return []entity.Identifier{newChildIdentifier(id, filename, decl.Name.Pos(), decl.Name.String(),
+		identifierType, e.currentLoc, e.currentLocPos)}
 }
 
 func newIdentifier(id string, filename string, pos token.Pos, name string, identifierType token.Token) entity.Identifier {
