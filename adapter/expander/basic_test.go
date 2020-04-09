@@ -82,7 +82,7 @@ func TestExpand_OnBasicWhenNoDeclFound_ShouldReturnUnexpandedResults(t *testing.
 
 func TestExpand_OnBasic_ShouldReturnExpandedResultsFromWords(t *testing.T) {
 	miningResults := map[entity.MinerType]entity.Miner{
-		entity.MinerDeclarations: miner.Declaration{
+		entity.MinerDeclarations: &miner.Declaration{
 			Decls: map[string]entity.Decl{
 				"strbuff": entity.Decl{
 					ID:       "strbuff",
@@ -115,7 +115,7 @@ func TestExpand_OnBasic_ShouldReturnExpandedResultsFromWords(t *testing.T) {
 
 func TestExpand_OnBasic_ShouldReturnExpandedResultsFromPhrases(t *testing.T) {
 	miningResults := map[entity.MinerType]entity.Miner{
-		entity.MinerDeclarations: miner.Declaration{
+		entity.MinerDeclarations: &miner.Declaration{
 			Decls: map[string]entity.Decl{
 				"sb": entity.Decl{
 					ID:       "sb",

@@ -33,6 +33,8 @@ type Miner interface {
 	Type() MinerType
 	// Visit applies the mining logic while traversing the Abstract Syntax Tree.
 	Visit(node ast.Node) ast.Visitor
+	// SetCurrentFile specifies the current file being mined.
+	SetCurrentFile(filename string)
 }
 
 type ExtractorFactory func(filename string) Extractor

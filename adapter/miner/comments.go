@@ -24,6 +24,11 @@ func (c *Comments) Type() entity.MinerType {
 	return entity.MinerComments
 }
 
+// SetCurrentFile specifies the current file being mined.
+func (c *Comments) SetCurrentFile(filename string) {
+	// do nothing
+}
+
 // Visit implements the ast.Visitor interface and handles the logic for the data extraction.
 func (c *Comments) Visit(node ast.Node) ast.Visitor {
 	if node == nil {

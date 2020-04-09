@@ -21,9 +21,8 @@ type Scope struct {
 }
 
 // NewScope initializes a new scopes miner.
-func NewScope(filename string) Scope {
-	return Scope{
-		Filename:        filename,
+func NewScope() *Scope {
+	return &Scope{
 		Scopes:          make(map[string]entity.ScopedDecl),
 		PackageComments: make([]string, 0),
 	}
@@ -51,12 +50,17 @@ func newScopedDecl(filename string, pkg string, receiver string, name string, de
 }
 
 // Type returns the specific entity.MinerType for the miner.
-func (m Scope) Type() entity.MinerType {
+func (m *Scope) Type() entity.MinerType {
 	return entity.MinerScopedDeclarations
 }
 
+// SetCurrentFile specifies the current file being mined.
+func (m *Scope) SetCurrentFile(filename string) {
+	m.Filename = filename
+}
+
 // Visit implements the ast.Visitor interface and handles the logic for the data extraction.
-func (m Scope) Visit(node ast.Node) ast.Visitor {
+func (m *Scope) Visit(node ast.Node) ast.Visitor {
 	if node == nil {
 		return nil
 	}

@@ -21,7 +21,7 @@ func (f amapFactory) Make(miningResults map[entity.MinerType]entity.Miner) (enti
 	if !ok {
 		return nil, fmt.Errorf("unable to retrieve input from %s", entity.MinerScopedDeclarations)
 	}
-	scopedDeclarations := declarationsMiner.(miner.Scope).ScopedDeclarations()
+	scopedDeclarations := declarationsMiner.(*miner.Scope).ScopedDeclarations()
 
 	commentsMiner, ok := miningResults[entity.MinerComments]
 	if !ok {

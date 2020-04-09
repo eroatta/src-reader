@@ -29,6 +29,11 @@ func (m WordCount) Type() entity.MinerType {
 	return entity.MinerWordCount
 }
 
+// SetCurrentFile specifies the current file being mined.
+func (m WordCount) SetCurrentFile(filename string) {
+	// do nothing
+}
+
 // Visit implements the ast.Visitor interface and handles the logic for the data extraction.
 func (m WordCount) Visit(node ast.Node) ast.Visitor {
 	if node == nil {

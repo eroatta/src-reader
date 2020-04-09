@@ -12,19 +12,26 @@ import (
 )
 
 func TestNewScopes_ShouldReturnScopesMiner(t *testing.T) {
-	miner := miner.NewScope("testfile")
+	miner := miner.NewScope()
 
 	assert.NotNil(t, miner)
 }
 
-func TestGetName_OnScope_ShouldReturnScope(t *testing.T) {
-	miner := miner.NewScope("testfile")
+func TestType_OnScope_ShouldReturnScope(t *testing.T) {
+	miner := miner.NewScope()
 
 	assert.Equal(t, entity.MinerScopedDeclarations, miner.Type())
 }
 
+func TestSetCurrentFile_OnScope_ShoudldSetNewFilename(t *testing.T) {
+	miner := miner.NewScope()
+	miner.SetCurrentFile("new_file.go")
+
+	assert.Equal(t, "new_file.go", miner.Filename)
+}
+
 func TestScopedDeclarations_OnScope_ShouldReturnScopes(t *testing.T) {
-	miner := miner.NewScope("testfile")
+	miner := miner.NewScope()
 
 	assert.Equal(t, 0, len(miner.ScopedDeclarations()))
 }
@@ -54,7 +61,8 @@ func TestVisit_OnScopeWithPlainFuncDecl_ShouldReturnScopedDeclaration(t *testing
 	fs := token.NewFileSet()
 	node, _ := parser.ParseFile(fs, "testfile.go", []byte(src), parser.ParseComments)
 
-	m := miner.NewScope("testfile.go")
+	m := miner.NewScope()
+	m.SetCurrentFile("testfile.go")
 	ast.Walk(m, node)
 
 	scopedDecls := m.ScopedDeclarations()
@@ -94,7 +102,8 @@ func TestVisit_OnScopeWithFuncDeclWithComments_ShouldReturnScopedDeclaration(t *
 	fs := token.NewFileSet()
 	node, _ := parser.ParseFile(fs, "testfile.go", []byte(src), parser.ParseComments)
 
-	m := miner.NewScope("testfile.go")
+	m := miner.NewScope()
+	m.SetCurrentFile("testfile.go")
 	ast.Walk(m, node)
 
 	scopedDecls := m.ScopedDeclarations()
@@ -154,7 +163,8 @@ func TestVisit_OnScopeWithMultipleFuncDeclWithComments_ShouldReturnScopedDeclara
 	fs := token.NewFileSet()
 	node, _ := parser.ParseFile(fs, "testfile.go", []byte(src), parser.ParseComments)
 
-	m := miner.NewScope("testfile.go")
+	m := miner.NewScope()
+	m.SetCurrentFile("testfile.go")
 	ast.Walk(m, node)
 
 	scopedDecls := m.ScopedDeclarations()
@@ -240,7 +250,8 @@ func TestVisit_OnScopeWithMultipleFuncDeclWithFullBody_ShouldReturnScopedDeclara
 	fs := token.NewFileSet()
 	node, _ := parser.ParseFile(fs, "testfile.go", []byte(src), parser.ParseComments)
 
-	m := miner.NewScope("testfile.go")
+	m := miner.NewScope()
+	m.SetCurrentFile("testfile.go")
 	ast.Walk(m, node)
 
 	scopedDecls := m.ScopedDeclarations()
@@ -270,7 +281,8 @@ func TestVisit_OnScopeWithPlainVarDecl_ShouldReturnScopedDeclaration(t *testing.
 	fs := token.NewFileSet()
 	node, _ := parser.ParseFile(fs, "testfile.go", []byte(src), parser.ParseComments)
 
-	m := miner.NewScope("testfile.go")
+	m := miner.NewScope()
+	m.SetCurrentFile("testfile.go")
 	ast.Walk(m, node)
 
 	scopedDecls := m.ScopedDeclarations()
@@ -305,7 +317,8 @@ func TestVisit_OnScopeWithFullyCommentedVarDecl_ShouldReturnScopedDeclaration(t 
 	fs := token.NewFileSet()
 	node, _ := parser.ParseFile(fs, "testfile.go", []byte(src), parser.ParseComments)
 
-	m := miner.NewScope("testfile.go")
+	m := miner.NewScope()
+	m.SetCurrentFile("testfile.go")
 	ast.Walk(m, node)
 
 	scopedDecls := m.ScopedDeclarations()
@@ -360,7 +373,8 @@ func TestVisit_OnScopeWithVarBlockDecl_ShouldReturnScopedDeclaration(t *testing.
 	fs := token.NewFileSet()
 	node, _ := parser.ParseFile(fs, "testfile.go", []byte(src), parser.ParseComments)
 
-	m := miner.NewScope("testfile.go")
+	m := miner.NewScope()
+	m.SetCurrentFile("testfile.go")
 	ast.Walk(m, node)
 
 	scopedDecls := m.ScopedDeclarations()
@@ -390,7 +404,8 @@ func TestVisit_OnScopeWithPlainConstDecl_ShouldReturnScopedDeclaration(t *testin
 	fs := token.NewFileSet()
 	node, _ := parser.ParseFile(fs, "testfile.go", []byte(src), parser.ParseComments)
 
-	m := miner.NewScope("testfile.go")
+	m := miner.NewScope()
+	m.SetCurrentFile("testfile.go")
 	ast.Walk(m, node)
 
 	scopedDecls := m.ScopedDeclarations()
@@ -425,7 +440,8 @@ func TestVisit_OnScopeWithFullyCommentedConstDecl_ShouldReturnScopedDeclaration(
 	fs := token.NewFileSet()
 	node, _ := parser.ParseFile(fs, "testfile.go", []byte(src), parser.ParseComments)
 
-	m := miner.NewScope("testfile.go")
+	m := miner.NewScope()
+	m.SetCurrentFile("testfile.go")
 	ast.Walk(m, node)
 
 	scopedDecls := m.ScopedDeclarations()
@@ -490,7 +506,8 @@ func TestVisit_OnScopeWithConstBlockDecl_ShouldReturnScopedDeclaration(t *testin
 	fs := token.NewFileSet()
 	node, _ := parser.ParseFile(fs, "testfile.go", []byte(src), parser.ParseComments)
 
-	m := miner.NewScope("testfile.go")
+	m := miner.NewScope()
+	m.SetCurrentFile("testfile.go")
 	ast.Walk(m, node)
 
 	scopedDecls := m.ScopedDeclarations()
@@ -520,7 +537,8 @@ func TestVisit_OnScopeWithPlainStructDecl_ShouldReturnScopedDeclaration(t *testi
 	fs := token.NewFileSet()
 	node, _ := parser.ParseFile(fs, "testfile.go", []byte(src), parser.ParseComments)
 
-	m := miner.NewScope("testfile.go")
+	m := miner.NewScope()
+	m.SetCurrentFile("testfile.go")
 	ast.Walk(m, node)
 
 	scopedDecls := m.ScopedDeclarations()
@@ -558,7 +576,8 @@ func TestVisit_OnScopeWithFullyCommentedStructDecl_ShouldReturnScopedDeclaration
 	fs := token.NewFileSet()
 	node, _ := parser.ParseFile(fs, "testfile.go", []byte(src), parser.ParseComments)
 
-	m := miner.NewScope("testfile.go")
+	m := miner.NewScope()
+	m.SetCurrentFile("testfile.go")
 	ast.Walk(m, node)
 
 	scopedDecls := m.ScopedDeclarations()
@@ -637,7 +656,8 @@ func TestVisit_OnScopeWithStructBlockDecl_ShouldReturnScopedDeclaration(t *testi
 	fs := token.NewFileSet()
 	node, _ := parser.ParseFile(fs, "testfile.go", []byte(src), parser.ParseComments)
 
-	m := miner.NewScope("testfile.go")
+	m := miner.NewScope()
+	m.SetCurrentFile("testfile.go")
 	ast.Walk(m, node)
 
 	scopedDecls := m.ScopedDeclarations()
@@ -667,7 +687,8 @@ func TestVisit_OnScopeWithPlainInterfaceDecl_ShouldReturnScopedDeclaration(t *te
 	fs := token.NewFileSet()
 	node, _ := parser.ParseFile(fs, "testfile.go", []byte(src), parser.ParseComments)
 
-	m := miner.NewScope("testfile.go")
+	m := miner.NewScope()
+	m.SetCurrentFile("testfile.go")
 	ast.Walk(m, node)
 
 	scopedDecls := m.ScopedDeclarations()
@@ -705,7 +726,8 @@ func TestVisit_OnScopeWithFullyCommentedInterfaceDecl_ShouldReturnScopedDeclarat
 	fs := token.NewFileSet()
 	node, _ := parser.ParseFile(fs, "testfile.go", []byte(src), parser.ParseComments)
 
-	m := miner.NewScope("testfile.go")
+	m := miner.NewScope()
+	m.SetCurrentFile("testfile.go")
 	ast.Walk(m, node)
 
 	scopedDecls := m.ScopedDeclarations()
@@ -769,7 +791,8 @@ func TestVisit_OnScopeWithInterfaceBlockDecl_ShouldReturnScopedDeclaration(t *te
 	fs := token.NewFileSet()
 	node, _ := parser.ParseFile(fs, "testfile.go", []byte(src), parser.ParseComments)
 
-	m := miner.NewScope("testfile.go")
+	m := miner.NewScope()
+	m.SetCurrentFile("testfile.go")
 	ast.Walk(m, node)
 
 	scopedDecls := m.ScopedDeclarations()

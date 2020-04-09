@@ -25,6 +25,7 @@ func newDecl(ID string, declType token.Token) entity.Decl {
 // Declaration represents the declarations miner, which extracts information about
 // words and phrases for each function/variable/struct/interface declaration.
 type Declaration struct {
+	Filename    string
 	Dict        lists.List
 	PackageName string
 	Comments    []*ast.CommentGroup
@@ -33,20 +34,25 @@ type Declaration struct {
 }
 
 // NewDeclaration initializes a new declarations miner.
-func NewDeclaration(dict lists.List) Declaration {
-	return Declaration{
+func NewDeclaration(dict lists.List) *Declaration {
+	return &Declaration{
 		Dict:  dict,
 		Decls: make(map[string]entity.Decl),
 	}
 }
 
 // Type returns the specific entity.MinerType for the miner.
-func (m Declaration) Type() entity.MinerType {
+func (m *Declaration) Type() entity.MinerType {
 	return entity.MinerDeclarations
 }
 
+// SetCurrentFile specifies the current file being mined.
+func (m *Declaration) SetCurrentFile(filename string) {
+	m.Filename = filename
+}
+
 // Visit implements the ast.Visitor interface and handles the logic for the data extraction.
-func (m Declaration) Visit(node ast.Node) ast.Visitor {
+func (m *Declaration) Visit(node ast.Node) ast.Visitor {
 	// TODO: (stemming + stopping)
 	if node == nil {
 		return nil
@@ -92,7 +98,7 @@ func (m Declaration) Visit(node ast.Node) ast.Visitor {
 						continue
 					}
 
-					declText := newDecl(declID(m.PackageName, elem.Tok, name.String()), elem.Tok)
+					declText := newDecl(declID(m.Filename, m.PackageName, elem.Tok, name.String(), ""), elem.Tok)
 					declText = extractDeclFromValue(declText, valSpec, name.Name, j, m.Dict)
 					declText = merge(merge(declText, genDeclComments), valDeclComments)
 
@@ -117,13 +123,13 @@ func (m Declaration) Visit(node ast.Node) ast.Visitor {
 				}
 
 				if structType, ok := typeSpec.Type.(*ast.StructType); ok {
-					declText.ID = declID(m.PackageName, token.STRUCT, name)
+					declText.ID = declID(m.Filename, m.PackageName, token.STRUCT, name, "")
 					declText.DeclType = token.STRUCT
 					declText = extractDeclFromStruct(declText, structType, m.Dict)
 				}
 
 				if interfaceType, ok := typeSpec.Type.(*ast.InterfaceType); ok {
-					declText.ID = declID(m.PackageName, token.INTERFACE, name)
+					declText.ID = declID(m.Filename, m.PackageName, token.INTERFACE, name, "")
 					declText.DeclType = token.INTERFACE
 					declText = extractDeclFromInterface(declText, interfaceType, m.Dict)
 				}
@@ -150,9 +156,19 @@ func (m Declaration) shouldMine(elem *ast.GenDecl) bool {
 	return shouldMine
 }
 
-func extractDeclFromFunction(elem *ast.FuncDecl, m Declaration) entity.Decl {
+func extractDeclFromFunction(elem *ast.FuncDecl, m *Declaration) entity.Decl {
 	name := elem.Name.String()
-	functionText := newDecl(declID(m.PackageName, token.FUNC, name), token.FUNC)
+	receiver := ""
+	if elem.Recv != nil && elem.Recv.NumFields() > 0 {
+		for _, r := range elem.Recv.List {
+			typ, ok := r.Type.(*ast.Ident)
+			if ok {
+				receiver = typ.Name
+			}
+		}
+	}
+
+	functionText := newDecl(declID(m.Filename, m.PackageName, token.FUNC, name, receiver), token.FUNC)
 
 	for _, part := range conserv.Split(name) {
 		if m.Dict.Contains(part) {
@@ -289,8 +305,14 @@ func extractWordAndPhrasesFromComment(functionText entity.Decl, comment string, 
 	return functionText
 }
 
-func declID(pkg string, declType token.Token, name string) string {
-	return fmt.Sprintf("%s++%s::%s", pkg, declType, name)
+func declID(filename string, pkg string, declType token.Token, name string, receiver string) string {
+	return entity.NewDeclarationIDBuilder().
+		WithFilename(filename).
+		WithPackage(pkg).
+		WithReceiver(receiver).
+		WithName(name).
+		WithType(declType).
+		Build()
 }
 
 // Declarations returns a map of declaration IDs and the mined text for each declaration.

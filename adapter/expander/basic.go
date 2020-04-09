@@ -23,7 +23,7 @@ func (f basicFactory) Make(miningResults map[entity.MinerType]entity.Miner) (ent
 	if !ok {
 		return nil, fmt.Errorf("unable to retrieve input from %s", entity.MinerDeclarations)
 	}
-	declarations := declarationsMiner.(miner.Declaration).Declarations()
+	declarations := declarationsMiner.(*miner.Declaration).Declarations()
 
 	return &basicExpander{
 		expander:     expander{"amap"},

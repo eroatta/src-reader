@@ -18,10 +18,17 @@ func TestNewDeclaration_ShouldReturnDeclarationMiner(t *testing.T) {
 	assert.NotNil(t, miner)
 }
 
-func TestGetName_OnDeclaration_ShouldReturnDeclaration(t *testing.T) {
+func TestType_OnDeclaration_ShouldReturnDeclaration(t *testing.T) {
 	miner := miner.NewDeclaration(nil)
 
 	assert.Equal(t, entity.MinerDeclarations, miner.Type())
+}
+
+func TestSetCurrentFile_OnDeclaration_ShouldSetFile(t *testing.T) {
+	miner := miner.NewDeclaration(nil)
+	miner.SetCurrentFile("new_file.go")
+
+	assert.Equal(t, "new_file.go", miner.Filename)
 }
 
 func TestVisit_OnDeclarationWithFunctions_ShouldReturnDecls(t *testing.T) {
@@ -61,16 +68,16 @@ func TestVisit_OnDeclarationWithFunctions_ShouldReturnDecls(t *testing.T) {
 	}{
 		{"no_functions", "package main", make(map[string]entity.Decl)},
 		{"functions_without_text_or_comments", srcWithoutTextOrComments, map[string]entity.Decl{
-			"main++func::main": entity.Decl{
-				ID:       "main++func::main",
+			"filename:testfile.go+++pkg:main+++declType:func+++name:main": entity.Decl{
+				ID:       "filename:testfile.go+++pkg:main+++declType:func+++name:main",
 				DeclType: token.FUNC,
 				Words:    map[string]struct{}{"main": struct{}{}},
 				Phrases:  make(map[string]struct{}),
 			},
 		}},
 		{"functions_with_text_and_comments", srcWithTextAndComments, map[string]entity.Decl{
-			"main++func::main": entity.Decl{
-				ID:       "main++func::main",
+			"filename:testfile.go+++pkg:main+++declType:func+++name:main": entity.Decl{
+				ID:       "filename:testfile.go+++pkg:main+++declType:func+++name:main",
 				DeclType: token.FUNC,
 				Words: map[string]struct{}{
 					"main":     struct{}{},
@@ -90,14 +97,14 @@ func TestVisit_OnDeclarationWithFunctions_ShouldReturnDecls(t *testing.T) {
 			},
 		}},
 		{"functions_with_multiple_functions", srcWithMultipleFunctions, map[string]entity.Decl{
-			"main++func::main": entity.Decl{
-				ID:       "main++func::main",
+			"filename:testfile.go+++pkg:main+++declType:func+++name:main": entity.Decl{
+				ID:       "filename:testfile.go+++pkg:main+++declType:func+++name:main",
 				DeclType: token.FUNC,
 				Words:    map[string]struct{}{"main": struct{}{}},
 				Phrases:  make(map[string]struct{}),
 			},
-			"main++func::another": entity.Decl{
-				ID:       "main++func::another",
+			"filename:testfile.go+++pkg:main+++declType:func+++name:another": entity.Decl{
+				ID:       "filename:testfile.go+++pkg:main+++declType:func+++name:another",
 				DeclType: token.FUNC,
 				Words: map[string]struct{}{
 					"another":  struct{}{},
@@ -112,9 +119,10 @@ func TestVisit_OnDeclarationWithFunctions_ShouldReturnDecls(t *testing.T) {
 	for _, fixture := range tests {
 		t.Run(fixture.name, func(t *testing.T) {
 			fs := token.NewFileSet()
-			node, _ := parser.ParseFile(fs, "", []byte(fixture.src), parser.ParseComments)
+			node, _ := parser.ParseFile(fs, "testfile.go", []byte(fixture.src), parser.ParseComments)
 
 			m := miner.NewDeclaration(lists.Dicctionary)
+			m.SetCurrentFile("testfile.go")
 			ast.Walk(m, node)
 
 			decls := m.Declarations()
@@ -168,15 +176,15 @@ func TestVisit_OnDeclarationWithVarDecl_ShouldReturnWordsAndPhrases(t *testing.T
 		expected map[string]entity.Decl
 	}{
 		{"variable_without_comments", srcVarWithoutComments, map[string]entity.Decl{
-			"main++var::Common": entity.Decl{
-				ID:       "main++var::Common",
+			"filename:testfile.go+++pkg:main+++declType:var+++name:Common": entity.Decl{
+				ID:       "filename:testfile.go+++pkg:main+++declType:var+++name:Common",
 				DeclType: token.VAR,
 				Words:    map[string]struct{}{"common": struct{}{}},
 				Phrases:  make(map[string]struct{}),
 			}}},
 		{"variable_with_doc_comments", srcVarWithDocComments, map[string]entity.Decl{
-			"main++var::Common": entity.Decl{
-				ID:       "main++var::Common",
+			"filename:testfile.go+++pkg:main+++declType:var+++name:Common": entity.Decl{
+				ID:       "filename:testfile.go+++pkg:main+++declType:var+++name:Common",
 				DeclType: token.VAR,
 				Words: map[string]struct{}{
 					"comment": struct{}{},
@@ -188,8 +196,8 @@ func TestVisit_OnDeclarationWithVarDecl_ShouldReturnWordsAndPhrases(t *testing.T
 				},
 			}}},
 		{"variable_with_doc_and_ignored_line_comments", srcVarWithDocAndLineComments, map[string]entity.Decl{
-			"main++var::Common": entity.Decl{
-				ID:       "main++var::Common",
+			"filename:testfile.go+++pkg:main+++declType:var+++name:Common": entity.Decl{
+				ID:       "filename:testfile.go+++pkg:main+++declType:var+++name:Common",
 				DeclType: token.VAR,
 				Words: map[string]struct{}{
 					"comment": struct{}{},
@@ -201,8 +209,8 @@ func TestVisit_OnDeclarationWithVarDecl_ShouldReturnWordsAndPhrases(t *testing.T
 				},
 			}}},
 		{"multiple_variables_same_line", srcMultipleVarSpecs, map[string]entity.Decl{
-			"main++var::common": entity.Decl{
-				ID:       "main++var::common",
+			"filename:testfile.go+++pkg:main+++declType:var+++name:common": entity.Decl{
+				ID:       "filename:testfile.go+++pkg:main+++declType:var+++name:common",
 				DeclType: token.VAR,
 				Words: map[string]struct{}{
 					"comment": struct{}{},
@@ -212,8 +220,8 @@ func TestVisit_OnDeclarationWithVarDecl_ShouldReturnWordsAndPhrases(t *testing.T
 				Phrases: map[string]struct{}{
 					"outer comment": struct{}{},
 				}},
-			"main++var::regular": entity.Decl{
-				ID:       "main++var::regular",
+			"filename:testfile.go+++pkg:main+++declType:var+++name:regular": entity.Decl{
+				ID:       "filename:testfile.go+++pkg:main+++declType:var+++name:regular",
 				DeclType: token.VAR,
 				Words: map[string]struct{}{
 					"comment": struct{}{},
@@ -225,8 +233,8 @@ func TestVisit_OnDeclarationWithVarDecl_ShouldReturnWordsAndPhrases(t *testing.T
 				},
 			}}},
 		{"var_block", srcVarBlock, map[string]entity.Decl{
-			"main++var::common": entity.Decl{
-				ID:       "main++var::common",
+			"filename:testfile.go+++pkg:main+++declType:var+++name:common": entity.Decl{
+				ID:       "filename:testfile.go+++pkg:main+++declType:var+++name:common",
 				DeclType: token.VAR,
 				Words: map[string]struct{}{
 					"comment": struct{}{},
@@ -236,8 +244,8 @@ func TestVisit_OnDeclarationWithVarDecl_ShouldReturnWordsAndPhrases(t *testing.T
 				Phrases: map[string]struct{}{
 					"outer comment": struct{}{},
 				}},
-			"main++var::regular": entity.Decl{
-				ID:       "main++var::regular",
+			"filename:testfile.go+++pkg:main+++declType:var+++name:regular": entity.Decl{
+				ID:       "filename:testfile.go+++pkg:main+++declType:var+++name:regular",
 				DeclType: token.VAR,
 				Words: map[string]struct{}{
 					"comment": struct{}{},
@@ -248,8 +256,8 @@ func TestVisit_OnDeclarationWithVarDecl_ShouldReturnWordsAndPhrases(t *testing.T
 				Phrases: map[string]struct{}{
 					"outer comment": struct{}{},
 				}},
-			"main++var::nrzXXZ": entity.Decl{
-				ID:       "main++var::nrzXXZ",
+			"filename:testfile.go+++pkg:main+++declType:var+++name:nrzXXZ": entity.Decl{
+				ID:       "filename:testfile.go+++pkg:main+++declType:var+++name:nrzXXZ",
 				DeclType: token.VAR,
 				Words: map[string]struct{}{
 					"comment": struct{}{},
@@ -267,6 +275,7 @@ func TestVisit_OnDeclarationWithVarDecl_ShouldReturnWordsAndPhrases(t *testing.T
 			node, _ := parser.ParseFile(fs, "", []byte(fixture.src), parser.ParseComments)
 
 			m := miner.NewDeclaration(lists.Dicctionary)
+			m.SetCurrentFile("testfile.go")
 			ast.Walk(m, node)
 
 			decls := m.Declarations()
@@ -320,8 +329,8 @@ func TestVisit_OnDeclarationWithConstDecl_ShouldReturnWordsAndPhrases(t *testing
 		expected map[string]entity.Decl
 	}{
 		{"constant_without_comments", srcConstWithoutComments, map[string]entity.Decl{
-			"main++const::Common": entity.Decl{
-				ID:       "main++const::Common",
+			"filename:testfile.go+++pkg:main+++declType:const+++name:Common": entity.Decl{
+				ID:       "filename:testfile.go+++pkg:main+++declType:const+++name:Common",
 				DeclType: token.CONST,
 				Words: map[string]struct{}{
 					"common": struct{}{},
@@ -330,8 +339,8 @@ func TestVisit_OnDeclarationWithConstDecl_ShouldReturnWordsAndPhrases(t *testing
 				Phrases: make(map[string]struct{}),
 			}}},
 		{"constant_with_doc_comments", srcConstWithDocComments, map[string]entity.Decl{
-			"main++const::Common": entity.Decl{
-				ID:       "main++const::Common",
+			"filename:testfile.go+++pkg:main+++declType:const+++name:Common": entity.Decl{
+				ID:       "filename:testfile.go+++pkg:main+++declType:const+++name:Common",
 				DeclType: token.CONST,
 				Words: map[string]struct{}{
 					"comment": struct{}{},
@@ -344,8 +353,8 @@ func TestVisit_OnDeclarationWithConstDecl_ShouldReturnWordsAndPhrases(t *testing
 				},
 			}}},
 		{"constant_with_doc_and_ignored_line_comments", srcConstWithDocAndLineComments, map[string]entity.Decl{
-			"main++const::Common": entity.Decl{
-				ID:       "main++const::Common",
+			"filename:testfile.go+++pkg:main+++declType:const+++name:Common": entity.Decl{
+				ID:       "filename:testfile.go+++pkg:main+++declType:const+++name:Common",
 				DeclType: token.CONST,
 				Words: map[string]struct{}{
 					"comment": struct{}{},
@@ -358,8 +367,8 @@ func TestVisit_OnDeclarationWithConstDecl_ShouldReturnWordsAndPhrases(t *testing
 				},
 			}}},
 		{"multiple_constants_same_line", srcMultipleConstSpecs, map[string]entity.Decl{
-			"main++const::common": entity.Decl{
-				ID:       "main++const::common",
+			"filename:testfile.go+++pkg:main+++declType:const+++name:common": entity.Decl{
+				ID:       "filename:testfile.go+++pkg:main+++declType:const+++name:common",
 				DeclType: token.CONST,
 				Words: map[string]struct{}{
 					"comment": struct{}{},
@@ -370,8 +379,8 @@ func TestVisit_OnDeclarationWithConstDecl_ShouldReturnWordsAndPhrases(t *testing
 				Phrases: map[string]struct{}{
 					"outer comment": struct{}{},
 				}},
-			"main++const::regular": entity.Decl{
-				ID:       "main++const::regular",
+			"filename:testfile.go+++pkg:main+++declType:const+++name:regular": entity.Decl{
+				ID:       "filename:testfile.go+++pkg:main+++declType:const+++name:regular",
 				DeclType: token.CONST,
 				Words: map[string]struct{}{
 					"comment": struct{}{},
@@ -384,8 +393,8 @@ func TestVisit_OnDeclarationWithConstDecl_ShouldReturnWordsAndPhrases(t *testing
 				},
 			}}},
 		{"const_block", srcConstBlock, map[string]entity.Decl{
-			"main++const::common": entity.Decl{
-				ID:       "main++const::common",
+			"filename:testfile.go+++pkg:main+++declType:const+++name:common": entity.Decl{
+				ID:       "filename:testfile.go+++pkg:main+++declType:const+++name:common",
 				DeclType: token.CONST,
 				Words: map[string]struct{}{
 					"comment": struct{}{},
@@ -397,8 +406,8 @@ func TestVisit_OnDeclarationWithConstDecl_ShouldReturnWordsAndPhrases(t *testing
 					"common value":  struct{}{},
 					"outer comment": struct{}{},
 				}},
-			"main++const::regular": entity.Decl{
-				ID:       "main++const::regular",
+			"filename:testfile.go+++pkg:main+++declType:const+++name:regular": entity.Decl{
+				ID:       "filename:testfile.go+++pkg:main+++declType:const+++name:regular",
 				DeclType: token.CONST,
 				Words: map[string]struct{}{
 					"comment": struct{}{},
@@ -409,8 +418,8 @@ func TestVisit_OnDeclarationWithConstDecl_ShouldReturnWordsAndPhrases(t *testing
 				Phrases: map[string]struct{}{
 					"outer comment": struct{}{},
 				}},
-			"main++const::nrzXXZ": entity.Decl{
-				ID:       "main++const::nrzXXZ",
+			"filename:testfile.go+++pkg:main+++declType:const+++name:nrzXXZ": entity.Decl{
+				ID:       "filename:testfile.go+++pkg:main+++declType:const+++name:nrzXXZ",
 				DeclType: token.CONST,
 				Words: map[string]struct{}{
 					"comment": struct{}{},
@@ -428,6 +437,7 @@ func TestVisit_OnDeclarationWithConstDecl_ShouldReturnWordsAndPhrases(t *testing
 			node, _ := parser.ParseFile(fs, "", []byte(fixture.src), parser.ParseComments)
 
 			m := miner.NewDeclaration(lists.Dicctionary)
+			m.SetCurrentFile("testfile.go")
 			ast.Walk(m, node)
 
 			decls := m.Declarations()
@@ -503,8 +513,8 @@ func TestVisit_OnDeclarationWithTypeDecl_ShouldReturnWordsAndPhrases(t *testing.
 		expected map[string]entity.Decl
 	}{
 		{"empty_struct", srcStructWithoutFields, map[string]entity.Decl{
-			"main++struct::selector": entity.Decl{
-				ID:       "main++struct::selector",
+			"filename:testfile.go+++pkg:main+++declType:struct+++name:selector": entity.Decl{
+				ID:       "filename:testfile.go+++pkg:main+++declType:struct+++name:selector",
 				DeclType: token.STRUCT,
 				Words: map[string]struct{}{
 					"selector": struct{}{},
@@ -512,8 +522,8 @@ func TestVisit_OnDeclarationWithTypeDecl_ShouldReturnWordsAndPhrases(t *testing.
 				Phrases: map[string]struct{}{}},
 		}},
 		{"struct_with_comments", srcStructWithComments, map[string]entity.Decl{
-			"main++struct::selector": entity.Decl{
-				ID:       "main++struct::selector",
+			"filename:testfile.go+++pkg:main+++declType:struct+++name:selector": entity.Decl{
+				ID:       "filename:testfile.go+++pkg:main+++declType:struct+++name:selector",
 				DeclType: token.STRUCT,
 				Words: map[string]struct{}{
 					"comment":  struct{}{},
@@ -525,8 +535,8 @@ func TestVisit_OnDeclarationWithTypeDecl_ShouldReturnWordsAndPhrases(t *testing.
 				}},
 		}},
 		{"struct_with_fields", srcStructWithFields, map[string]entity.Decl{
-			"main++struct::selector": entity.Decl{
-				ID:       "main++struct::selector",
+			"filename:testfile.go+++pkg:main+++declType:struct+++name:selector": entity.Decl{
+				ID:       "filename:testfile.go+++pkg:main+++declType:struct+++name:selector",
 				DeclType: token.STRUCT,
 				Words: map[string]struct{}{
 					"comment":  struct{}{},
@@ -539,8 +549,8 @@ func TestVisit_OnDeclarationWithTypeDecl_ShouldReturnWordsAndPhrases(t *testing.
 				}},
 		}},
 		{"struct_with_fields_and_comments", srcStructWithFieldsAndComments, map[string]entity.Decl{
-			"main++struct::selector": entity.Decl{
-				ID:       "main++struct::selector",
+			"filename:testfile.go+++pkg:main+++declType:struct+++name:selector": entity.Decl{
+				ID:       "filename:testfile.go+++pkg:main+++declType:struct+++name:selector",
 				DeclType: token.STRUCT,
 				Words: map[string]struct{}{
 					"comment":  struct{}{},
@@ -555,8 +565,8 @@ func TestVisit_OnDeclarationWithTypeDecl_ShouldReturnWordsAndPhrases(t *testing.
 				}},
 		}},
 		{"struct_block_decl", srcStructBlock, map[string]entity.Decl{
-			"main++struct::selector": entity.Decl{
-				ID:       "main++struct::selector",
+			"filename:testfile.go+++pkg:main+++declType:struct+++name:selector": entity.Decl{
+				ID:       "filename:testfile.go+++pkg:main+++declType:struct+++name:selector",
 				DeclType: token.STRUCT,
 				Words: map[string]struct{}{
 					"comment":  struct{}{},
@@ -571,8 +581,8 @@ func TestVisit_OnDeclarationWithTypeDecl_ShouldReturnWordsAndPhrases(t *testing.
 					"global comment": struct{}{},
 					"local comment":  struct{}{},
 				}},
-			"main++struct::picker": entity.Decl{
-				ID:       "main++struct::picker",
+			"filename:testfile.go+++pkg:main+++declType:struct+++name:picker": entity.Decl{
+				ID:       "filename:testfile.go+++pkg:main+++declType:struct+++name:picker",
 				DeclType: token.STRUCT,
 				Words: map[string]struct{}{
 					"inner":   struct{}{},
@@ -587,8 +597,8 @@ func TestVisit_OnDeclarationWithTypeDecl_ShouldReturnWordsAndPhrases(t *testing.
 				}},
 		}},
 		{"struct_with_hardwords", srcStructWithHardwords, map[string]entity.Decl{
-			"main++struct::httpClient": entity.Decl{
-				ID:       "main++struct::httpClient",
+			"filename:testfile.go+++pkg:main+++declType:struct+++name:httpClient": entity.Decl{
+				ID:       "filename:testfile.go+++pkg:main+++declType:struct+++name:httpClient",
 				DeclType: token.STRUCT,
 				Words: map[string]struct{}{
 					"client":   struct{}{},
@@ -607,6 +617,7 @@ func TestVisit_OnDeclarationWithTypeDecl_ShouldReturnWordsAndPhrases(t *testing.
 			node, _ := parser.ParseFile(fs, "", []byte(fixture.src), parser.ParseComments)
 
 			m := miner.NewDeclaration(lists.Dicctionary)
+			m.SetCurrentFile("testfile.go")
 			ast.Walk(m, node)
 
 			decls := m.Declarations()
@@ -682,8 +693,8 @@ func TestVisit_OnDeclarationWithInterfaceDecl_ShouldReturnWordsAndPhrases(t *tes
 		expected map[string]entity.Decl
 	}{
 		{"empty_interface", srcInterfaceWithoutMethods, map[string]entity.Decl{
-			"main++interface::selector": entity.Decl{
-				ID:       "main++interface::selector",
+			"filename:testfile.go+++pkg:main+++declType:interface+++name:selector": entity.Decl{
+				ID:       "filename:testfile.go+++pkg:main+++declType:interface+++name:selector",
 				DeclType: token.INTERFACE,
 				Words: map[string]struct{}{
 					"selector": struct{}{},
@@ -691,8 +702,8 @@ func TestVisit_OnDeclarationWithInterfaceDecl_ShouldReturnWordsAndPhrases(t *tes
 				Phrases: map[string]struct{}{}},
 		}},
 		{"interface_with_comments", srcInterfaceWithComments, map[string]entity.Decl{
-			"main++interface::selector": entity.Decl{
-				ID:       "main++interface::selector",
+			"filename:testfile.go+++pkg:main+++declType:interface+++name:selector": entity.Decl{
+				ID:       "filename:testfile.go+++pkg:main+++declType:interface+++name:selector",
 				DeclType: token.INTERFACE,
 				Words: map[string]struct{}{
 					"comment":   struct{}{},
@@ -704,8 +715,8 @@ func TestVisit_OnDeclarationWithInterfaceDecl_ShouldReturnWordsAndPhrases(t *tes
 				}},
 		}},
 		{"interface_with_methods", srcInterfaceWithMethods, map[string]entity.Decl{
-			"main++interface::selector": entity.Decl{
-				ID:       "main++interface::selector",
+			"filename:testfile.go+++pkg:main+++declType:interface+++name:selector": entity.Decl{
+				ID:       "filename:testfile.go+++pkg:main+++declType:interface+++name:selector",
 				DeclType: token.INTERFACE,
 				Words: map[string]struct{}{
 					"comment":   struct{}{},
@@ -718,8 +729,8 @@ func TestVisit_OnDeclarationWithInterfaceDecl_ShouldReturnWordsAndPhrases(t *tes
 				}},
 		}},
 		{"interface_with_methods_and_comments", srcInterfaceWithMethodsAndComments, map[string]entity.Decl{
-			"main++interface::selector": entity.Decl{
-				ID:       "main++interface::selector",
+			"filename:testfile.go+++pkg:main+++declType:interface+++name:selector": entity.Decl{
+				ID:       "filename:testfile.go+++pkg:main+++declType:interface+++name:selector",
 				DeclType: token.INTERFACE,
 				Words: map[string]struct{}{
 					"comment":   struct{}{},
@@ -734,8 +745,8 @@ func TestVisit_OnDeclarationWithInterfaceDecl_ShouldReturnWordsAndPhrases(t *tes
 				}},
 		}},
 		{"interface_block_decl", srcInterfaceBlock, map[string]entity.Decl{
-			"main++interface::selector": entity.Decl{
-				ID:       "main++interface::selector",
+			"filename:testfile.go+++pkg:main+++declType:interface+++name:selector": entity.Decl{
+				ID:       "filename:testfile.go+++pkg:main+++declType:interface+++name:selector",
 				DeclType: token.INTERFACE,
 				Words: map[string]struct{}{
 					"comment":   struct{}{},
@@ -750,8 +761,8 @@ func TestVisit_OnDeclarationWithInterfaceDecl_ShouldReturnWordsAndPhrases(t *tes
 					"global comment":    struct{}{},
 					"interface comment": struct{}{},
 				}},
-			"main++interface::picker": entity.Decl{
-				ID:       "main++interface::picker",
+			"filename:testfile.go+++pkg:main+++declType:interface+++name:picker": entity.Decl{
+				ID:       "filename:testfile.go+++pkg:main+++declType:interface+++name:picker",
 				DeclType: token.INTERFACE,
 				Words: map[string]struct{}{
 					"inner":   struct{}{},
@@ -766,8 +777,8 @@ func TestVisit_OnDeclarationWithInterfaceDecl_ShouldReturnWordsAndPhrases(t *tes
 				}},
 		}},
 		{"interface_with_hardwords", srcInterfaceWithHardwords, map[string]entity.Decl{
-			"main++interface::httpClient": entity.Decl{
-				ID:       "main++interface::httpClient",
+			"filename:testfile.go+++pkg:main+++declType:interface+++name:httpClient": entity.Decl{
+				ID:       "filename:testfile.go+++pkg:main+++declType:interface+++name:httpClient",
 				DeclType: token.INTERFACE,
 				Words: map[string]struct{}{
 					"client":   struct{}{},
@@ -786,6 +797,7 @@ func TestVisit_OnDeclarationWithInterfaceDecl_ShouldReturnWordsAndPhrases(t *tes
 			node, _ := parser.ParseFile(fs, "", []byte(fixture.src), parser.ParseComments)
 
 			m := miner.NewDeclaration(lists.Dicctionary)
+			m.SetCurrentFile("testfile.go")
 			ast.Walk(m, node)
 
 			decls := m.Declarations()

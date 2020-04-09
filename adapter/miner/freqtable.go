@@ -21,6 +21,10 @@ func (g GlobalFreqTable) Type() entity.MinerType {
 	return entity.MinerGlobalFrequencyTable
 }
 
+func (g GlobalFreqTable) SetCurrentFile(filename string) {
+	// do nothing
+}
+
 func (g GlobalFreqTable) Visit(node ast.Node) ast.Visitor {
 	return nil
 }

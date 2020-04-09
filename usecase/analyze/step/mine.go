@@ -23,6 +23,7 @@ func Mine(parsed []entity.File, miners ...entity.Miner) map[entity.MinerType]ent
 					continue
 				}
 
+				miner.SetCurrentFile(f.Name)
 				ast.Walk(miner, f.AST)
 			}
 

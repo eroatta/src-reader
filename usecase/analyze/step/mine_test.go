@@ -103,6 +103,8 @@ func (m *miner) Type() entity.MinerType {
 	return m.typ
 }
 
+func (m *miner) SetCurrentFile(f string) {}
+
 func (m *miner) Visit(n ast.Node) ast.Visitor {
 	m.visits++
 	return m
