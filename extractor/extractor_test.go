@@ -68,7 +68,73 @@ func TestVisit_OnExtractorWithFuncDecl_ShouldReturnFoundIdentifiers(t *testing.T
 }
 
 func TestVisit_OnExtractorWithFuncDeclUsingSameFuncName_ShouldReturnFoundIdentifiers(t *testing.T) {
-	assert.FailNow(t, "not yet implemented")
+	src := `
+		package main
+
+		type car struct {}
+
+		func (c car) name() {
+			// do nothing
+		}
+
+		type boat struct{}
+
+		func (b boat) name() {
+			// do nothing
+		}
+	`
+
+	expected := []entity.Identifier{
+		{
+			ID:         "filename:testfile.go+++pkg:main+++declType:struct+++name:car",
+			File:       "testfile.go",
+			Position:   25,
+			Name:       "car",
+			Type:       token.STRUCT,
+			Splits:     make(map[string][]string),
+			Expansions: make(map[string][]string),
+			Parent:     "",
+		},
+		{
+			ID:         "filename:testfile.go+++pkg:main+++declType:func+++name:car.name",
+			File:       "testfile.go",
+			Position:   42,
+			Name:       "name",
+			Type:       token.FUNC,
+			Splits:     make(map[string][]string),
+			Expansions: make(map[string][]string),
+			Parent:     "",
+		},
+		{
+			ID:         "filename:testfile.go+++pkg:main+++declType:struct+++name:boat",
+			File:       "testfile.go",
+			Position:   93,
+			Name:       "boat",
+			Type:       token.STRUCT,
+			Splits:     make(map[string][]string),
+			Expansions: make(map[string][]string),
+			Parent:     "",
+		},
+		{
+			ID:         "filename:testfile.go+++pkg:main+++declType:func+++name:boat.name",
+			File:       "testfile.go",
+			Position:   110,
+			Name:       "name",
+			Type:       token.FUNC,
+			Splits:     make(map[string][]string),
+			Expansions: make(map[string][]string),
+			Parent:     "",
+		},
+	}
+
+	fs := token.NewFileSet()
+	node, _ := parser.ParseFile(fs, "testfile.go", []byte(src), parser.ParseComments)
+
+	e := extractor.New("testfile.go")
+	ast.Walk(e, node)
+
+	identifiers := e.Identifiers()
+	assert.Equal(t, expected, identifiers)
 }
 
 func TestVisit_OnExtractorWithFuncDecl_ShouldReturnFoundLocalIdentifiers(t *testing.T) {
