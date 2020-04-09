@@ -14,6 +14,7 @@ type Extractor struct {
 	currentLoc    string
 	currentLocPos token.Pos
 	identifiers   []entity.Identifier
+	scopes        map[string]*ast.Object
 }
 
 // New creates a new Extractor.
@@ -33,6 +34,7 @@ func (e *Extractor) Visit(node ast.Node) ast.Visitor {
 	switch elem := node.(type) {
 	case *ast.File:
 		e.packageName = elem.Name.String()
+		e.scopes = elem.Scope.Objects
 
 	case *ast.FuncDecl:
 		name := elem.Name.String()
@@ -101,8 +103,15 @@ func (e *Extractor) fromValueSpec(filename string, token token.Token, decl *ast.
 
 		id := entity.NewDeclarationIDBuilder().WithFilename(e.filename).
 			WithPackage(e.packageName).WithName(name.String()).WithType(token).Build()
+
+		if obj, ok := e.scopes[name.Name]; ok && obj.Pos() == name.Pos() {
+			identifiers = append(identifiers,
+				newIdentifier(id, filename, name.Pos(), name.String(), token))
+			continue
+		}
+
 		identifiers = append(identifiers,
-			newIdentifier(id, filename, name.Pos(), name.String(), token))
+			newChildIdentifier(id, filename, name.Pos(), name.String(), token, e.currentLoc, e.currentLocPos))
 	}
 
 	return identifiers

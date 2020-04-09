@@ -138,7 +138,74 @@ func TestVisit_OnExtractorWithFuncDeclUsingSameFuncName_ShouldReturnFoundIdentif
 }
 
 func TestVisit_OnExtractorWithFuncDecl_ShouldReturnFoundLocalIdentifiers(t *testing.T) {
-	assert.FailNow(t, "not yet implemented")
+	src := `
+	package main
+
+	func main() {
+   		var firstString string
+   		secondString := "second"
+
+   		moreStrings := []string{}
+   		for _, s := range moreStrings {
+       		// do nothing
+   		}
+	}
+	`
+
+	expected := []entity.Identifier{
+		{
+			ID:         "filename:testfile.go+++pkg:main+++declType:func+++name:main",
+			File:       "testfile.go",
+			Position:   18,
+			Name:       "main",
+			Type:       token.FUNC,
+			Splits:     make(map[string][]string),
+			Expansions: make(map[string][]string),
+			Parent:     "",
+		},
+		{
+			ID:         "filename:testfile.go+++pkg:main+++declType:var+++name:firstString+++local:41",
+			File:       "testfile.go",
+			Position:   41,
+			Name:       "firstString",
+			Type:       token.VAR,
+			Splits:     make(map[string][]string),
+			Expansions: make(map[string][]string),
+			Parent:     "filename:testfile.go+++pkg:main+++declType:func+++name:main",
+			ParentPos:  18,
+		},
+		{
+			ID:         "filename:testfile.go+++pkg:main+++declType::=+++name:secondString+++local:65",
+			File:       "testfile.go",
+			Position:   65,
+			Name:       "secondString",
+			Type:       token.DEFINE,
+			Splits:     make(map[string][]string),
+			Expansions: make(map[string][]string),
+			Parent:     "filename:testfile.go+++pkg:main+++declType:func+++name:main",
+			ParentPos:  18,
+		},
+		{
+			ID:         "filename:testfile.go+++pkg:main+++declType::=+++name:moreStrings+++local:96",
+			File:       "testfile.go",
+			Position:   96,
+			Name:       "moreStrings",
+			Type:       token.DEFINE,
+			Splits:     make(map[string][]string),
+			Expansions: make(map[string][]string),
+			Parent:     "filename:testfile.go+++pkg:main+++declType:func+++name:main",
+			ParentPos:  18,
+		},
+	}
+
+	fs := token.NewFileSet()
+	node, _ := parser.ParseFile(fs, "testfile.go", []byte(src), parser.ParseComments)
+
+	e := extractor.New("testfile.go")
+	ast.Walk(e, node)
+
+	identifiers := e.Identifiers()
+	assert.Equal(t, expected, identifiers)
 }
 
 func TestVisit_OnExtractorWithVarDecl_ShouldReturnFoundIdentifiers(t *testing.T) {
