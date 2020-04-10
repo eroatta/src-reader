@@ -105,6 +105,11 @@ type Identifier struct {
 	Error      error
 }
 
+// IsLocal indicates if an identifier is part of a function.
+func (i Identifier) IsLocal() bool {
+	return i.Parent != ""
+}
+
 // ScopedDecl represents the related scope for a declaration.
 type ScopedDecl struct {
 	ID              string

@@ -61,6 +61,7 @@ func TestExpand_OnAMAPWhenNoSplitsApplicable_ShouldReturnEmptyResults(t *testing
 	amap, _ := factory.Make(miningResults)
 
 	ident := entity.Identifier{
+		ID:   "filename:main.go+++pkg:main+++declType:var+++name:str",
 		Name: "str",
 		Splits: map[string][]string{
 			"gentest": []string{"str"},
@@ -81,6 +82,7 @@ func TestExpand_OnAMAPWhenNoDeclFound_ShouldReturnUnexpandedResults(t *testing.T
 	factory := expander.NewAMAPFactory()
 	amap, _ := factory.Make(miningResults)
 	ident := entity.Identifier{
+		ID:   "filename:main.go+++pkg:main+++declType:var+++name:str",
 		Name: "str",
 		Splits: map[string][]string{
 			"samurai": []string{"str"},
@@ -97,7 +99,7 @@ func TestExpand_OnAMAP_ShouldReturnExpandedResults(t *testing.T) {
 	miningResults := map[entity.MinerType]entity.Miner{
 		entity.MinerScopedDeclarations: &miner.Scope{
 			Scopes: map[string]entity.ScopedDecl{
-				"sb": entity.ScopedDecl{
+				"filename:main.go+++pkg:main+++declType:var+++name:sb": entity.ScopedDecl{
 					ID:       "sb",
 					DeclType: token.FUNC,
 					Comments: []string{"string buffer"},
@@ -111,10 +113,43 @@ func TestExpand_OnAMAP_ShouldReturnExpandedResults(t *testing.T) {
 	amap, _ := factory.Make(miningResults)
 
 	ident := entity.Identifier{
+		ID:   "filename:main.go+++pkg:main+++declType:var+++name:sb",
 		Name: "sb",
 		Splits: map[string][]string{
 			"samurai": []string{"sb"},
 		},
+	}
+
+	got := amap.Expand(ident)
+
+	assert.Equal(t, 1, len(got))
+	assert.EqualValues(t, []string{"string buffer"}, got)
+}
+
+func TestExpand_OnAMAP_WhileUsingLocalIdentifier_ShouldReturnExpandedResults(t *testing.T) {
+	miningResults := map[entity.MinerType]entity.Miner{
+		entity.MinerScopedDeclarations: &miner.Scope{
+			Scopes: map[string]entity.ScopedDecl{
+				"filename:main.go+++pkg:main+++declType:var+++name:sb": entity.ScopedDecl{
+					ID:       "sb",
+					DeclType: token.FUNC,
+					Comments: []string{"string buffer"},
+				},
+			},
+		},
+		entity.MinerComments: miner.NewComments(),
+	}
+
+	factory := expander.NewAMAPFactory()
+	amap, _ := factory.Make(miningResults)
+
+	ident := entity.Identifier{
+		ID:   "filename:main.go+++pkg:main+++declType:var+++name:sb+++local:45",
+		Name: "sb",
+		Splits: map[string][]string{
+			"samurai": []string{"sb"},
+		},
+		Parent: "filename:main.go+++pkg:main+++declType:var+++name:sb",
 	}
 
 	got := amap.Expand(ident)

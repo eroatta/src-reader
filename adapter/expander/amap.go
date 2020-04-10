@@ -53,14 +53,16 @@ func (a amapExpander) Expand(ident entity.Identifier) []string {
 		return []string{}
 	}
 
-	// TODO: use key
-	scopedDecl, ok := a.scopedDeclarations[ident.Name]
+	declarationID := ident.ID
+	if ident.IsLocal() {
+		declarationID = ident.Parent
+	}
+	scopedDecl, ok := a.scopedDeclarations[declarationID]
 	if !ok {
 		return split
 	}
 
 	// TODO change strings.Join
-	// TODO: also, we can use amap.NewTokenScope(code.ScopedDecl)
 	scope := amap.NewTokenScope(scopedDecl.VariableDecls, scopedDecl.Name,
 		strings.Join(scopedDecl.BodyText, " "), scopedDecl.Comments, scopedDecl.PackageComments)
 
