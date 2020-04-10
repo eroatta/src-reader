@@ -55,7 +55,7 @@ func (b basicExpander) Expand(ident entity.Identifier) []string {
 	}
 	decl, ok := b.declarations[declarationID]
 	if !ok {
-		return split
+		return []string{split}
 	}
 
 	wordsBuilder := expansion.NewSetBuilder()
@@ -75,7 +75,7 @@ func (b basicExpander) Expand(ident entity.Identifier) []string {
 	}
 
 	var expanded []string
-	for _, token := range split {
+	for _, token := range strings.Split(split, " ") {
 		expansions := basic.Expand(token, words, phrases, basic.DefaultExpansions)
 		if len(expansions) == 0 {
 			expansions = []string{token}
@@ -83,7 +83,7 @@ func (b basicExpander) Expand(ident entity.Identifier) []string {
 
 		if len(expansions) > 1 {
 			// TODO: enable once fixed basic.Expand
-			// expansions = handleMultipleExpansions(token, expansions)
+			expansions = handleMultipleExpansions(token, expansions)
 		}
 
 		expanded = append(expanded, expansions...)

@@ -52,7 +52,7 @@ type Splitter interface {
 	// Name returns the name of the custom splitter.
 	Name() string
 	// Split returns the split identifier.
-	Split(token string) []string //TODO: we should return a string, divided by something like hyphen
+	Split(token string) string
 }
 
 // Expander interface is used to define a custom expander.
@@ -100,7 +100,7 @@ type Identifier struct {
 	Parent     string
 	ParentPos  token.Pos
 	Node       *ast.Node
-	Splits     map[string][]string
+	Splits     map[string]string
 	Expansions map[string][]string
 	Error      error
 }

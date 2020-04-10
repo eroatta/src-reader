@@ -268,7 +268,7 @@ func (t *extractorMock) Visit(node ast.Node) ast.Visitor {
 		t.idents = append(t.idents, entity.Identifier{
 			Name:       elem.Name.String(),
 			Position:   elem.Pos(),
-			Splits:     make(map[string][]string),
+			Splits:     make(map[string]string),
 			Expansions: make(map[string][]string),
 		})
 	}

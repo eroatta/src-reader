@@ -27,7 +27,7 @@ func (e noexpExpander) Expand(ident entity.Identifier) []string {
 		return []string{}
 	}
 
-	return split
+	return []string{split}
 }
 
 func (e noexpExpander) ApplicableOn() string {

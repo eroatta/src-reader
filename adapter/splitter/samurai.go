@@ -57,6 +57,6 @@ type samuraiSplitter struct {
 }
 
 // Split splits a token using the Samurai splitter.
-func (s samuraiSplitter) Split(token string) []string {
+func (s samuraiSplitter) Split(token string) string {
 	return samurai.Split(token, s.context, lists.Prefixes, lists.Suffixes)
 }

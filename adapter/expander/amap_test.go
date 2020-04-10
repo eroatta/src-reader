@@ -63,8 +63,8 @@ func TestExpand_OnAMAPWhenNoSplitsApplicable_ShouldReturnEmptyResults(t *testing
 	ident := entity.Identifier{
 		ID:   "filename:main.go+++pkg:main+++declType:var+++name:str",
 		Name: "str",
-		Splits: map[string][]string{
-			"gentest": []string{"str"},
+		Splits: map[string]string{
+			"gentest": "str",
 		},
 	}
 
@@ -84,8 +84,8 @@ func TestExpand_OnAMAPWhenNoDeclFound_ShouldReturnUnexpandedResults(t *testing.T
 	ident := entity.Identifier{
 		ID:   "filename:main.go+++pkg:main+++declType:var+++name:str",
 		Name: "str",
-		Splits: map[string][]string{
-			"samurai": []string{"str"},
+		Splits: map[string]string{
+			"samurai": "str",
 		},
 	}
 
@@ -115,8 +115,8 @@ func TestExpand_OnAMAP_ShouldReturnExpandedResults(t *testing.T) {
 	ident := entity.Identifier{
 		ID:   "filename:main.go+++pkg:main+++declType:var+++name:sb",
 		Name: "sb",
-		Splits: map[string][]string{
-			"samurai": []string{"sb"},
+		Splits: map[string]string{
+			"samurai": "sb",
 		},
 	}
 
@@ -146,8 +146,8 @@ func TestExpand_OnAMAP_WhileUsingLocalIdentifier_ShouldReturnExpandedResults(t *
 	ident := entity.Identifier{
 		ID:   "filename:main.go+++pkg:main+++declType:var+++name:sb+++local:45",
 		Name: "sb",
-		Splits: map[string][]string{
-			"samurai": []string{"sb"},
+		Splits: map[string]string{
+			"samurai": "sb",
 		},
 		Parent: "filename:main.go+++pkg:main+++declType:var+++name:sb",
 	}

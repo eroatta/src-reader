@@ -110,7 +110,7 @@ func (m *Declaration) Visit(node ast.Node) ast.Visitor {
 				name := typeSpec.Name.String()
 				declText := newDecl("", token.TYPE)
 
-				for _, part := range conserv.Split(name) {
+				for _, part := range strings.Split(conserv.Split(name), " ") {
 					if m.Dict.Contains(part) {
 						declText.Words[strings.ToLower(part)] = struct{}{}
 					}
@@ -170,7 +170,7 @@ func extractDeclFromFunction(elem *ast.FuncDecl, m *Declaration) entity.Decl {
 
 	functionText := newDecl(declID(m.Filename, m.PackageName, token.FUNC, name, receiver), token.FUNC)
 
-	for _, part := range conserv.Split(name) {
+	for _, part := range strings.Split(conserv.Split(name), " ") {
 		if m.Dict.Contains(part) {
 			functionText.Words[strings.ToLower(part)] = struct{}{}
 		}
@@ -195,7 +195,7 @@ func extractDeclFromFunction(elem *ast.FuncDecl, m *Declaration) entity.Decl {
 }
 
 func extractDeclFromValue(declText entity.Decl, valSpec *ast.ValueSpec, name string, index int, list lists.List) entity.Decl {
-	for _, part := range conserv.Split(name) {
+	for _, part := range strings.Split(conserv.Split(name), " ") {
 		if list.Contains(part) {
 			declText.Words[strings.ToLower(part)] = struct{}{}
 		}
@@ -225,7 +225,7 @@ func extractDeclFromStruct(declText entity.Decl, structType *ast.StructType, lis
 	if structType.Fields != nil && structType.Fields.List != nil {
 		for _, field := range structType.Fields.List {
 			for _, fname := range field.Names {
-				for _, part := range conserv.Split(fname.Name) {
+				for _, part := range strings.Split(conserv.Split(fname.Name), " ") {
 					if list.Contains(part) {
 						declText.Words[strings.ToLower(part)] = struct{}{}
 					}
@@ -247,7 +247,7 @@ func extractDeclFromInterface(declText entity.Decl, interfaceType *ast.Interface
 	if interfaceType.Methods != nil && interfaceType.Methods.List != nil {
 		for _, method := range interfaceType.Methods.List {
 			for _, mname := range method.Names {
-				for _, part := range conserv.Split(mname.Name) {
+				for _, part := range strings.Split(conserv.Split(mname.Name), " ") {
 					if list.Contains(part) {
 						declText.Words[strings.ToLower(part)] = struct{}{}
 					}

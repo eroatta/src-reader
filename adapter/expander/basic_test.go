@@ -50,8 +50,8 @@ func TestExpand_OnBasicWhenNoSplitsApplicable_ShouldReturnEmptyResults(t *testin
 	ident := entity.Identifier{
 		ID:   "filename:main.go+++pkg:main+++declType:var+++name:str",
 		Name: "str",
-		Splits: map[string][]string{
-			"gentest": []string{"str"},
+		Splits: map[string]string{
+			"gentest": "str",
 		},
 	}
 
@@ -71,8 +71,8 @@ func TestExpand_OnBasicWhenNoDeclFound_ShouldReturnUnexpandedResults(t *testing.
 	ident := entity.Identifier{
 		ID:   "filename:main.go+++pkg:main+++declType:var+++name:str",
 		Name: "str",
-		Splits: map[string][]string{
-			"greedy": []string{"str"},
+		Splits: map[string]string{
+			"greedy": "str",
 		},
 	}
 
@@ -105,8 +105,8 @@ func TestExpand_OnBasic_ShouldReturnExpandedResultsFromWords(t *testing.T) {
 	ident := entity.Identifier{
 		ID:   "filename:main.go+++pkg:main+++declType:var+++name:strbuff",
 		Name: "strbuff",
-		Splits: map[string][]string{
-			"greedy": []string{"str", "buff"},
+		Splits: map[string]string{
+			"greedy": "str buff",
 		},
 	}
 
@@ -139,8 +139,8 @@ func TestExpand_OnBasic_WhileUsingLocalVariables_ShouldReturnExpandedResultsFrom
 	ident := entity.Identifier{
 		ID:   "filename:main.go+++pkg:main+++declType:var+++name:sb+++local:43",
 		Name: "sb",
-		Splits: map[string][]string{
-			"greedy": []string{"s", "b"},
+		Splits: map[string]string{
+			"greedy": "s b",
 		},
 		Parent: "filename:main.go+++pkg:main+++declType:var+++name:strbuff",
 	}
@@ -173,15 +173,15 @@ func TestExpand_OnBasic_ShouldReturnExpandedResultsFromPhrases(t *testing.T) {
 	ident := entity.Identifier{
 		ID:   "filename:main.go+++pkg:main+++declType:var+++name:sb",
 		Name: "sb",
-		Splits: map[string][]string{
-			"greedy": []string{"sb"},
+		Splits: map[string]string{
+			"greedy": "sb",
 		},
 	}
 
 	got := basic.Expand(ident)
 
-	assert.Equal(t, 2, len(got))
-	assert.EqualValues(t, []string{"string", "buffer"}, got)
+	assert.Equal(t, 1, len(got))
+	assert.EqualValues(t, []string{"string buffer"}, got)
 }
 
 func TestExpand_OnBasicWhenMultipleResults_ShouldReturnClosestThreePerWord(t *testing.T) {

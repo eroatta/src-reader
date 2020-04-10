@@ -147,7 +147,7 @@ func newIdentifier(id string, filename string, pos token.Pos, name string, ident
 		Position:   pos,
 		Name:       name,
 		Type:       identifierType,
-		Splits:     make(map[string][]string),
+		Splits:     make(map[string]string),
 		Expansions: make(map[string][]string),
 	}
 }

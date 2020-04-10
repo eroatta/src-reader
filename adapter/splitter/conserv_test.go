@@ -13,12 +13,12 @@ func TestNewConservFactory_ShouldReturnConservSplitterFactory(t *testing.T) {
 	assert.NotNil(t, factory)
 }
 
-func TestSplit_OnConserv_ShouldReturnAnArrayOfStrings(t *testing.T) {
+func TestSplit_OnConserv_ShouldReturnSplit(t *testing.T) {
 	factory := splitter.NewConservFactory()
 	splitter, _ := factory.Make(nil)
 
 	got := splitter.Split("car")
 
 	assert.Equal(t, "conserv", splitter.Name())
-	assert.ElementsMatch(t, []string{"car"}, got)
+	assert.Equal(t, "car", got)
 }

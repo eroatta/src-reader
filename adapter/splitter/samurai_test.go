@@ -41,7 +41,7 @@ func TestMake_OnSamuraiFactory_WhenMissingGlobalFrequencyTable_ShouldReturnError
 	assert.Error(t, err)
 }
 
-func TestSplit_OnSamurai_ShouldReturnAnArrayOfStrings(t *testing.T) {
+func TestSplit_OnSamurai_ShouldReturnSplit(t *testing.T) {
 	miningResults := map[entity.MinerType]entity.Miner{
 		entity.MinerWordCount:            miner.NewWordCount(),
 		entity.MinerGlobalFrequencyTable: miner.NewGlobalFreqTable(samurai.NewFrequencyTable()),
@@ -52,5 +52,5 @@ func TestSplit_OnSamurai_ShouldReturnAnArrayOfStrings(t *testing.T) {
 	got := splitter.Split("car")
 
 	assert.Equal(t, "samurai", splitter.Name())
-	assert.ElementsMatch(t, []string{"car"}, got)
+	assert.Equal(t, "car", got)
 }

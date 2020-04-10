@@ -23,6 +23,6 @@ type greedySplitter struct {
 }
 
 // Split splits a token using the Greedy splitter.
-func (g greedySplitter) Split(token string) []string {
+func (g greedySplitter) Split(token string) string {
 	return greedy.Split(token, greedy.DefaultList)
 }

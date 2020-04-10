@@ -59,7 +59,7 @@ func (a amapExpander) Expand(ident entity.Identifier) []string {
 	}
 	scopedDecl, ok := a.scopedDeclarations[declarationID]
 	if !ok {
-		return split
+		return []string{split}
 	}
 
 	// TODO change strings.Join
@@ -67,7 +67,7 @@ func (a amapExpander) Expand(ident entity.Identifier) []string {
 		strings.Join(scopedDecl.BodyText, " "), scopedDecl.Comments, scopedDecl.PackageComments)
 
 	var expanded []string
-	for _, token := range split {
+	for _, token := range strings.Split(split, " ") {
 		expanded = append(expanded, amap.Expand(token, scope, a.referenceText)...)
 	}
 

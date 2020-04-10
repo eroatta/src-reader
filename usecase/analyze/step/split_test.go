@@ -28,7 +28,7 @@ func TestSplit_OnEmptySplitter_ShouldSendElementsWithoutSplits(t *testing.T) {
 	go func() {
 		identc <- entity.Identifier{
 			Name:   "main",
-			Splits: make(map[string][]string),
+			Splits: make(map[string]string),
 		}
 		close(identc)
 	}()
@@ -49,22 +49,22 @@ func TestSplit_OnOneIdentifierAndTwoSplitters_ShouldSendElementsWithTwoSplits(t 
 	go func() {
 		identc <- entity.Identifier{
 			Name:   "star_wars-II",
-			Splits: make(map[string][]string),
+			Splits: make(map[string]string),
 		}
 		close(identc)
 	}()
 
 	byHyphen := splitter{
 		name: "hyphen",
-		sfunc: func(token string) []string {
-			return strings.Split(token, "-")
+		sfunc: func(token string) string {
+			return strings.ReplaceAll(token, "-", " ")
 		},
 	}
 
 	byUnderscore := splitter{
 		name: "underscore",
-		sfunc: func(token string) []string {
-			return strings.Split(token, "_")
+		sfunc: func(token string) string {
+			return strings.ReplaceAll(token, "_", " ")
 		},
 	}
 
@@ -78,13 +78,13 @@ func TestSplit_OnOneIdentifierAndTwoSplitters_ShouldSendElementsWithTwoSplits(t 
 	assert.Equal(t, 1, len(splitidents))
 
 	splits := splitidents[0].Splits
-	assert.Equal(t, []string{"star_wars", "II"}, splits["hyphen"])
-	assert.Equal(t, []string{"star", "wars-II"}, splits["underscore"])
+	assert.Equal(t, "star_wars II", splits["hyphen"])
+	assert.Equal(t, "star wars-II", splits["underscore"])
 }
 
 type splitter struct {
 	name  string
-	sfunc func(string) []string
+	sfunc func(string) string
 }
 
 func (s splitter) Name() string {
@@ -95,10 +95,10 @@ func (s splitter) Name() string {
 	return "test"
 }
 
-func (s splitter) Split(token string) []string {
+func (s splitter) Split(token string) string {
 	if s.sfunc != nil {
 		return s.sfunc(token)
 	}
 
-	return []string{}
+	return ""
 }

@@ -42,8 +42,8 @@ func TestExpand_OnNoexpWhenNoSplitsApplicable_ShouldReturnEmptyResults(t *testin
 
 	ident := entity.Identifier{
 		Name: "str",
-		Splits: map[string][]string{
-			"gentest": []string{"str"},
+		Splits: map[string]string{
+			"gentest": "str",
 		},
 	}
 
@@ -60,8 +60,8 @@ func TestExpand_OnNoexp_ShouldReturnSameSplittedValues(t *testing.T) {
 
 	ident := entity.Identifier{
 		Name: "str",
-		Splits: map[string][]string{
-			"conserv": []string{"str"},
+		Splits: map[string]string{
+			"conserv": "str",
 		},
 	}
 

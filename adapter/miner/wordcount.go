@@ -67,7 +67,7 @@ func (m WordCount) Visit(node ast.Node) ast.Visitor {
 	}
 
 	for _, token := range tokens {
-		for _, splitting := range conserv.Split(token) {
+		for _, splitting := range strings.Split(conserv.Split(token), " ") {
 			m.words[strings.ToLower(splitting)]++
 		}
 	}

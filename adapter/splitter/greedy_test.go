@@ -14,12 +14,12 @@ func TestNewGreedyFactory_ShouldReturnGreedySplitterFactory(t *testing.T) {
 
 }
 
-func TestSplit_OnGreedy_ShouldReturnAnArrayOfStrings(t *testing.T) {
+func TestSplit_OnGreedy_ShouldReturnSplit(t *testing.T) {
 	factory := splitter.NewGreedyFactory()
 	splitter, _ := factory.Make(nil)
 
 	got := splitter.Split("car")
 
 	assert.Equal(t, "greedy", splitter.Name())
-	assert.ElementsMatch(t, []string{"car"}, got)
+	assert.Equal(t, "car", got)
 }

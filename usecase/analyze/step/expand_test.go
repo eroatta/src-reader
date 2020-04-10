@@ -27,8 +27,8 @@ func TestExpand_OnEmptyExpander_ShouldSendElementsWithoutExpansions(t *testing.T
 	go func() {
 		identc <- entity.Identifier{
 			Name: "crtfile",
-			Splits: map[string][]string{
-				"test": []string{"crt", "file"},
+			Splits: map[string]string{
+				"test": "crt file",
 			},
 			Expansions: make(map[string][]string),
 		}
@@ -51,8 +51,8 @@ func TestExpand_OnOneIdentifierAndTwoExpanders_ShouldSendElementsWithOneExpansio
 	go func() {
 		identc <- entity.Identifier{
 			Name: "ctrldel",
-			Splits: map[string][]string{
-				"custom": []string{"ctrl", "del"},
+			Splits: map[string]string{
+				"custom": "ctrl del",
 			},
 			Expansions: make(map[string][]string),
 		}
@@ -62,7 +62,7 @@ func TestExpand_OnOneIdentifierAndTwoExpanders_ShouldSendElementsWithOneExpansio
 	custom := expander{
 		name:    "custom",
 		worksOn: "custom",
-		efunc: func(token []string) []string {
+		efunc: func(token string) []string {
 			return []string{"control", "delete"}
 		},
 	}
@@ -70,7 +70,7 @@ func TestExpand_OnOneIdentifierAndTwoExpanders_ShouldSendElementsWithOneExpansio
 	skipped := expander{
 		name:    "skipped",
 		worksOn: "none",
-		efunc: func(token []string) []string {
+		efunc: func(token string) []string {
 			return []string{"should", "not", "be", "called"}
 		},
 	}
@@ -94,7 +94,7 @@ func TestExpand_OnOneIdentifierAndTwoExpanders_ShouldSendElementsWithOneExpansio
 type expander struct {
 	name    string
 	worksOn string
-	efunc   func([]string) []string
+	efunc   func(string) []string
 }
 
 func (e expander) Name() string {

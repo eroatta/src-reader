@@ -23,6 +23,6 @@ type conservSplitter struct {
 }
 
 // Split splits a token using the Conserv splitter.
-func (c conservSplitter) Split(token string) []string {
+func (c conservSplitter) Split(token string) string {
 	return conserv.Split(token)
 }
