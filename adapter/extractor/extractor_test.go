@@ -6,8 +6,8 @@ import (
 	"go/token"
 	"testing"
 
+	"github.com/eroatta/src-reader/adapter/extractor"
 	"github.com/eroatta/src-reader/entity"
-	"github.com/eroatta/src-reader/extractor"
 	"github.com/stretchr/testify/assert"
 )
 
