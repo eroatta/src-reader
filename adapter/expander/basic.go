@@ -2,9 +2,10 @@ package expander
 
 import (
 	"fmt"
-	"log"
+	"sort"
 	"strings"
 
+	"github.com/agnivade/levenshtein"
 	"github.com/eroatta/src-reader/adapter/miner"
 	"github.com/eroatta/src-reader/entity"
 	"github.com/eroatta/token/basic"
@@ -81,8 +82,8 @@ func (b basicExpander) Expand(ident entity.Identifier) []string {
 		}
 
 		if len(expansions) > 1 {
-			// TODO: sort them
-			log.Println("multiple expansions...")
+			// TODO: enable once fixed basic.Expand
+			// expansions = handleMultipleExpansions(token, expansions)
 		}
 
 		expanded = append(expanded, expansions...)
@@ -94,3 +95,37 @@ func (b basicExpander) Expand(ident entity.Identifier) []string {
 func (b basicExpander) ApplicableOn() string {
 	return "greedy"
 }
+
+// handleMultipleExpansinos measures the distance between two strings according the
+// Levenshtein algorithm, and select the closest three expansions.
+func handleMultipleExpansions(token string, expansions []string) []string {
+	distances := make([]distance, len(expansions))
+	for i, expansion := range expansions {
+		value := levenshtein.ComputeDistance(token, expansion)
+		distances[i] = distance{value, expansion}
+	}
+	sort.Sort(byValue(distances))
+
+	limit := 3
+	if len(distances) < limit {
+		limit = len(distances)
+	}
+
+	picked := []string{}
+	for _, distance := range distances[0:limit] {
+		picked = append(picked, distance.expansion)
+	}
+
+	return picked
+}
+
+type distance struct {
+	value     int
+	expansion string
+}
+
+type byValue []distance
+
+func (a byValue) Len() int           { return len(a) }
+func (a byValue) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a byValue) Less(i, j int) bool { return a[i].value > a[j].value }
