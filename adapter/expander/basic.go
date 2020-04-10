@@ -48,8 +48,11 @@ func (b basicExpander) Expand(ident entity.Identifier) []string {
 		return []string{}
 	}
 
-	// TODO: use key
-	decl, ok := b.declarations[ident.Name]
+	declarationID := ident.ID
+	if ident.IsLocal() {
+		declarationID = ident.Parent
+	}
+	decl, ok := b.declarations[declarationID]
 	if !ok {
 		return split
 	}
