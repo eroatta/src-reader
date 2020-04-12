@@ -86,7 +86,6 @@ func (b basicExpander) Expand(ident entity.Identifier) []entity.Expansion {
 		}
 
 		if len(expansions) > 1 {
-			// TODO: enable once fixed basic.Expand
 			expansions = handleMultipleExpansions(split.Value, expansions)
 		}
 
