@@ -15,7 +15,9 @@ import (
 )
 
 func TestNewAnalyzeProjectUsecase_ShouldReturnNewInstance(t *testing.T) {
-	assert.FailNow(t, "not yet implemented")
+	uc := analyze.NewAnalyzeProjectUsecase(nil, nil)
+
+	assert.Empty(t, uc)
 }
 
 func TestAnalyze_OnAnalyzeProjectUsecase_WhenFailingToReadFiles_ShouldReturnError(t *testing.T) {
