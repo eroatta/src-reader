@@ -99,7 +99,7 @@ func (s splitter) Split(token string) []entity.Split {
 	if s.sfunc != nil {
 		splits := []entity.Split{}
 		for i, sp := range strings.Split(s.sfunc(token), " ") {
-			splits = append(splits, entity.Split{i + 1, sp})
+			splits = append(splits, entity.Split{Order: i + 1, Value: sp})
 		}
 
 		return splits
