@@ -199,5 +199,34 @@ func TestExpand_OnBasic_ShouldReturnExpandedResultsFromPhrases(t *testing.T) {
 }
 
 func TestExpand_OnBasicWhenMultipleResults_ShouldReturnClosestThreePerWord(t *testing.T) {
-	assert.FailNow(t, "not yet implemented")
+	miningResults := map[entity.MinerType]entity.Miner{
+		entity.MinerDeclarations: &miner.Declaration{
+			Decls: map[string]entity.Decl{
+				"filename:main.go+++pkg:main+++declType:var+++name:contrl": entity.Decl{
+					ID:       "contrl",
+					DeclType: token.FUNC,
+					Words:    map[string]struct{}{},
+					Phrases:  map[string]struct{}{},
+				},
+			},
+		},
+	}
+
+	factory := expander.NewBasicFactory()
+	basic, _ := factory.Make(miningResults)
+
+	ident := entity.Identifier{
+		ID:   "filename:main.go+++pkg:main+++declType:var+++name:contrl",
+		Name: "contrl",
+		Splits: map[string][]entity.Split{
+			"greedy": []entity.Split{
+				{Order: 1, Value: "contrl"},
+			},
+		},
+	}
+
+	got := basic.Expand(ident)
+
+	assert.Equal(t, 1, len(got))
+	assert.EqualValues(t, []entity.Expansion{{From: "contrl", Values: []string{"control", "control", "contrail"}}}, got)
 }
