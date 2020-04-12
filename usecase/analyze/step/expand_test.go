@@ -27,10 +27,13 @@ func TestExpand_OnEmptyExpander_ShouldSendElementsWithoutExpansions(t *testing.T
 	go func() {
 		identc <- entity.Identifier{
 			Name: "crtfile",
-			Splits: map[string]string{
-				"test": "crt file",
+			Splits: map[string][]entity.Split{
+				"test": []entity.Split{
+					{Order: 1, Value: "crt"},
+					{Order: 2, Value: "file"},
+				},
 			},
-			Expansions: make(map[string][]string),
+			Expansions: make(map[string][]entity.Expansion),
 		}
 		close(identc)
 	}()
@@ -51,10 +54,13 @@ func TestExpand_OnOneIdentifierAndTwoExpanders_ShouldSendElementsWithOneExpansio
 	go func() {
 		identc <- entity.Identifier{
 			Name: "ctrldel",
-			Splits: map[string]string{
-				"custom": "ctrl del",
+			Splits: map[string][]entity.Split{
+				"custom": []entity.Split{
+					{Order: 1, Value: "ctrl"},
+					{Order: 2, Value: "del"},
+				},
 			},
-			Expansions: make(map[string][]string),
+			Expansions: make(map[string][]entity.Expansion),
 		}
 		close(identc)
 	}()
@@ -62,16 +68,24 @@ func TestExpand_OnOneIdentifierAndTwoExpanders_ShouldSendElementsWithOneExpansio
 	custom := expander{
 		name:    "custom",
 		worksOn: "custom",
-		efunc: func(token string) []string {
-			return []string{"control", "delete"}
+		efunc: func([]entity.Split) []entity.Expansion {
+			return []entity.Expansion{
+				{From: "ctrl", Values: []string{"control"}},
+				{From: "del", Values: []string{"delete"}},
+			}
 		},
 	}
 
 	skipped := expander{
 		name:    "skipped",
 		worksOn: "none",
-		efunc: func(token string) []string {
-			return []string{"should", "not", "be", "called"}
+		efunc: func([]entity.Split) []entity.Expansion {
+			return []entity.Expansion{
+				{From: "should", Values: []string{"should"}},
+				{From: "not", Values: []string{"not"}},
+				{From: "be", Values: []string{"be"}},
+				{From: "called", Values: []string{"called"}},
+			}
 		},
 	}
 
@@ -85,7 +99,8 @@ func TestExpand_OnOneIdentifierAndTwoExpanders_ShouldSendElementsWithOneExpansio
 	assert.Equal(t, 1, len(expandidents))
 
 	expansions := expandidents[0].Expansions
-	assert.Equal(t, []string{"control", "delete"}, expansions["custom"])
+	assert.Equal(t, []entity.Expansion{{From: "ctrl", Values: []string{"control"}},
+		{From: "del", Values: []string{"delete"}}}, expansions["custom"])
 
 	_, found := expansions["skipped"]
 	assert.False(t, found)
@@ -94,7 +109,7 @@ func TestExpand_OnOneIdentifierAndTwoExpanders_ShouldSendElementsWithOneExpansio
 type expander struct {
 	name    string
 	worksOn string
-	efunc   func(string) []string
+	efunc   func([]entity.Split) []entity.Expansion
 }
 
 func (e expander) Name() string {
@@ -109,10 +124,10 @@ func (e expander) ApplicableOn() string {
 	return e.worksOn
 }
 
-func (e expander) Expand(ident entity.Identifier) []string {
+func (e expander) Expand(ident entity.Identifier) []entity.Expansion {
 	if e.efunc != nil {
 		return e.efunc(ident.Splits[e.worksOn])
 	}
 
-	return []string{}
+	return []entity.Expansion{}
 }

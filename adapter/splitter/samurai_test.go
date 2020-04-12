@@ -52,5 +52,5 @@ func TestSplit_OnSamurai_ShouldReturnSplit(t *testing.T) {
 	got := splitter.Split("car")
 
 	assert.Equal(t, "samurai", splitter.Name())
-	assert.Equal(t, "car", got)
+	assert.Equal(t, []entity.Split{{Order: 1, Value: "car"}}, got)
 }

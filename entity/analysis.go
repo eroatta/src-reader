@@ -52,7 +52,7 @@ type Splitter interface {
 	// Name returns the name of the custom splitter.
 	Name() string
 	// Split returns the split identifier.
-	Split(token string) string
+	Split(token string) []Split
 }
 
 // Expander interface is used to define a custom expander.
@@ -62,7 +62,7 @@ type Expander interface {
 	// ApplicableOn defines the name of splits used as input.
 	ApplicableOn() string
 	// Expand performs the expansion on the token as a whole.
-	Expand(ident Identifier) []string
+	Expand(ident Identifier) []Expansion
 }
 
 type SplitterAbstractFactory interface {
@@ -100,14 +100,24 @@ type Identifier struct {
 	Parent     string
 	ParentPos  token.Pos
 	Node       *ast.Node
-	Splits     map[string]string
-	Expansions map[string][]string
+	Splits     map[string][]Split
+	Expansions map[string][]Expansion
 	Error      error
 }
 
 // IsLocal indicates if an identifier is part of a function.
 func (i Identifier) IsLocal() bool {
 	return i.Parent != ""
+}
+
+type Split struct {
+	Order int
+	Value string
+}
+
+type Expansion struct {
+	From   string
+	Values []string
 }
 
 // ScopedDecl represents the related scope for a declaration.

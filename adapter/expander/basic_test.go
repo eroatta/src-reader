@@ -50,8 +50,10 @@ func TestExpand_OnBasicWhenNoSplitsApplicable_ShouldReturnEmptyResults(t *testin
 	ident := entity.Identifier{
 		ID:   "filename:main.go+++pkg:main+++declType:var+++name:str",
 		Name: "str",
-		Splits: map[string]string{
-			"gentest": "str",
+		Splits: map[string][]entity.Split{
+			"gentest": []entity.Split{
+				{Order: 1, Value: "str"},
+			},
 		},
 	}
 
@@ -71,15 +73,17 @@ func TestExpand_OnBasicWhenNoDeclFound_ShouldReturnUnexpandedResults(t *testing.
 	ident := entity.Identifier{
 		ID:   "filename:main.go+++pkg:main+++declType:var+++name:str",
 		Name: "str",
-		Splits: map[string]string{
-			"greedy": "str",
+		Splits: map[string][]entity.Split{
+			"greedy": []entity.Split{
+				{Order: 1, Value: "str"},
+			},
 		},
 	}
 
 	got := basic.Expand(ident)
 
 	assert.Equal(t, 1, len(got))
-	assert.EqualValues(t, []string{"str"}, got)
+	assert.EqualValues(t, []entity.Expansion{{From: "str", Values: []string{"str"}}}, got)
 }
 
 func TestExpand_OnBasic_ShouldReturnExpandedResultsFromWords(t *testing.T) {
@@ -105,15 +109,19 @@ func TestExpand_OnBasic_ShouldReturnExpandedResultsFromWords(t *testing.T) {
 	ident := entity.Identifier{
 		ID:   "filename:main.go+++pkg:main+++declType:var+++name:strbuff",
 		Name: "strbuff",
-		Splits: map[string]string{
-			"greedy": "str buff",
+		Splits: map[string][]entity.Split{
+			"greedy": []entity.Split{
+				{Order: 1, Value: "str"},
+				{Order: 2, Value: "buff"},
+			},
 		},
 	}
 
 	got := basic.Expand(ident)
 
 	assert.Equal(t, 2, len(got))
-	assert.EqualValues(t, []string{"string", "buffer"}, got)
+	assert.EqualValues(t, []entity.Expansion{{From: "str", Values: []string{"string"}},
+		{From: "buff", Values: []string{"buffer"}}}, got)
 }
 
 func TestExpand_OnBasic_WhileUsingLocalVariables_ShouldReturnExpandedResultsFromWords(t *testing.T) {
@@ -139,8 +147,11 @@ func TestExpand_OnBasic_WhileUsingLocalVariables_ShouldReturnExpandedResultsFrom
 	ident := entity.Identifier{
 		ID:   "filename:main.go+++pkg:main+++declType:var+++name:sb+++local:43",
 		Name: "sb",
-		Splits: map[string]string{
-			"greedy": "s b",
+		Splits: map[string][]entity.Split{
+			"greedy": []entity.Split{
+				{Order: 1, Value: "s"},
+				{Order: 2, Value: "b"},
+			},
 		},
 		Parent: "filename:main.go+++pkg:main+++declType:var+++name:strbuff",
 	}
@@ -148,7 +159,8 @@ func TestExpand_OnBasic_WhileUsingLocalVariables_ShouldReturnExpandedResultsFrom
 	got := basic.Expand(ident)
 
 	assert.Equal(t, 2, len(got))
-	assert.EqualValues(t, []string{"string", "buffer"}, got)
+	assert.EqualValues(t, []entity.Expansion{{From: "s", Values: []string{"string"}},
+		{From: "b", Values: []string{"buffer"}}}, got)
 }
 
 func TestExpand_OnBasic_ShouldReturnExpandedResultsFromPhrases(t *testing.T) {
@@ -173,15 +185,17 @@ func TestExpand_OnBasic_ShouldReturnExpandedResultsFromPhrases(t *testing.T) {
 	ident := entity.Identifier{
 		ID:   "filename:main.go+++pkg:main+++declType:var+++name:sb",
 		Name: "sb",
-		Splits: map[string]string{
-			"greedy": "sb",
+		Splits: map[string][]entity.Split{
+			"greedy": []entity.Split{
+				{Order: 1, Value: "sb"},
+			},
 		},
 	}
 
 	got := basic.Expand(ident)
 
 	assert.Equal(t, 1, len(got))
-	assert.EqualValues(t, []string{"string buffer"}, got)
+	assert.EqualValues(t, []entity.Expansion{{From: "sb", Values: []string{"string buffer"}}}, got)
 }
 
 func TestExpand_OnBasicWhenMultipleResults_ShouldReturnClosestThreePerWord(t *testing.T) {

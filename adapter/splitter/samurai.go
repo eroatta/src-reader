@@ -2,6 +2,7 @@ package splitter
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/eroatta/src-reader/adapter/miner"
 	"github.com/eroatta/src-reader/entity"
@@ -57,6 +58,11 @@ type samuraiSplitter struct {
 }
 
 // Split splits a token using the Samurai splitter.
-func (s samuraiSplitter) Split(token string) string {
-	return samurai.Split(token, s.context, lists.Prefixes, lists.Suffixes)
+func (s samuraiSplitter) Split(token string) []entity.Split {
+	splits := []entity.Split{}
+	for i, split := range strings.Split(samurai.Split(token, s.context, lists.Prefixes, lists.Suffixes), " ") {
+		splits = append(splits, entity.Split{Order: i + 1, Value: split})
+	}
+
+	return splits
 }

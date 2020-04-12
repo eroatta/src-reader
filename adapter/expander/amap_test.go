@@ -38,7 +38,7 @@ func TestMake_OnAMAPFactory_WhenMissingReferenceText_ShouldReturnError(t *testin
 	assert.Error(t, err)
 }
 
-func TestApplicableOn_OnAMAP_ShouldReturnSamurai(t *testing.T) {
+func TestApplicablestrOn_OnAMAP_ShouldReturnSamurai(t *testing.T) {
 	miningResults := map[entity.MinerType]entity.Miner{
 		entity.MinerScopedDeclarations: miner.NewScope(),
 		entity.MinerComments:           miner.NewComments(),
@@ -63,8 +63,10 @@ func TestExpand_OnAMAPWhenNoSplitsApplicable_ShouldReturnEmptyResults(t *testing
 	ident := entity.Identifier{
 		ID:   "filename:main.go+++pkg:main+++declType:var+++name:str",
 		Name: "str",
-		Splits: map[string]string{
-			"gentest": "str",
+		Splits: map[string][]entity.Split{
+			"gentest": []entity.Split{
+				{Order: 1, Value: "str"},
+			},
 		},
 	}
 
@@ -84,15 +86,17 @@ func TestExpand_OnAMAPWhenNoDeclFound_ShouldReturnUnexpandedResults(t *testing.T
 	ident := entity.Identifier{
 		ID:   "filename:main.go+++pkg:main+++declType:var+++name:str",
 		Name: "str",
-		Splits: map[string]string{
-			"samurai": "str",
+		Splits: map[string][]entity.Split{
+			"samurai": []entity.Split{
+				{Order: 1, Value: "str"},
+			},
 		},
 	}
 
 	got := amap.Expand(ident)
 
 	assert.Equal(t, 1, len(got))
-	assert.EqualValues(t, []string{"str"}, got)
+	assert.EqualValues(t, []entity.Expansion{{From: "str", Values: []string{"str"}}}, got)
 }
 
 func TestExpand_OnAMAP_ShouldReturnExpandedResults(t *testing.T) {
@@ -115,15 +119,17 @@ func TestExpand_OnAMAP_ShouldReturnExpandedResults(t *testing.T) {
 	ident := entity.Identifier{
 		ID:   "filename:main.go+++pkg:main+++declType:var+++name:sb",
 		Name: "sb",
-		Splits: map[string]string{
-			"samurai": "sb",
+		Splits: map[string][]entity.Split{
+			"samurai": []entity.Split{
+				{Order: 1, Value: "sb"},
+			},
 		},
 	}
 
 	got := amap.Expand(ident)
 
 	assert.Equal(t, 1, len(got))
-	assert.EqualValues(t, []string{"string buffer"}, got)
+	assert.EqualValues(t, []entity.Expansion{{From: "sb", Values: []string{"string buffer"}}}, got)
 }
 
 func TestExpand_OnAMAP_WhileUsingLocalIdentifier_ShouldReturnExpandedResults(t *testing.T) {
@@ -146,8 +152,10 @@ func TestExpand_OnAMAP_WhileUsingLocalIdentifier_ShouldReturnExpandedResults(t *
 	ident := entity.Identifier{
 		ID:   "filename:main.go+++pkg:main+++declType:var+++name:sb+++local:45",
 		Name: "sb",
-		Splits: map[string]string{
-			"samurai": "sb",
+		Splits: map[string][]entity.Split{
+			"samurai": []entity.Split{
+				{Order: 1, Value: "sb"},
+			},
 		},
 		Parent: "filename:main.go+++pkg:main+++declType:var+++name:sb",
 	}
@@ -155,5 +163,5 @@ func TestExpand_OnAMAP_WhileUsingLocalIdentifier_ShouldReturnExpandedResults(t *
 	got := amap.Expand(ident)
 
 	assert.Equal(t, 1, len(got))
-	assert.EqualValues(t, []string{"string buffer"}, got)
+	assert.EqualValues(t, []entity.Expansion{{From: "sb", Values: []string{"string buffer"}}}, got)
 }

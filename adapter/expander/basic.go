@@ -43,10 +43,10 @@ type basicExpander struct {
 // If no declaration information can be found, we avoid trying to expand the identifier
 // because results can be broad.
 // If a declaration is found but several expansions are found, we handle a subset of them.
-func (b basicExpander) Expand(ident entity.Identifier) []string {
-	split, ok := ident.Splits[b.ApplicableOn()]
+func (b basicExpander) Expand(ident entity.Identifier) []entity.Expansion {
+	splits, ok := ident.Splits[b.ApplicableOn()]
 	if !ok {
-		return []string{}
+		return []entity.Expansion{}
 	}
 
 	declarationID := ident.ID
@@ -55,7 +55,11 @@ func (b basicExpander) Expand(ident entity.Identifier) []string {
 	}
 	decl, ok := b.declarations[declarationID]
 	if !ok {
-		return []string{split}
+		expansions := make([]entity.Expansion, len(splits))
+		for i, split := range splits {
+			expansions[i] = entity.Expansion{From: split.Value, Values: []string{split.Value}}
+		}
+		return expansions
 	}
 
 	wordsBuilder := expansion.NewSetBuilder()
@@ -74,19 +78,19 @@ func (b basicExpander) Expand(ident entity.Identifier) []string {
 		phrases[acron.String()] = strings.ReplaceAll(phrase, " ", "-")
 	}
 
-	var expanded []string
-	for _, token := range strings.Split(split, " ") {
-		expansions := basic.Expand(token, words, phrases, basic.DefaultExpansions)
+	expanded := make([]entity.Expansion, len(splits))
+	for i, split := range splits {
+		expansions := basic.Expand(split.Value, words, phrases, basic.DefaultExpansions)
 		if len(expansions) == 0 {
-			expansions = []string{token}
+			expansions = []string{split.Value}
 		}
 
 		if len(expansions) > 1 {
 			// TODO: enable once fixed basic.Expand
-			expansions = handleMultipleExpansions(token, expansions)
+			expansions = handleMultipleExpansions(split.Value, expansions)
 		}
 
-		expanded = append(expanded, expansions...)
+		expanded[i] = entity.Expansion{From: split.Value, Values: expansions}
 	}
 
 	return expanded

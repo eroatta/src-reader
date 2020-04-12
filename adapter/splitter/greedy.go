@@ -1,6 +1,8 @@
 package splitter
 
 import (
+	"strings"
+
 	"github.com/eroatta/src-reader/entity"
 	"github.com/eroatta/token/greedy"
 )
@@ -23,6 +25,11 @@ type greedySplitter struct {
 }
 
 // Split splits a token using the Greedy splitter.
-func (g greedySplitter) Split(token string) string {
-	return greedy.Split(token, greedy.DefaultList)
+func (g greedySplitter) Split(token string) []entity.Split {
+	splits := []entity.Split{}
+	for i, split := range strings.Split(greedy.Split(token, greedy.DefaultList), " ") {
+		splits = append(splits, entity.Split{Order: i + 1, Value: split})
+	}
+
+	return splits
 }

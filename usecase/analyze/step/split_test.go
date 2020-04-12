@@ -28,7 +28,7 @@ func TestSplit_OnEmptySplitter_ShouldSendElementsWithoutSplits(t *testing.T) {
 	go func() {
 		identc <- entity.Identifier{
 			Name:   "main",
-			Splits: make(map[string]string),
+			Splits: make(map[string][]entity.Split),
 		}
 		close(identc)
 	}()
@@ -49,7 +49,7 @@ func TestSplit_OnOneIdentifierAndTwoSplitters_ShouldSendElementsWithTwoSplits(t 
 	go func() {
 		identc <- entity.Identifier{
 			Name:   "star_wars-II",
-			Splits: make(map[string]string),
+			Splits: make(map[string][]entity.Split),
 		}
 		close(identc)
 	}()
@@ -78,8 +78,8 @@ func TestSplit_OnOneIdentifierAndTwoSplitters_ShouldSendElementsWithTwoSplits(t 
 	assert.Equal(t, 1, len(splitidents))
 
 	splits := splitidents[0].Splits
-	assert.Equal(t, "star_wars II", splits["hyphen"])
-	assert.Equal(t, "star wars-II", splits["underscore"])
+	assert.Equal(t, []entity.Split{{Order: 1, Value: "star_wars"}, {Order: 2, Value: "II"}}, splits["hyphen"])
+	assert.Equal(t, []entity.Split{{Order: 1, Value: "star"}, {Order: 2, Value: "wars-II"}}, splits["underscore"])
 }
 
 type splitter struct {
@@ -95,10 +95,15 @@ func (s splitter) Name() string {
 	return "test"
 }
 
-func (s splitter) Split(token string) string {
+func (s splitter) Split(token string) []entity.Split {
 	if s.sfunc != nil {
-		return s.sfunc(token)
+		splits := []entity.Split{}
+		for i, sp := range strings.Split(s.sfunc(token), " ") {
+			splits = append(splits, entity.Split{i + 1, sp})
+		}
+
+		return splits
 	}
 
-	return ""
+	return []entity.Split{}
 }

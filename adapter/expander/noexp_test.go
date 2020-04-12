@@ -42,8 +42,10 @@ func TestExpand_OnNoexpWhenNoSplitsApplicable_ShouldReturnEmptyResults(t *testin
 
 	ident := entity.Identifier{
 		Name: "str",
-		Splits: map[string]string{
-			"gentest": "str",
+		Splits: map[string][]entity.Split{
+			"gentest": []entity.Split{
+				{Order: 1, Value: "str"},
+			},
 		},
 	}
 
@@ -58,15 +60,16 @@ func TestExpand_OnNoexp_ShouldReturnSameSplittedValues(t *testing.T) {
 	factory := expander.NewNoExpansionFactory()
 	noexp, _ := factory.Make(miningResults)
 
+	split := entity.Split{Order: 1, Value: "str"}
 	ident := entity.Identifier{
 		Name: "str",
-		Splits: map[string]string{
-			"conserv": "str",
+		Splits: map[string][]entity.Split{
+			"conserv": []entity.Split{split},
 		},
 	}
 
 	got := noexp.Expand(ident)
 
 	assert.Equal(t, 1, len(got))
-	assert.EqualValues(t, []string{"str"}, got)
+	assert.EqualValues(t, []entity.Expansion{{From: "str", Values: []string{"str"}}}, got)
 }

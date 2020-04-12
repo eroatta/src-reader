@@ -47,10 +47,10 @@ type amapExpander struct {
 // On AMAP, we rely on the related scoped declaration information for the identifier.
 // If no decalaration information can be found, we avoid trying to expand the identifier
 // because results can be broad.
-func (a amapExpander) Expand(ident entity.Identifier) []string {
-	split, ok := ident.Splits[a.ApplicableOn()]
+func (a amapExpander) Expand(ident entity.Identifier) []entity.Expansion {
+	splits, ok := ident.Splits[a.ApplicableOn()]
 	if !ok {
-		return []string{}
+		return []entity.Expansion{}
 	}
 
 	declarationID := ident.ID
@@ -59,19 +59,23 @@ func (a amapExpander) Expand(ident entity.Identifier) []string {
 	}
 	scopedDecl, ok := a.scopedDeclarations[declarationID]
 	if !ok {
-		return []string{split}
+		expansions := make([]entity.Expansion, len(splits))
+		for i, split := range splits {
+			expansions[i] = entity.Expansion{From: split.Value, Values: []string{split.Value}}
+		}
+		return expansions
 	}
 
 	// TODO change strings.Join
 	scope := amap.NewTokenScope(scopedDecl.VariableDecls, scopedDecl.Name,
 		strings.Join(scopedDecl.BodyText, " "), scopedDecl.Comments, scopedDecl.PackageComments)
 
-	var expanded []string
-	for _, token := range strings.Split(split, " ") {
-		expanded = append(expanded, amap.Expand(token, scope, a.referenceText)...)
+	expansions := make([]entity.Expansion, len(splits))
+	for i, split := range splits {
+		expansions[i] = entity.Expansion{From: split.Value, Values: amap.Expand(split.Value, scope, a.referenceText)}
 	}
 
-	return expanded
+	return expansions
 }
 
 func (a amapExpander) ApplicableOn() string {

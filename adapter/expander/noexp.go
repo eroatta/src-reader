@@ -21,13 +21,17 @@ type noexpExpander struct {
 	expander
 }
 
-func (e noexpExpander) Expand(ident entity.Identifier) []string {
-	split, ok := ident.Splits[e.ApplicableOn()]
+func (e noexpExpander) Expand(ident entity.Identifier) []entity.Expansion {
+	splits, ok := ident.Splits[e.ApplicableOn()]
 	if !ok {
-		return []string{}
+		return []entity.Expansion{}
 	}
 
-	return []string{split}
+	expansions := make([]entity.Expansion, len(splits))
+	for i, split := range splits {
+		expansions[i] = entity.Expansion{From: split.Value, Values: []string{split.Value}}
+	}
+	return expansions
 }
 
 func (e noexpExpander) ApplicableOn() string {

@@ -244,8 +244,9 @@ func (e expanderMock) ApplicableOn() string {
 	return "conserv"
 }
 
-func (e expanderMock) Expand(ident entity.Identifier) []string {
-	return []string{fmt.Sprintf("%s-expanded", ident.Name)}
+func (e expanderMock) Expand(ident entity.Identifier) []entity.Expansion {
+	return []entity.Expansion{
+		{From: ident.Name, Values: []string{fmt.Sprintf("%s-expanded", ident.Name)}}}
 }
 
 func newExtractorMock(filename string) entity.Extractor {
@@ -268,8 +269,8 @@ func (t *extractorMock) Visit(node ast.Node) ast.Visitor {
 		t.idents = append(t.idents, entity.Identifier{
 			Name:       elem.Name.String(),
 			Position:   elem.Pos(),
-			Splits:     make(map[string]string),
-			Expansions: make(map[string][]string),
+			Splits:     make(map[string][]entity.Split),
+			Expansions: make(map[string][]entity.Expansion),
 		})
 	}
 
