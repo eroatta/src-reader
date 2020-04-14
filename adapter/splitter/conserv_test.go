@@ -18,7 +18,7 @@ func TestSplit_OnConserv_ShouldReturnSplit(t *testing.T) {
 	factory := splitter.NewConservFactory()
 	splitter, _ := factory.Make(nil)
 
-	got := splitter.Split("Car")
+	got := splitter.Split("car")
 
 	assert.Equal(t, "conserv", splitter.Name())
 	assert.Equal(t, []entity.Split{{Order: 1, Value: "car"}}, got)

@@ -49,7 +49,7 @@ func TestSplit_OnSamurai_ShouldReturnSplit(t *testing.T) {
 
 	factory := splitter.NewSamuraiFactory()
 	splitter, _ := factory.Make(miningResults)
-	got := splitter.Split("Car")
+	got := splitter.Split("car")
 
 	assert.Equal(t, "samurai", splitter.Name())
 	assert.Equal(t, []entity.Split{{Order: 1, Value: "car"}}, got)
