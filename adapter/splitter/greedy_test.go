@@ -19,7 +19,7 @@ func TestSplit_OnGreedy_ShouldReturnSplit(t *testing.T) {
 	factory := splitter.NewGreedyFactory()
 	splitter, _ := factory.Make(nil)
 
-	got := splitter.Split("car")
+	got := splitter.Split("Car")
 
 	assert.Equal(t, "greedy", splitter.Name())
 	assert.Equal(t, []entity.Split{{Order: 1, Value: "car"}}, got)

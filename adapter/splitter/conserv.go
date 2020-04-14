@@ -28,7 +28,7 @@ type conservSplitter struct {
 func (c conservSplitter) Split(token string) []entity.Split {
 	splits := []entity.Split{}
 	for i, split := range strings.Split(conserv.Split(token), " ") {
-		splits = append(splits, entity.Split{Order: i + 1, Value: split})
+		splits = append(splits, entity.Split{Order: i + 1, Value: strings.ToLower(split)})
 	}
 
 	return splits

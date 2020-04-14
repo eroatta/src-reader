@@ -61,7 +61,7 @@ type samuraiSplitter struct {
 func (s samuraiSplitter) Split(token string) []entity.Split {
 	splits := []entity.Split{}
 	for i, split := range strings.Split(samurai.Split(token, s.context, lists.Prefixes, lists.Suffixes), " ") {
-		splits = append(splits, entity.Split{Order: i + 1, Value: split})
+		splits = append(splits, entity.Split{Order: i + 1, Value: strings.ToLower(split)})
 	}
 
 	return splits

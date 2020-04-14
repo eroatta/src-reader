@@ -28,7 +28,7 @@ type greedySplitter struct {
 func (g greedySplitter) Split(token string) []entity.Split {
 	splits := []entity.Split{}
 	for i, split := range strings.Split(greedy.Split(token, greedy.DefaultList), " ") {
-		splits = append(splits, entity.Split{Order: i + 1, Value: split})
+		splits = append(splits, entity.Split{Order: i + 1, Value: strings.ToLower(split)})
 	}
 
 	return splits
