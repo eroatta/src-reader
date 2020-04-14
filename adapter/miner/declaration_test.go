@@ -121,7 +121,7 @@ func TestVisit_OnDeclarationWithFunctions_ShouldReturnDecls(t *testing.T) {
 			fs := token.NewFileSet()
 			node, _ := parser.ParseFile(fs, "testfile.go", []byte(fixture.src), parser.ParseComments)
 
-			m := miner.NewDeclaration(lists.Dicctionary)
+			m := miner.NewDeclaration(lists.Dictionary)
 			m.SetCurrentFile("testfile.go")
 			ast.Walk(m, node)
 
@@ -274,7 +274,7 @@ func TestVisit_OnDeclarationWithVarDecl_ShouldReturnWordsAndPhrases(t *testing.T
 			fs := token.NewFileSet()
 			node, _ := parser.ParseFile(fs, "", []byte(fixture.src), parser.ParseComments)
 
-			m := miner.NewDeclaration(lists.Dicctionary)
+			m := miner.NewDeclaration(lists.Dictionary)
 			m.SetCurrentFile("testfile.go")
 			ast.Walk(m, node)
 
@@ -436,7 +436,7 @@ func TestVisit_OnDeclarationWithConstDecl_ShouldReturnWordsAndPhrases(t *testing
 			fs := token.NewFileSet()
 			node, _ := parser.ParseFile(fs, "", []byte(fixture.src), parser.ParseComments)
 
-			m := miner.NewDeclaration(lists.Dicctionary)
+			m := miner.NewDeclaration(lists.Dictionary)
 			m.SetCurrentFile("testfile.go")
 			ast.Walk(m, node)
 
@@ -616,7 +616,7 @@ func TestVisit_OnDeclarationWithTypeDecl_ShouldReturnWordsAndPhrases(t *testing.
 			fs := token.NewFileSet()
 			node, _ := parser.ParseFile(fs, "", []byte(fixture.src), parser.ParseComments)
 
-			m := miner.NewDeclaration(lists.Dicctionary)
+			m := miner.NewDeclaration(lists.Dictionary)
 			m.SetCurrentFile("testfile.go")
 			ast.Walk(m, node)
 
@@ -796,7 +796,7 @@ func TestVisit_OnDeclarationWithInterfaceDecl_ShouldReturnWordsAndPhrases(t *tes
 			fs := token.NewFileSet()
 			node, _ := parser.ParseFile(fs, "", []byte(fixture.src), parser.ParseComments)
 
-			m := miner.NewDeclaration(lists.Dicctionary)
+			m := miner.NewDeclaration(lists.Dictionary)
 			m.SetCurrentFile("testfile.go")
 			ast.Walk(m, node)
 

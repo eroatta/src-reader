@@ -26,6 +26,8 @@ github.com/eroatta/token v0.0.0-20190815135418-c41c76e47cf5 h1:jlrChmRQRN6SzGrt6
 github.com/eroatta/token v0.0.0-20190815135418-c41c76e47cf5/go.mod h1:i6SMO44pl9g6eBfyLESYOAjiB4xbe1Z/919CyvU9e1M=
 github.com/eroatta/token v0.0.0-20200410193950-4bae94ca6536 h1:Kb8tuiC3s7rQ1tT0eVhHR/VMlkXX9pADw/k2dpqIrr0=
 github.com/eroatta/token v0.0.0-20200410193950-4bae94ca6536/go.mod h1:i6SMO44pl9g6eBfyLESYOAjiB4xbe1Z/919CyvU9e1M=
+github.com/eroatta/token v0.0.0-20200414231506-a6cba19b8140 h1:fDiaDLj3A8xj1v2nBpdHtm6QEgipMVcA6zcWgw+i9fs=
+github.com/eroatta/token v0.0.0-20200414231506-a6cba19b8140/go.mod h1:i6SMO44pl9g6eBfyLESYOAjiB4xbe1Z/919CyvU9e1M=
 github.com/flynn/go-shlex v0.0.0-20150515145356-3f9db97f8568 h1:BHsljHzVlRcyQhjrss6TZTdY2VfCqZPbv5k3iBFa2ZQ=
 github.com/flynn/go-shlex v0.0.0-20150515145356-3f9db97f8568/go.mod h1:xEzjJPgXI435gkrCt3MPfRiAkVrwSbHsst4LCFVfpJc=
 github.com/fogleman/gg v1.2.1-0.20190220221249-0403632d5b90/go.mod h1:R/bRT+9gY/C5z7JzPU0zXsXHKM4/ayA+zqcVNZzPa1k=
