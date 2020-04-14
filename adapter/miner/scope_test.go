@@ -628,7 +628,7 @@ func TestVisit_OnScopeWithStructBlockDecl_ShouldReturnScopedDeclaration(t *testi
 			DeclType: token.STRUCT,
 			Name:     "httpClient",
 			VariableDecls: []string{
-				"protocolPicker string",
+				"protocolpicker string",
 				"url string",
 			},
 			Statements: make([]string, 0),
@@ -776,7 +776,7 @@ func TestVisit_OnScopeWithInterfaceBlockDecl_ShouldReturnScopedDeclaration(t *te
 			Name:          "httpClient",
 			VariableDecls: make([]string, 0),
 			Statements: []string{
-				"protocolPicker",
+				"protocolpicker",
 				"url",
 			},
 			BodyText: make([]string, 0),

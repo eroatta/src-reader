@@ -118,7 +118,7 @@ func (m *Scope) Visit(node ast.Node) ast.Visitor {
 
 			for _, arg := range in.Names {
 				if arg.Name != "" {
-					variableDecls = append(variableDecls, fmt.Sprintf("%s %s", arg.String(), paramType))
+					variableDecls = append(variableDecls, strings.ToLower(fmt.Sprintf("%s %s", arg.String(), paramType)))
 				}
 			}
 		}
@@ -149,7 +149,7 @@ func (m *Scope) Visit(node ast.Node) ast.Visitor {
 
 				for _, arg := range out.Names {
 					if arg.Name != "" {
-						variableDecls = append(variableDecls, fmt.Sprintf("%s %s", arg.String(), paramType))
+						variableDecls = append(variableDecls, strings.ToLower(fmt.Sprintf("%s %s", arg.String(), paramType)))
 					}
 				}
 			}
@@ -247,7 +247,7 @@ func (m *Scope) Visit(node ast.Node) ast.Visitor {
 						for _, field := range structType.Fields.List {
 							if fieldType, ok := field.Type.(*ast.Ident); ok {
 								for _, name := range field.Names {
-									variableDecls = append(variableDecls, fmt.Sprintf("%s %s", name.String(), fieldType.String()))
+									variableDecls = append(variableDecls, strings.ToLower(fmt.Sprintf("%s %s", name.String(), fieldType.String())))
 								}
 
 								if field.Doc != nil {
@@ -272,7 +272,7 @@ func (m *Scope) Visit(node ast.Node) ast.Visitor {
 						statements := make([]string, 0)
 						for _, method := range interfaceType.Methods.List {
 							for _, name := range method.Names {
-								statements = append(statements, name.String())
+								statements = append(statements, strings.ToLower(name.String()))
 							}
 
 							if method.Doc != nil {

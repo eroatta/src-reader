@@ -112,7 +112,7 @@ func (m *Declaration) Visit(node ast.Node) ast.Visitor {
 
 				for _, part := range strings.Split(conserv.Split(name), " ") {
 					if m.Dict.Contains(part) {
-						declText.Words[strings.ToLower(part)] = struct{}{}
+						declText.Words[part] = struct{}{}
 					}
 				}
 
@@ -172,7 +172,7 @@ func extractDeclFromFunction(elem *ast.FuncDecl, m *Declaration) entity.Decl {
 
 	for _, part := range strings.Split(conserv.Split(name), " ") {
 		if m.Dict.Contains(part) {
-			functionText.Words[strings.ToLower(part)] = struct{}{}
+			functionText.Words[part] = struct{}{}
 		}
 	}
 
@@ -197,7 +197,7 @@ func extractDeclFromFunction(elem *ast.FuncDecl, m *Declaration) entity.Decl {
 func extractDeclFromValue(declText entity.Decl, valSpec *ast.ValueSpec, name string, index int, list lists.List) entity.Decl {
 	for _, part := range strings.Split(conserv.Split(name), " ") {
 		if list.Contains(part) {
-			declText.Words[strings.ToLower(part)] = struct{}{}
+			declText.Words[part] = struct{}{}
 		}
 	}
 
@@ -205,9 +205,9 @@ func extractDeclFromValue(declText entity.Decl, valSpec *ast.ValueSpec, name str
 		if val, ok := valSpec.Values[index].(*ast.BasicLit); ok && val.Kind == token.STRING {
 			valStr := strings.Replace(val.Value, "\"", "", -1)
 			for _, word := range strings.Split(valStr, " ") {
-				word = cleaner.ReplaceAllString(word, "")
-				if list.Contains(strings.ToLower(word)) {
-					declText.Words[strings.ToLower(word)] = struct{}{}
+				word = strings.ToLower(cleaner.ReplaceAllString(word, ""))
+				if list.Contains(word) {
+					declText.Words[word] = struct{}{}
 				}
 			}
 
@@ -227,7 +227,7 @@ func extractDeclFromStruct(declText entity.Decl, structType *ast.StructType, lis
 			for _, fname := range field.Names {
 				for _, part := range strings.Split(conserv.Split(fname.Name), " ") {
 					if list.Contains(part) {
-						declText.Words[strings.ToLower(part)] = struct{}{}
+						declText.Words[part] = struct{}{}
 					}
 				}
 			}
@@ -249,7 +249,7 @@ func extractDeclFromInterface(declText entity.Decl, interfaceType *ast.Interface
 			for _, mname := range method.Names {
 				for _, part := range strings.Split(conserv.Split(mname.Name), " ") {
 					if list.Contains(part) {
-						declText.Words[strings.ToLower(part)] = struct{}{}
+						declText.Words[part] = struct{}{}
 					}
 				}
 			}
@@ -281,6 +281,7 @@ func cleanComment(text string) string {
 	cleanComment := strings.ReplaceAll(text, "//", "")
 	cleanComment = strings.ReplaceAll(cleanComment, "\\n", " ")
 	cleanComment = strings.ReplaceAll(cleanComment, "\\t", " ")
+	cleanComment = strings.ToLower(cleanComment)
 
 	return strings.TrimSpace(cleanComment)
 }
@@ -290,7 +291,7 @@ func extractWordAndPhrasesFromComment(functionText entity.Decl, comment string, 
 	for _, word := range strings.Split(cleanComment, " ") {
 		word = cleaner.ReplaceAllString(word, "")
 		if list.Contains(word) {
-			functionText.Words[strings.ToLower(word)] = struct{}{}
+			functionText.Words[word] = struct{}{}
 		}
 	}
 
