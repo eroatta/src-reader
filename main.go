@@ -10,12 +10,15 @@ import (
 	"github.com/eroatta/src-reader/adapter/cloner"
 	"github.com/eroatta/src-reader/adapter/expander"
 	"github.com/eroatta/src-reader/adapter/extractor"
+	"github.com/eroatta/src-reader/adapter/frequencytable"
 	"github.com/eroatta/src-reader/adapter/github"
+	"github.com/eroatta/src-reader/adapter/miner"
 	"github.com/eroatta/src-reader/adapter/persistence"
 	"github.com/eroatta/src-reader/adapter/splitter"
 	"github.com/eroatta/src-reader/entity"
 	"github.com/eroatta/src-reader/usecase/analyze"
 	"github.com/eroatta/src-reader/usecase/create"
+	"github.com/eroatta/token/lists"
 )
 
 func main() {
@@ -56,12 +59,20 @@ func importProjectUsecase(url string) {
 	identifierRepository := persistence.NewCSVIdentifierRepository(output)
 	analyzeUsecase := analyze.NewAnalyzeProjectUsecase(sourceCodeRepository, identifierRepository)
 
+	miners := []entity.Miner{
+		miner.NewWordCount(),
+		miner.NewScope(),
+		miner.NewComments(),
+		miner.NewDeclaration(lists.Dictionary),
+		miner.NewGlobalFreqTable(frequencytable.Global),
+	}
+
 	analysisResults, err := analyzeUsecase.Analyze(context.TODO(), project, &entity.AnalysisConfig{
-		Miners:                    make([]entity.Miner, 0),
+		Miners:                    miners,
 		ExtractorFactory:          extractor.New,
-		Splitters:                 []string{"conserv", "greedy"},
+		Splitters:                 []string{"conserv", "greedy", "samurai"},
 		SplittingAlgorithmFactory: splitter.NewSplitterFactory(),
-		Expanders:                 []string{"noexp"},
+		Expanders:                 []string{"noexp", "basic", "amap"},
 		ExpansionAlgorithmFactory: expander.NewExpanderFactory(),
 	})
 	if err != nil {
