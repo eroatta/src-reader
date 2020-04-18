@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/eroatta/src-reader/entity"
 	"github.com/eroatta/src-reader/repository"
@@ -35,22 +36,55 @@ type analyzeProjectUsecase struct {
 }
 
 type Results struct {
+	// id
+	// status (?)
+	DateCreated             time.Time
+	ProjectID               string
+	ProjectURL              string
+	PipelineMiners          []string
+	PipelineSplitters       []string
+	PipelineExpanders       []string
+	FilesTotal              int
+	FilesValid              int
+	FilesError              int
+	FilesErrorSamples       []string
+	IdentifiersTotal        int
+	IdentifiersValid        int
+	IdentifiersError        int
+	IdentifiersErrorSamples []string
 }
 
 func (uc analyzeProjectUsecase) Analyze(ctx context.Context, project entity.Project, config *entity.AnalysisConfig) (Results, error) {
+	analysisResults := Results{
+		DateCreated:       time.Now(),
+		ProjectID:         project.Metadata.Fullname, // TODO: review
+		ProjectURL:        project.URL,
+		PipelineMiners:    make([]string, 0),
+		PipelineSplitters: make([]string, 0),
+		PipelineExpanders: make([]string, 0),
+	}
 	// read and parse files
 	filesc := step.Read(ctx, uc.sourceCodeRepository, project.SourceCode.Location, project.SourceCode.Files)
 	parsed := step.Parse(filesc)
 	files := step.Merge(parsed)
 
 	valid := make([]entity.File, 0)
+	fileErrorSamples := make([]string, 0)
 	for _, file := range files {
 		if file.Error != nil {
+			if len(fileErrorSamples) < 10 {
+				fileErrorSamples = append(fileErrorSamples, file.Error.Error())
+			}
+
 			log.WithError(file.Error).Warn(fmt.Sprintf("unable to read or parse file %s at %s", file.Name, project.SourceCode.Location))
 			continue
 		}
 		valid = append(valid, file)
 	}
+	analysisResults.FilesTotal = len(files)
+	analysisResults.FilesValid = len(valid)
+	analysisResults.FilesError = len(files) - len(valid)
+	analysisResults.FilesErrorSamples = fileErrorSamples
 
 	// if every file can't be parsed, then fail
 	if len(valid) == 0 {
@@ -61,8 +95,66 @@ func (uc analyzeProjectUsecase) Analyze(ctx context.Context, project entity.Proj
 
 	// apply the pre-process step (mine them)
 	miningResults := step.Mine(valid, config.Miners...)
+	for name := range miningResults {
+		analysisResults.PipelineMiners = append(analysisResults.PipelineMiners, string(name))
+	}
 
 	// make the splitters from input and mining results
+	splitters := buildSplittersFromInputAndMiningResults(config, miningResults)
+	if len(splitters) == 0 {
+		log.WithField("desired", config.Splitters).Error("unable to create any splitter")
+		return Results{}, ErrUnableToCreateProcessors
+	}
+	for _, splitter := range splitters {
+		analysisResults.PipelineSplitters = append(analysisResults.PipelineSplitters, splitter.Name())
+	}
+
+	// make the expanders from input and mining results
+	expanders := buildExpandersFromInputAndMiningResults(config, miningResults)
+	if len(expanders) == 0 {
+		log.WithField("desired", config.Expanders).Error("unable to create any expander")
+		return Results{}, ErrUnableToCreateProcessors
+	}
+	for _, expander := range expanders {
+		analysisResults.PipelineExpanders = append(analysisResults.PipelineExpanders, expander.Name())
+	}
+
+	// analyze each identifier
+	identc := step.Extract(valid, config.ExtractorFactory)
+	splittedc := step.Split(identc, splitters...)
+	expandedc := step.Expand(splittedc, expanders...)
+
+	identErrorSamples := make([]string, 0)
+	for ident := range expandedc {
+		analysisResults.IdentifiersTotal++
+		if ident.Error != nil {
+			if len(identErrorSamples) < 10 {
+				identErrorSamples = append(identErrorSamples, ident.Error.Error())
+			}
+
+			log.WithFields(log.Fields{
+				"project":    project.Metadata.Fullname,
+				"filename":   ident.File,
+				"identifier": ident.Name,
+				"position":   ident.Position,
+			}).Warn("an error occurred during the splitting the expansion for the identifier")
+			analysisResults.IdentifiersError++
+		}
+
+		err := uc.identifierRepository.Add(ctx, project, ident)
+		if err != nil {
+			log.WithError(err).Error(fmt.Sprintf("unable to save identifier %s, on file %s for project %s",
+				ident.Name, ident.File, project.URL))
+			return Results{}, ErrUnableToSaveIdentifiers
+		}
+	}
+	analysisResults.IdentifiersValid = analysisResults.IdentifiersTotal - analysisResults.IdentifiersError
+	analysisResults.IdentifiersErrorSamples = identErrorSamples
+
+	return analysisResults, nil
+}
+
+func buildSplittersFromInputAndMiningResults(config *entity.AnalysisConfig, miningResults map[entity.MinerType]entity.Miner) []entity.Splitter {
 	splitters := make([]entity.Splitter, 0)
 	for _, name := range config.Splitters {
 		factory, err := config.SplittingAlgorithmFactory.Get(name)
@@ -79,12 +171,11 @@ func (uc analyzeProjectUsecase) Analyze(ctx context.Context, project entity.Proj
 
 		splitters = append(splitters, splitter)
 	}
-	if len(splitters) == 0 {
-		log.WithField("desired", config.Splitters).Error("unable to create any splitter")
-		return Results{}, ErrUnableToCreateProcessors
-	}
 
-	// make the expanders from input and mining results
+	return splitters
+}
+
+func buildExpandersFromInputAndMiningResults(config *entity.AnalysisConfig, miningResults map[entity.MinerType]entity.Miner) []entity.Expander {
 	expanders := make([]entity.Expander, 0)
 	for _, name := range config.Expanders {
 		factory, err := config.ExpansionAlgorithmFactory.Get(name)
@@ -101,26 +192,6 @@ func (uc analyzeProjectUsecase) Analyze(ctx context.Context, project entity.Proj
 
 		expanders = append(expanders, expander)
 	}
-	if len(expanders) == 0 {
-		log.WithField("desired", config.Expanders).Error("unable to create any expander")
-		return Results{}, ErrUnableToCreateProcessors
-	}
 
-	// analyze each identifier
-	identc := step.Extract(valid, config.ExtractorFactory)
-	splittedc := step.Split(identc, splitters...)
-	expandedc := step.Expand(splittedc, expanders...)
-
-	//errs := make([]error, 0)
-	for ident := range expandedc {
-		err := uc.identifierRepository.Add(ctx, project, ident)
-		if err != nil {
-			log.WithError(err).Error(fmt.Sprintf("unable to save identifier %s, on file %s for project %s",
-				ident.Name, ident.File, project.URL))
-			//errs = append(errs, err)
-			return Results{}, ErrUnableToSaveIdentifiers
-		}
-	}
-
-	return Results{}, nil
+	return expanders
 }

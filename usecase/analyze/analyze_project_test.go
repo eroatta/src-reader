@@ -162,9 +162,12 @@ func TestAnalyze_OnAnalyzeProjectUsecase_WhenFailingToSaveIdentifiers_ShouldRetu
 	assert.Empty(t, results)
 }
 
-func TestAnalyze_OnAnalyzeProjectUsecase_WhenAnalyzingIdentifiers_ShouldResults(t *testing.T) {
+func TestAnalyze_OnAnalyzeProjectUsecase_WhenAnalyzingIdentifiers_ShouldReturnAnalysisResults(t *testing.T) {
 	project := entity.Project{
 		URL: "https://github.com/eroatta/test",
+		Metadata: entity.Metadata{
+			Fullname: "eroatta/test",
+		},
 		SourceCode: entity.SourceCode{
 			Hash:     "asdf1234asdf",
 			Location: "/tmp/repositories/eroatta/test",
@@ -195,7 +198,19 @@ func TestAnalyze_OnAnalyzeProjectUsecase_WhenAnalyzingIdentifiers_ShouldResults(
 	})
 
 	assert.NoError(t, err)
-	assert.Empty(t, results)
+	assert.Equal(t, "eroatta/test", results.ProjectID)
+	assert.Equal(t, "https://github.com/eroatta/test", results.ProjectURL)
+	assert.Equal(t, 1, results.FilesTotal)
+	assert.Equal(t, 1, results.FilesValid)
+	assert.Equal(t, 0, results.FilesError)
+	assert.Empty(t, results.FilesErrorSamples)
+	assert.EqualValues(t, []string{}, results.PipelineMiners)
+	assert.EqualValues(t, []string{"conserv"}, results.PipelineSplitters)
+	assert.EqualValues(t, []string{"mock"}, results.PipelineExpanders)
+	assert.Equal(t, 1, results.IdentifiersTotal)
+	assert.Equal(t, 1, results.IdentifiersValid)
+	assert.Equal(t, 0, results.IdentifiersError)
+	assert.Empty(t, results.IdentifiersErrorSamples)
 }
 
 type sourceCodeFileReaderMock struct {
