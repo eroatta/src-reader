@@ -27,7 +27,7 @@ func (f basicFactory) Make(miningResults map[entity.MinerType]entity.Miner) (ent
 	declarations := declarationsMiner.(*miner.Declaration).Declarations()
 
 	return &basicExpander{
-		expander:     expander{"amap"},
+		expander:     expander{"basic"},
 		declarations: declarations,
 	}, nil
 }
