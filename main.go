@@ -46,10 +46,17 @@ func importProjectUsecase(url string) {
 	log.Println("Import::: Done")
 
 	log.Println("Analysis::: Start")
-	identiferRepository := identifierRepositoryMock{}
-	analyzeUsecase := analyze.NewAnalyzeProjectUsecase(sourceCodeRepository, identiferRepository)
+	output, err := os.OpenFile("csv_identifiers_repository.csv",
+		os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	defer output.Close()
 
-	_, err = analyzeUsecase.Analyze(context.TODO(), project, &entity.AnalysisConfig{
+	identifierRepository := persistence.NewCSVIdentifierRepository(output)
+	analyzeUsecase := analyze.NewAnalyzeProjectUsecase(sourceCodeRepository, identifierRepository)
+
+	analysisResults, err := analyzeUsecase.Analyze(context.TODO(), project, &entity.AnalysisConfig{
 		Miners:                    make([]entity.Miner, 0),
 		ExtractorFactory:          extractor.New,
 		Splitters:                 []string{"conserv", "greedy"},
@@ -62,6 +69,23 @@ func importProjectUsecase(url string) {
 	}
 
 	log.Println("Analysis::: Done")
+	log.Println(fmt.Sprintf("Results -	Project -		ID: %s", analysisResults.ProjectID))
+	log.Println(fmt.Sprintf("Results -	Project -		URL: %s", analysisResults.ProjectURL))
+	log.Println(fmt.Sprintf("Results -	Files -			Total: %d", analysisResults.FilesTotal))
+	log.Println(fmt.Sprintf("Results -	Files -			Valid: %d", analysisResults.FilesValid))
+	log.Println(fmt.Sprintf("Results -	Files -			With Error: %d", analysisResults.FilesError))
+	for _, sample := range analysisResults.FilesErrorSamples {
+		log.Println(fmt.Sprintf("Results -	Files -			Error Sample: %s", sample))
+	}
+	log.Println(fmt.Sprintf("Results -	Pipeline -		Miners: %v", analysisResults.PipelineMiners))
+	log.Println(fmt.Sprintf("Results -	Pipeline -		Splitters: %v", analysisResults.PipelineSplitters))
+	log.Println(fmt.Sprintf("Results -	Pipeline -		Expanders: %v", analysisResults.PipelineExpanders))
+	log.Println(fmt.Sprintf("Results -	Identifiers -		Total: %d", analysisResults.IdentifiersTotal))
+	log.Println(fmt.Sprintf("Results -	Identifiers -		Valid: %d", analysisResults.IdentifiersValid))
+	log.Println(fmt.Sprintf("Results -	Identifiers -		With Error: %d", analysisResults.IdentifiersError))
+	for _, sample := range analysisResults.IdentifiersErrorSamples {
+		log.Println(fmt.Sprintf("Results -	Identifiers -		Error Sample: %s", sample))
+	}
 }
 
 type identifierRepositoryMock struct {
