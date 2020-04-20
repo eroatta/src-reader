@@ -2,8 +2,8 @@ package entity
 
 import "time"
 
-// TODO: change description
-// Project defines a project under analysis.
+// Project represents a GitHub repository, which contains metadata about it
+// and references to locally stored source code.
 type Project struct {
 	Status     string
 	URL        string
@@ -11,7 +11,7 @@ type Project struct {
 	SourceCode SourceCode
 }
 
-// Metadata holds the project information.
+// Metadata holds the remote project information.
 type Metadata struct {
 	RemoteID      string
 	Owner         string
@@ -29,6 +29,8 @@ type Metadata struct {
 	Forks         int32
 }
 
+// SourceCode specifies the hash used for extracting the source code copy, its location
+// and the associated list of included files.
 type SourceCode struct {
 	Hash     string
 	Location string
