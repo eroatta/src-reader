@@ -98,19 +98,3 @@ func importProjectUsecase(url string) {
 		log.Println(fmt.Sprintf("Results -	Identifiers -		Error Sample: %s", sample))
 	}
 }
-
-type identifierRepositoryMock struct {
-}
-
-func (i identifierRepositoryMock) Add(ctx context.Context, p entity.Project, ident entity.Identifier) error {
-	log.Println("Storing identifier...")
-	for alg, splits := range ident.Splits {
-		log.Println(fmt.Sprintf("%s \"%s\" Splitted into: %v by %s", ident.Type, ident.Name, splits, alg))
-	}
-
-	for alg, expans := range ident.Expansions {
-		log.Println(fmt.Sprintf("%s \"%s\" Expanded into: %v by %s", ident.Type, ident.Name, expans, alg))
-	}
-
-	return nil
-}
