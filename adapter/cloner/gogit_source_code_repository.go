@@ -70,7 +70,7 @@ func (r GogitCloneRepository) Clone(ctx context.Context, fullname string, cloneU
 	files, err := read(wt.Filesystem, "")
 	if err != nil {
 		log.WithError(err).Error(fmt.Sprintf("failed to get filenames on cloned repository %s", cloneURL))
-		return entity.SourceCode{}, repository.ErrUnexpected
+		return entity.SourceCode{}, repository.ErrSourceCodeUnableAccessMetadata
 	}
 
 	return entity.SourceCode{

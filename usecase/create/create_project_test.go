@@ -19,7 +19,7 @@ func TestNewImportProjectUsecase_ShouldReturnNewInstance(t *testing.T) {
 
 func TestImport_OnImportProjectUsecase_ShouldReturnImportResults(t *testing.T) {
 	prMock := projectRepositoryMock{
-		getByURLErr: repository.ErrNoResults,
+		getByURLErr: repository.ErrProjectNoResults,
 	}
 	rprMock := remoteProjectRepositoryMock{
 		metadata: entity.Metadata{
@@ -68,7 +68,7 @@ func TestImport_OnImportProjectUsecase_WhenAlreadyImportedProject_ShouldImportRe
 func TestImport_OnImportProjectUsecase_WhenUnableToCheckExistingProject_ShouldReturnError(t *testing.T) {
 	prMock := projectRepositoryMock{
 		project:     entity.Project{},
-		getByURLErr: repository.ErrUnexpected,
+		getByURLErr: repository.ErrProjectUnexpected,
 	}
 	uc := create.NewImportProjectUsecase(prMock, nil, nil)
 
@@ -80,10 +80,10 @@ func TestImport_OnImportProjectUsecase_WhenUnableToCheckExistingProject_ShouldRe
 
 func TestImport_OnImportProjectUsecase_WhenUnableToRetrieveMetadataFromRemoteRepository_ShouldReturnError(t *testing.T) {
 	prMock := projectRepositoryMock{
-		getByURLErr: repository.ErrNoResults,
+		getByURLErr: repository.ErrProjectNoResults,
 	}
 	rprMock := remoteProjectRepositoryMock{
-		err: repository.ErrUnexpected,
+		err: repository.ErrProjectUnexpected,
 	}
 	uc := create.NewImportProjectUsecase(prMock, rprMock, nil)
 
@@ -95,7 +95,7 @@ func TestImport_OnImportProjectUsecase_WhenUnableToRetrieveMetadataFromRemoteRep
 
 func TestImport_OnImportProjectUsecase_WhenUnableToCloneSourceCode_ShouldReturnError(t *testing.T) {
 	prMock := projectRepositoryMock{
-		getByURLErr: repository.ErrNoResults,
+		getByURLErr: repository.ErrProjectNoResults,
 	}
 	rprMock := remoteProjectRepositoryMock{
 		metadata: entity.Metadata{
@@ -104,7 +104,7 @@ func TestImport_OnImportProjectUsecase_WhenUnableToCloneSourceCode_ShouldReturnE
 		},
 	}
 	scrMock := sourceCodeRepositoryMock{
-		err: repository.ErrUnexpected,
+		err: repository.ErrProjectUnexpected,
 	}
 	uc := create.NewImportProjectUsecase(prMock, rprMock, scrMock)
 
@@ -116,8 +116,8 @@ func TestImport_OnImportProjectUsecase_WhenUnableToCloneSourceCode_ShouldReturnE
 
 func TestImport_OnImportProjectUsecase_WhenUnableToSaveImportedProject_ShouldReturnError(t *testing.T) {
 	prMock := projectRepositoryMock{
-		getByURLErr: repository.ErrNoResults,
-		addErr:      repository.ErrUnexpected,
+		getByURLErr: repository.ErrProjectNoResults,
+		addErr:      repository.ErrProjectUnexpected,
 	}
 	rprMock := remoteProjectRepositoryMock{
 		metadata: entity.Metadata{

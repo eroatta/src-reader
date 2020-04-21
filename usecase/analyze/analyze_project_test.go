@@ -144,7 +144,7 @@ func TestAnalyze_OnAnalyzeProjectUsecase_WhenFailingToSaveIdentifiers_ShouldRetu
 	}
 
 	identifierRepositoryMock := identifierRepositoryMock{
-		err: repository.ErrUnexpected,
+		err: repository.ErrIdentifierUnexpected,
 	}
 
 	uc := analyze.NewAnalyzeProjectUsecase(sourceCodeRepositoryMock, identifierRepositoryMock)

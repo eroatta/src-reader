@@ -7,12 +7,11 @@ import (
 	"github.com/eroatta/src-reader/entity"
 )
 
-// TODO: each repository should handle their own errors
 var (
-	// ErrNoResults indicates that no results were found.
-	ErrNoResults = errors.New("No results found")
-	// ErrUnexpected indicates that the current action couldn't be completed because of an internal issue.
-	ErrUnexpected = errors.New("Unexpected error performing the current action")
+	// ErrProjectNoResults indicates that no projects were found matching the given criteria.
+	ErrProjectNoResults = errors.New("no projects found for the given criteria")
+	// ErrProjectUnexpected indicates that the current action couldn't be completed because of an internal issue.
+	ErrProjectUnexpected = errors.New("unexpected error performing the current action")
 )
 
 // ProjectRepository represents a repository capable of operating with new and existing projects.

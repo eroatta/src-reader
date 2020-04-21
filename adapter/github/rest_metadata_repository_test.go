@@ -43,7 +43,7 @@ func TestRetrieveMetadata_OnRESTMetadataRepository_WhileInvalidToken_ShouldRetur
 
 	metadata, err := metadataRepository.RetrieveMetadata(context.TODO(), "owner/reponame")
 
-	assert.EqualError(t, err, repository.ErrUnexpected.Error())
+	assert.EqualError(t, err, repository.ErrMetadataUnexpected.Error())
 	assert.Empty(t, metadata)
 }
 
@@ -68,7 +68,7 @@ func TestRetrieveMetadata_OnRESTMetadataRepository_WhileNotFoundGitHubProject_Sh
 
 	metadata, err := metadataRepository.RetrieveMetadata(context.TODO(), "owner/reponame")
 
-	assert.EqualError(t, err, repository.ErrUnexpected.Error())
+	assert.EqualError(t, err, repository.ErrMetadataUnexpected.Error())
 	assert.Empty(t, metadata)
 }
 
@@ -93,7 +93,7 @@ func TestRetrieveMetadata_OnRESTMetadataRepository_WhileInternalError_ShouldRetu
 
 	metadata, err := metadataRepository.RetrieveMetadata(context.TODO(), "owner/reponame")
 
-	assert.EqualError(t, err, repository.ErrUnexpected.Error())
+	assert.EqualError(t, err, repository.ErrMetadataUnexpected.Error())
 	assert.Empty(t, metadata)
 }
 

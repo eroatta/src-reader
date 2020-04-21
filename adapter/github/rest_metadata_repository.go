@@ -43,14 +43,14 @@ func (r RESTMetadataRepository) RetrieveMetadata(ctx context.Context, remoteRepo
 	response, err := r.httpClient.Do(request)
 	if err != nil {
 		log.WithError(err).Error(fmt.Sprintf("an error occurred while trying to GET the resource: %s", url))
-		return entity.Metadata{}, repository.ErrUnexpected
+		return entity.Metadata{}, repository.ErrMetadataUnexpected
 	}
 
 	body, err := ioutil.ReadAll(response.Body)
 	defer response.Body.Close()
 	if err != nil {
 		log.WithError(err).Error("an error occurred while reading response body")
-		return entity.Metadata{}, repository.ErrUnexpected
+		return entity.Metadata{}, repository.ErrMetadataUnexpected
 	}
 
 	if response.StatusCode != http.StatusOK {
@@ -58,14 +58,14 @@ func (r RESTMetadataRepository) RetrieveMetadata(ctx context.Context, remoteRepo
 		_ = json.Unmarshal(body, &errResponse)
 
 		log.WithField("status_code", response.StatusCode).WithField("response_message", errResponse.Message).Error(fmt.Sprintf("an error occurred while trying to GET the resource: %s", url))
-		return entity.Metadata{}, repository.ErrUnexpected
+		return entity.Metadata{}, repository.ErrMetadataUnexpected
 	}
 
 	var okResponse successResponse
 	err = json.Unmarshal(body, &okResponse)
 	if err != nil {
 		log.WithError(err).Error("an error occurred while parsing OK response body")
-		return entity.Metadata{}, repository.ErrUnexpected
+		return entity.Metadata{}, repository.ErrMetadataUnexpected
 	}
 
 	return entity.Metadata{

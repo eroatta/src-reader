@@ -47,7 +47,7 @@ func (uc importProjectUsecase) Import(ctx context.Context, url string) (entity.P
 	switch err {
 	case nil:
 		return project, nil
-	case repository.ErrNoResults:
+	case repository.ErrProjectNoResults:
 		// continue
 	default:
 		log.WithError(err).Error(fmt.Sprintf("unable to retrieve project for %s", url))

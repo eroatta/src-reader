@@ -25,7 +25,7 @@ func (r InMemoryProjectRepository) Add(ctx context.Context, project entity.Proje
 func (r InMemoryProjectRepository) GetByURL(ctx context.Context, url string) (entity.Project, error) {
 	project, ok := r.repos[url]
 	if !ok {
-		return entity.Project{}, repository.ErrNoResults
+		return entity.Project{}, repository.ErrProjectNoResults
 	}
 
 	return *project, nil
