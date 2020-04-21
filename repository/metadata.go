@@ -12,8 +12,8 @@ var (
 	ErrMetadataUnexpected = errors.New("unexpected error performing the current action")
 )
 
-// RemoteProjectRepository represents a repository capable of retrieving metadata from a remote project.
-type RemoteProjectRepository interface {
+// MetadataRepository represents a repository capable of retrieving metadata from a remote project.
+type MetadataRepository interface {
 	// RetrieveMetada extracts context information from a remote repository.
 	RetrieveMetadata(ctx context.Context, remoteRepository string) (entity.Metadata, error)
 }

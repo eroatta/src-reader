@@ -26,19 +26,19 @@ type ImportProjectUsecase interface {
 }
 
 // NewImportProjectUsecase initializes a new ImportProjectUsecase handler.
-func NewImportProjectUsecase(pr repository.ProjectRepository, rpr repository.RemoteProjectRepository,
+func NewImportProjectUsecase(pr repository.ProjectRepository, mr repository.MetadataRepository,
 	scr repository.SourceCodeRepository) ImportProjectUsecase {
 	return importProjectUsecase{
-		projectRepository:       pr,
-		remoteProjectRepository: rpr,
-		sourceCodeRepository:    scr,
+		projectRepository:    pr,
+		metadataRepository:   mr,
+		sourceCodeRepository: scr,
 	}
 }
 
 type importProjectUsecase struct {
-	projectRepository       repository.ProjectRepository
-	remoteProjectRepository repository.RemoteProjectRepository
-	sourceCodeRepository    repository.SourceCodeRepository
+	projectRepository    repository.ProjectRepository
+	metadataRepository   repository.MetadataRepository
+	sourceCodeRepository repository.SourceCodeRepository
 }
 
 func (uc importProjectUsecase) Import(ctx context.Context, url string) (entity.Project, error) {
@@ -55,7 +55,7 @@ func (uc importProjectUsecase) Import(ctx context.Context, url string) (entity.P
 	}
 
 	// retrieve metadata
-	metadata, err := uc.remoteProjectRepository.RetrieveMetadata(ctx, url)
+	metadata, err := uc.metadataRepository.RetrieveMetadata(ctx, url)
 	if err != nil {
 		log.WithError(err).Error(fmt.Sprintf("unable to retrive metadata for %s", url))
 		return entity.Project{}, ErrUnableToRetrieveMetadata

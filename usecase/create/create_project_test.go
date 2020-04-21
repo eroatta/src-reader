@@ -21,7 +21,7 @@ func TestImport_OnImportProjectUsecase_ShouldReturnImportResults(t *testing.T) {
 	prMock := projectRepositoryMock{
 		getByURLErr: repository.ErrProjectNoResults,
 	}
-	rprMock := remoteProjectRepositoryMock{
+	rprMock := metadataRepositoryMock{
 		metadata: entity.Metadata{
 			Fullname: "test/mytest",
 			Owner:    "test",
@@ -82,7 +82,7 @@ func TestImport_OnImportProjectUsecase_WhenUnableToRetrieveMetadataFromRemoteRep
 	prMock := projectRepositoryMock{
 		getByURLErr: repository.ErrProjectNoResults,
 	}
-	rprMock := remoteProjectRepositoryMock{
+	rprMock := metadataRepositoryMock{
 		err: repository.ErrProjectUnexpected,
 	}
 	uc := create.NewImportProjectUsecase(prMock, rprMock, nil)
@@ -97,7 +97,7 @@ func TestImport_OnImportProjectUsecase_WhenUnableToCloneSourceCode_ShouldReturnE
 	prMock := projectRepositoryMock{
 		getByURLErr: repository.ErrProjectNoResults,
 	}
-	rprMock := remoteProjectRepositoryMock{
+	rprMock := metadataRepositoryMock{
 		metadata: entity.Metadata{
 			Fullname: "test/mytest",
 			Owner:    "test",
@@ -119,7 +119,7 @@ func TestImport_OnImportProjectUsecase_WhenUnableToSaveImportedProject_ShouldRet
 		getByURLErr: repository.ErrProjectNoResults,
 		addErr:      repository.ErrProjectUnexpected,
 	}
-	rprMock := remoteProjectRepositoryMock{
+	rprMock := metadataRepositoryMock{
 		metadata: entity.Metadata{
 			Fullname: "test/mytest",
 			Owner:    "test",
@@ -151,12 +151,12 @@ func (m projectRepositoryMock) GetByURL(ctx context.Context, url string) (entity
 	return m.project, m.getByURLErr
 }
 
-type remoteProjectRepositoryMock struct {
+type metadataRepositoryMock struct {
 	metadata entity.Metadata
 	err      error
 }
 
-func (m remoteProjectRepositoryMock) RetrieveMetadata(ctx context.Context, url string) (entity.Metadata, error) {
+func (m metadataRepositoryMock) RetrieveMetadata(ctx context.Context, url string) (entity.Metadata, error) {
 	return m.metadata, m.err
 }
 
