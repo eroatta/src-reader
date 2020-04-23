@@ -2,26 +2,31 @@ package entity
 
 import "go/ast"
 
-const (
-	MinerWordCount            MinerType = "WordCount"
-	MinerScopedDeclarations   MinerType = "Scoped Declarations"
-	MinerDeclarations         MinerType = "Declarations"
-	MinerComments             MinerType = "Comments"
-	MinerGlobalFrequencyTable MinerType = "Global Frequency Table"
-)
-
-type MinerType string
-
 // Miner interface is used to define a custom miner.
 type Miner interface {
-	// Type provides the name of the miner.
-	Type() MinerType
+	// Name provides the name of the miner.
+	Name() string
 	// Visit applies the mining logic while traversing the Abstract Syntax Tree.
 	Visit(node ast.Node) ast.Visitor
 	// SetCurrentFile specifies the current file being mined.
 	SetCurrentFile(filename string)
+	// Results returns the results after mining.
+	Results() interface{}
 }
 
+// MinerAbstractFactory is an interface for creating mining algorithm factories.
+type MinerAbstractFactory interface {
+	// Get returns a MinerFactory for the selectd mining algorithm.
+	Get(algorithm string) (MinerFactory, error)
+}
+
+// MinerFactory is an interface for creating mining algorithm instances.
+type MinerFactory interface {
+	// Make returns a mining algorithm instance.
+	Make() (Miner, error)
+}
+
+// TODO: move it?
 type ExtractorFactory func(filename string) Extractor
 
 // Extractor is used to define a custom identifier extractor.
@@ -49,7 +54,7 @@ type SplitterAbstractFactory interface {
 // SplitterFactory is an interface for creating splitting algorithm instances.
 type SplitterFactory interface {
 	// Make returns a splitting algorithm instance built from miners.
-	Make(miners map[MinerType]Miner) (Splitter, error)
+	Make(miners map[string]Miner) (Splitter, error)
 }
 
 // Expander interface is used to define a custom expander.
@@ -71,5 +76,5 @@ type ExpanderAbstractFactory interface {
 // ExpanderFactory is an interface for creating expansion algorithm instances.
 type ExpanderFactory interface {
 	// Make returns an expansion algorithm instance built from miners.
-	Make(miningResults map[MinerType]Miner) (Expander, error)
+	Make(miningResults map[string]Miner) (Expander, error)
 }

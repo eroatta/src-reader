@@ -94,10 +94,12 @@ func (uc analyzeProjectUsecase) Analyze(ctx context.Context, project entity.Proj
 	}
 
 	// apply the pre-process step (mine them)
-	miningResults := step.Mine(valid, config.Miners...)
-	for name := range miningResults {
-		analysisResults.PipelineMiners = append(analysisResults.PipelineMiners, string(name))
+	miners := buildMiners(config)
+	for _, miner := range miners {
+		analysisResults.PipelineMiners = append(analysisResults.PipelineMiners, miner.Name())
 	}
+
+	miningResults := step.Mine(valid, miners...)
 
 	// make the splitters from input and mining results
 	splitters := buildSplittersFromInputAndMiningResults(config, miningResults)
@@ -154,7 +156,28 @@ func (uc analyzeProjectUsecase) Analyze(ctx context.Context, project entity.Proj
 	return analysisResults, nil
 }
 
-func buildSplittersFromInputAndMiningResults(config *entity.AnalysisConfig, miningResults map[entity.MinerType]entity.Miner) []entity.Splitter {
+func buildMiners(config *entity.AnalysisConfig) []entity.Miner {
+	miners := make([]entity.Miner, 0)
+	for _, name := range config.Miners {
+		factory, err := config.MinerAlgorithmFactory.Get(name)
+		if err != nil {
+			log.WithError(err).Error(fmt.Sprintf("unable to get mining factory for %s", name))
+			continue
+		}
+
+		miner, err := factory.Make()
+		if err != nil {
+			log.WithError(err).Error(fmt.Sprintf("unable to make mining algorithm for %s", name))
+			continue
+		}
+
+		miners = append(miners, miner)
+	}
+
+	return miners
+}
+
+func buildSplittersFromInputAndMiningResults(config *entity.AnalysisConfig, miningResults map[string]entity.Miner) []entity.Splitter {
 	splitters := make([]entity.Splitter, 0)
 	for _, name := range config.Splitters {
 		factory, err := config.SplittingAlgorithmFactory.Get(name)
@@ -175,7 +198,7 @@ func buildSplittersFromInputAndMiningResults(config *entity.AnalysisConfig, mini
 	return splitters
 }
 
-func buildExpandersFromInputAndMiningResults(config *entity.AnalysisConfig, miningResults map[entity.MinerType]entity.Miner) []entity.Expander {
+func buildExpandersFromInputAndMiningResults(config *entity.AnalysisConfig, miningResults map[string]entity.Miner) []entity.Expander {
 	expanders := make([]entity.Expander, 0)
 	for _, name := range config.Expanders {
 		factory, err := config.ExpansionAlgorithmFactory.Get(name)

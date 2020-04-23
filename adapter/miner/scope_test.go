@@ -11,16 +11,18 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestNewScopes_ShouldReturnScopesMiner(t *testing.T) {
-	miner := miner.NewScope()
+func TestNewScopesFactory_ShouldReturnScopesMinerFactory(t *testing.T) {
+	factory := miner.NewScopesFactory()
 
-	assert.NotNil(t, miner)
+	assert.NotNil(t, factory)
 }
 
-func TestType_OnScope_ShouldReturnScope(t *testing.T) {
-	miner := miner.NewScope()
+func TestMake_OnScopesFactory_ShouldReturnMiner(t *testing.T) {
+	factory := miner.NewScopesFactory()
+	miner, err := factory.Make()
 
-	assert.Equal(t, entity.MinerScopedDeclarations, miner.Type())
+	assert.Equal(t, "scoped-declarations", miner.Name())
+	assert.NoError(t, err)
 }
 
 func TestSetCurrentFile_OnScope_ShoudldSetNewFilename(t *testing.T) {
@@ -33,7 +35,8 @@ func TestSetCurrentFile_OnScope_ShoudldSetNewFilename(t *testing.T) {
 func TestScopedDeclarations_OnScope_ShouldReturnScopes(t *testing.T) {
 	miner := miner.NewScope()
 
-	assert.Equal(t, 0, len(miner.ScopedDeclarations()))
+	results := miner.Results().(map[string]entity.ScopedDecl)
+	assert.Equal(t, 0, len(results))
 }
 
 func TestVisit_OnScopeWithPlainFuncDecl_ShouldReturnScopedDeclaration(t *testing.T) {
@@ -65,7 +68,7 @@ func TestVisit_OnScopeWithPlainFuncDecl_ShouldReturnScopedDeclaration(t *testing
 	m.SetCurrentFile("testfile.go")
 	ast.Walk(m, node)
 
-	scopedDecls := m.ScopedDeclarations()
+	scopedDecls := m.Results().(map[string]entity.ScopedDecl)
 	assert.Equal(t, expected, scopedDecls)
 }
 
@@ -106,7 +109,7 @@ func TestVisit_OnScopeWithFuncDeclWithComments_ShouldReturnScopedDeclaration(t *
 	m.SetCurrentFile("testfile.go")
 	ast.Walk(m, node)
 
-	scopedDecls := m.ScopedDeclarations()
+	scopedDecls := m.Results().(map[string]entity.ScopedDecl)
 	assert.Equal(t, expected, scopedDecls)
 }
 
@@ -167,7 +170,7 @@ func TestVisit_OnScopeWithMultipleFuncDeclWithComments_ShouldReturnScopedDeclara
 	m.SetCurrentFile("testfile.go")
 	ast.Walk(m, node)
 
-	scopedDecls := m.ScopedDeclarations()
+	scopedDecls := m.Results().(map[string]entity.ScopedDecl)
 	assert.Equal(t, expected, scopedDecls)
 }
 
@@ -254,7 +257,7 @@ func TestVisit_OnScopeWithMultipleFuncDeclWithFullBody_ShouldReturnScopedDeclara
 	m.SetCurrentFile("testfile.go")
 	ast.Walk(m, node)
 
-	scopedDecls := m.ScopedDeclarations()
+	scopedDecls := m.Results().(map[string]entity.ScopedDecl)
 	assert.Equal(t, expected, scopedDecls)
 }
 
@@ -285,7 +288,7 @@ func TestVisit_OnScopeWithPlainVarDecl_ShouldReturnScopedDeclaration(t *testing.
 	m.SetCurrentFile("testfile.go")
 	ast.Walk(m, node)
 
-	scopedDecls := m.ScopedDeclarations()
+	scopedDecls := m.Results().(map[string]entity.ScopedDecl)
 	assert.Equal(t, expected, scopedDecls)
 }
 
@@ -321,7 +324,7 @@ func TestVisit_OnScopeWithFullyCommentedVarDecl_ShouldReturnScopedDeclaration(t 
 	m.SetCurrentFile("testfile.go")
 	ast.Walk(m, node)
 
-	scopedDecls := m.ScopedDeclarations()
+	scopedDecls := m.Results().(map[string]entity.ScopedDecl)
 	assert.Equal(t, expected, scopedDecls)
 }
 
@@ -377,7 +380,7 @@ func TestVisit_OnScopeWithVarBlockDecl_ShouldReturnScopedDeclaration(t *testing.
 	m.SetCurrentFile("testfile.go")
 	ast.Walk(m, node)
 
-	scopedDecls := m.ScopedDeclarations()
+	scopedDecls := m.Results().(map[string]entity.ScopedDecl)
 	assert.Equal(t, expected, scopedDecls)
 }
 
@@ -408,7 +411,7 @@ func TestVisit_OnScopeWithPlainConstDecl_ShouldReturnScopedDeclaration(t *testin
 	m.SetCurrentFile("testfile.go")
 	ast.Walk(m, node)
 
-	scopedDecls := m.ScopedDeclarations()
+	scopedDecls := m.Results().(map[string]entity.ScopedDecl)
 	assert.Equal(t, expected, scopedDecls)
 }
 
@@ -444,7 +447,7 @@ func TestVisit_OnScopeWithFullyCommentedConstDecl_ShouldReturnScopedDeclaration(
 	m.SetCurrentFile("testfile.go")
 	ast.Walk(m, node)
 
-	scopedDecls := m.ScopedDeclarations()
+	scopedDecls := m.Results().(map[string]entity.ScopedDecl)
 	assert.Equal(t, expected, scopedDecls)
 }
 
@@ -510,7 +513,7 @@ func TestVisit_OnScopeWithConstBlockDecl_ShouldReturnScopedDeclaration(t *testin
 	m.SetCurrentFile("testfile.go")
 	ast.Walk(m, node)
 
-	scopedDecls := m.ScopedDeclarations()
+	scopedDecls := m.Results().(map[string]entity.ScopedDecl)
 	assert.Equal(t, expected, scopedDecls)
 }
 
@@ -541,7 +544,7 @@ func TestVisit_OnScopeWithPlainStructDecl_ShouldReturnScopedDeclaration(t *testi
 	m.SetCurrentFile("testfile.go")
 	ast.Walk(m, node)
 
-	scopedDecls := m.ScopedDeclarations()
+	scopedDecls := m.Results().(map[string]entity.ScopedDecl)
 	assert.Equal(t, expected, scopedDecls)
 }
 
@@ -580,7 +583,7 @@ func TestVisit_OnScopeWithFullyCommentedStructDecl_ShouldReturnScopedDeclaration
 	m.SetCurrentFile("testfile.go")
 	ast.Walk(m, node)
 
-	scopedDecls := m.ScopedDeclarations()
+	scopedDecls := m.Results().(map[string]entity.ScopedDecl)
 	assert.Equal(t, expected, scopedDecls)
 }
 
@@ -660,7 +663,7 @@ func TestVisit_OnScopeWithStructBlockDecl_ShouldReturnScopedDeclaration(t *testi
 	m.SetCurrentFile("testfile.go")
 	ast.Walk(m, node)
 
-	scopedDecls := m.ScopedDeclarations()
+	scopedDecls := m.Results().(map[string]entity.ScopedDecl)
 	assert.Equal(t, expected, scopedDecls)
 }
 
@@ -691,7 +694,7 @@ func TestVisit_OnScopeWithPlainInterfaceDecl_ShouldReturnScopedDeclaration(t *te
 	m.SetCurrentFile("testfile.go")
 	ast.Walk(m, node)
 
-	scopedDecls := m.ScopedDeclarations()
+	scopedDecls := m.Results().(map[string]entity.ScopedDecl)
 	assert.Equal(t, expected, scopedDecls)
 }
 
@@ -730,7 +733,7 @@ func TestVisit_OnScopeWithFullyCommentedInterfaceDecl_ShouldReturnScopedDeclarat
 	m.SetCurrentFile("testfile.go")
 	ast.Walk(m, node)
 
-	scopedDecls := m.ScopedDeclarations()
+	scopedDecls := m.Results().(map[string]entity.ScopedDecl)
 	assert.Equal(t, expected, scopedDecls)
 }
 
@@ -795,6 +798,6 @@ func TestVisit_OnScopeWithInterfaceBlockDecl_ShouldReturnScopedDeclaration(t *te
 	m.SetCurrentFile("testfile.go")
 	ast.Walk(m, node)
 
-	scopedDecls := m.ScopedDeclarations()
+	scopedDecls := m.Results().(map[string]entity.ScopedDecl)
 	assert.Equal(t, expected, scopedDecls)
 }

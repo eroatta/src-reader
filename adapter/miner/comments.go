@@ -7,21 +7,29 @@ import (
 	"github.com/eroatta/src-reader/entity"
 )
 
-// Comments handles the comments mining process.
-type Comments struct {
-	comments []string
+// NewCommentsFactory creates a new comments miner factory.
+func NewCommentsFactory() entity.MinerFactory {
+	return commentsFactory{}
+}
+
+type commentsFactory struct{}
+
+func (f commentsFactory) Make() (entity.Miner, error) {
+	return NewComments(), nil
 }
 
 // NewComments creates a new Comments miner.
 func NewComments() *Comments {
 	return &Comments{
+		miner:    miner{"comments"},
 		comments: make([]string, 0),
 	}
 }
 
-// Type returns the miner type.
-func (c *Comments) Type() entity.MinerType {
-	return entity.MinerComments
+// Comments handles the comments mining process.
+type Comments struct {
+	miner
+	comments []string
 }
 
 // SetCurrentFile specifies the current file being mined.
@@ -50,7 +58,7 @@ func (c *Comments) Visit(node ast.Node) ast.Visitor {
 	return c
 }
 
-// Collected returns the list of comments found.
-func (c *Comments) Collected() []string {
+// Results returns the list of comments found.
+func (c *Comments) Results() interface{} {
 	return c.comments
 }

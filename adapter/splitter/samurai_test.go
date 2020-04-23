@@ -18,8 +18,8 @@ func TestNewSamuraiFactory_ShouldReturnSamuraiSplitterFactory(t *testing.T) {
 }
 
 func TestMake_OnSamuraiFactory_WhenMissingLocalFrequencyTable_ShouldReturnError(t *testing.T) {
-	miningResults := map[entity.MinerType]entity.Miner{
-		entity.MinerGlobalFrequencyTable: miner.NewGlobalFreqTable(nil),
+	miningResults := map[string]entity.Miner{
+		"global-frequency-table": miner.NewGlobalFreqTable(nil),
 	}
 
 	factory := splitter.NewSamuraiFactory()
@@ -30,8 +30,8 @@ func TestMake_OnSamuraiFactory_WhenMissingLocalFrequencyTable_ShouldReturnError(
 }
 
 func TestMake_OnSamuraiFactory_WhenMissingGlobalFrequencyTable_ShouldReturnError(t *testing.T) {
-	miningResults := map[entity.MinerType]entity.Miner{
-		entity.MinerWordCount: miner.NewWordCount(),
+	miningResults := map[string]entity.Miner{
+		"wordcount": miner.NewWordCount(),
 	}
 
 	factory := splitter.NewSamuraiFactory()
@@ -42,9 +42,9 @@ func TestMake_OnSamuraiFactory_WhenMissingGlobalFrequencyTable_ShouldReturnError
 }
 
 func TestSplit_OnSamurai_ShouldReturnSplit(t *testing.T) {
-	miningResults := map[entity.MinerType]entity.Miner{
-		entity.MinerWordCount:            miner.NewWordCount(),
-		entity.MinerGlobalFrequencyTable: miner.NewGlobalFreqTable(samurai.NewFrequencyTable()),
+	miningResults := map[string]entity.Miner{
+		"wordcount":              miner.NewWordCount(),
+		"global-frequency-table": miner.NewGlobalFreqTable(samurai.NewFrequencyTable()),
 	}
 
 	factory := splitter.NewSamuraiFactory()

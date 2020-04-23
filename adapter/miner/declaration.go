@@ -13,37 +13,36 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func newDecl(ID string, declType token.Token) entity.Decl {
-	return entity.Decl{
-		ID:       ID,
-		DeclType: declType,
-		Words:    make(map[string]struct{}),
-		Phrases:  make(map[string]struct{}),
+// NewDeclarationsFactory creates a new declarations miner factory.
+func NewDeclarationsFactory() entity.MinerFactory {
+	return declarationsFactory{}
+}
+
+type declarationsFactory struct{}
+
+func (f declarationsFactory) Make() (entity.Miner, error) {
+	return NewDeclaration(lists.Dictionary), nil
+}
+
+// NewDeclaration initializes a new declarations miner.
+func NewDeclaration(dict lists.List) *Declaration {
+	return &Declaration{
+		miner: miner{"declarations"},
+		Dict:  dict,
+		Decls: make(map[string]entity.Decl),
 	}
 }
 
 // Declaration represents the declarations miner, which extracts information about
 // words and phrases for each function/variable/struct/interface declaration.
 type Declaration struct {
+	miner
 	Filename    string
 	Dict        lists.List
 	PackageName string
 	Comments    []*ast.CommentGroup
 	Included    []ast.Decl
 	Decls       map[string]entity.Decl
-}
-
-// NewDeclaration initializes a new declarations miner.
-func NewDeclaration(dict lists.List) *Declaration {
-	return &Declaration{
-		Dict:  dict,
-		Decls: make(map[string]entity.Decl),
-	}
-}
-
-// Type returns the specific entity.MinerType for the miner.
-func (m *Declaration) Type() entity.MinerType {
-	return entity.MinerDeclarations
 }
 
 // SetCurrentFile specifies the current file being mined.
@@ -142,6 +141,15 @@ func (m *Declaration) Visit(node ast.Node) ast.Visitor {
 	}
 
 	return m
+}
+
+func newDecl(ID string, declType token.Token) entity.Decl {
+	return entity.Decl{
+		ID:       ID,
+		DeclType: declType,
+		Words:    make(map[string]struct{}),
+		Phrases:  make(map[string]struct{}),
+	}
 }
 
 func (m Declaration) shouldMine(elem *ast.GenDecl) bool {
@@ -316,7 +324,7 @@ func declID(filename string, pkg string, declType token.Token, name string, rece
 		Build()
 }
 
-// Declarations returns a map of declaration IDs and the mined text for each declaration.
-func (m Declaration) Declarations() map[string]entity.Decl {
+// Results returns a map of declaration IDs and the mined text for each declaration.
+func (m Declaration) Results() interface{} {
 	return m.Decls
 }

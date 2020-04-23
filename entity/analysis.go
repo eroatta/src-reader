@@ -7,7 +7,8 @@ import (
 
 // AnalysisConfig defines the configuration options for an analysis execution.
 type AnalysisConfig struct {
-	Miners                    []Miner
+	Miners                    []string
+	MinerAlgorithmFactory     MinerAbstractFactory
 	ExtractorFactory          ExtractorFactory
 	SplittingAlgorithmFactory SplitterAbstractFactory
 	Splitters                 []string

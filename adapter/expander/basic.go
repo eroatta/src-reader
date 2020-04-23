@@ -1,12 +1,11 @@
 package expander
 
 import (
-	"fmt"
+	"errors"
 	"sort"
 	"strings"
 
 	"github.com/agnivade/levenshtein"
-	"github.com/eroatta/src-reader/adapter/miner"
 	"github.com/eroatta/src-reader/entity"
 	"github.com/eroatta/token/basic"
 	"github.com/eroatta/token/expansion"
@@ -19,12 +18,12 @@ func NewBasicFactory() entity.ExpanderFactory {
 
 type basicFactory struct{}
 
-func (f basicFactory) Make(miningResults map[entity.MinerType]entity.Miner) (entity.Expander, error) {
-	declarationsMiner, ok := miningResults[entity.MinerDeclarations]
+func (f basicFactory) Make(miningResults map[string]entity.Miner) (entity.Expander, error) {
+	declarationsMiner, ok := miningResults["declarations"]
 	if !ok {
-		return nil, fmt.Errorf("unable to retrieve input from %s", entity.MinerDeclarations)
+		return nil, errors.New("unable to retrieve input from declarations miner")
 	}
-	declarations := declarationsMiner.(*miner.Declaration).Declarations()
+	declarations := declarationsMiner.Results().(map[string]entity.Decl)
 
 	return &basicExpander{
 		expander:     expander{"basic"},

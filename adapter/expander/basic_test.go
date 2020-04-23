@@ -17,7 +17,7 @@ func TestNewBasicFactory_ShouldReturnBasicExpanderFactory(t *testing.T) {
 }
 
 func TestMake_OnBasicFactory_WhenMissingVariableDeclarations_ShouldReturnError(t *testing.T) {
-	miningResults := map[entity.MinerType]entity.Miner{}
+	miningResults := map[string]entity.Miner{}
 
 	factory := expander.NewBasicFactory()
 	basic, err := factory.Make(miningResults)
@@ -27,8 +27,8 @@ func TestMake_OnBasicFactory_WhenMissingVariableDeclarations_ShouldReturnError(t
 }
 
 func TestApplicableOn_OnBasic_ShouldReturnGreedy(t *testing.T) {
-	miningResults := map[entity.MinerType]entity.Miner{
-		entity.MinerDeclarations: miner.NewDeclaration(nil),
+	miningResults := map[string]entity.Miner{
+		"declarations": miner.NewDeclaration(nil),
 	}
 
 	factory := expander.NewBasicFactory()
@@ -40,8 +40,8 @@ func TestApplicableOn_OnBasic_ShouldReturnGreedy(t *testing.T) {
 }
 
 func TestExpand_OnBasicWhenNoSplitsApplicable_ShouldReturnEmptyResults(t *testing.T) {
-	miningResults := map[entity.MinerType]entity.Miner{
-		entity.MinerDeclarations: miner.NewDeclaration(nil),
+	miningResults := map[string]entity.Miner{
+		"declarations": miner.NewDeclaration(nil),
 	}
 
 	factory := expander.NewBasicFactory()
@@ -63,8 +63,8 @@ func TestExpand_OnBasicWhenNoSplitsApplicable_ShouldReturnEmptyResults(t *testin
 }
 
 func TestExpand_OnBasicWhenNoDeclFound_ShouldReturnUnexpandedResults(t *testing.T) {
-	miningResults := map[entity.MinerType]entity.Miner{
-		entity.MinerDeclarations: miner.NewDeclaration(nil),
+	miningResults := map[string]entity.Miner{
+		"declarations": miner.NewDeclaration(nil),
 	}
 
 	factory := expander.NewBasicFactory()
@@ -87,8 +87,8 @@ func TestExpand_OnBasicWhenNoDeclFound_ShouldReturnUnexpandedResults(t *testing.
 }
 
 func TestExpand_OnBasic_ShouldReturnExpandedResultsFromWords(t *testing.T) {
-	miningResults := map[entity.MinerType]entity.Miner{
-		entity.MinerDeclarations: &miner.Declaration{
+	miningResults := map[string]entity.Miner{
+		"declarations": &miner.Declaration{
 			Decls: map[string]entity.Decl{
 				"filename:main.go+++pkg:main+++declType:var+++name:strbuff": entity.Decl{
 					ID:       "strbuff",
@@ -125,8 +125,8 @@ func TestExpand_OnBasic_ShouldReturnExpandedResultsFromWords(t *testing.T) {
 }
 
 func TestExpand_OnBasic_WhileUsingLocalVariables_ShouldReturnExpandedResultsFromWords(t *testing.T) {
-	miningResults := map[entity.MinerType]entity.Miner{
-		entity.MinerDeclarations: &miner.Declaration{
+	miningResults := map[string]entity.Miner{
+		"declarations": &miner.Declaration{
 			Decls: map[string]entity.Decl{
 				"filename:main.go+++pkg:main+++declType:var+++name:strbuff": entity.Decl{
 					ID:       "filename:main.go+++pkg:main+++declType:var+++name:strbuff",
@@ -164,8 +164,8 @@ func TestExpand_OnBasic_WhileUsingLocalVariables_ShouldReturnExpandedResultsFrom
 }
 
 func TestExpand_OnBasic_ShouldReturnExpandedResultsFromPhrases(t *testing.T) {
-	miningResults := map[entity.MinerType]entity.Miner{
-		entity.MinerDeclarations: &miner.Declaration{
+	miningResults := map[string]entity.Miner{
+		"declarations": &miner.Declaration{
 			Decls: map[string]entity.Decl{
 				"filename:main.go+++pkg:main+++declType:var+++name:sb": entity.Decl{
 					ID:       "sb",
@@ -199,8 +199,8 @@ func TestExpand_OnBasic_ShouldReturnExpandedResultsFromPhrases(t *testing.T) {
 }
 
 func TestExpand_OnBasicWhenMultipleResults_ShouldReturnClosestThreePerWord(t *testing.T) {
-	miningResults := map[entity.MinerType]entity.Miner{
-		entity.MinerDeclarations: &miner.Declaration{
+	miningResults := map[string]entity.Miner{
+		"declarations": &miner.Declaration{
 			Decls: map[string]entity.Decl{
 				"filename:main.go+++pkg:main+++declType:var+++name:contrl": entity.Decl{
 					ID:       "contrl",

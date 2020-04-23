@@ -14,7 +14,7 @@ func NewGreedyFactory() entity.SplitterFactory {
 
 type greedyFactory struct{}
 
-func (f greedyFactory) Make(miningResults map[entity.MinerType]entity.Miner) (entity.Splitter, error) {
+func (f greedyFactory) Make(miningResults map[string]entity.Miner) (entity.Splitter, error) {
 	return greedySplitter{
 		splitter: splitter{"greedy"},
 	}, nil

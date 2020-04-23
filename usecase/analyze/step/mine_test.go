@@ -12,7 +12,7 @@ import (
 )
 
 func TestMine_OnNoFiles_ShouldReturnMinersWithoutResults(t *testing.T) {
-	processed := step.Mine([]entity.File{}, &miner{typ: entity.MinerType("empty")})
+	processed := step.Mine([]entity.File{}, &miner{typ: "empty"})
 
 	assert.Equal(t, 1, len(processed))
 
@@ -29,7 +29,7 @@ func TestMine_OnEmptyMiners_ShouldReturnNoResults(t *testing.T) {
 }
 
 func TestMine_OnFileWithNilAST_ShouldReturnMinersWithoutResults(t *testing.T) {
-	processed := step.Mine([]entity.File{{Name: "main.go"}}, &miner{typ: entity.MinerType("empty")})
+	processed := step.Mine([]entity.File{{Name: "main.go"}}, &miner{typ: "empty"})
 
 	assert.Equal(t, 1, len(processed))
 
@@ -76,8 +76,8 @@ func TestMine_OnTwoMiners_ShouldReturnResultsBothMiners(t *testing.T) {
 		FileSet: testFileset,
 	}
 
-	first := &miner{typ: entity.MinerType("first")}
-	second := &miner{typ: entity.MinerType("second")}
+	first := &miner{typ: "first"}
+	second := &miner{typ: "second"}
 
 	processed := step.Mine([]entity.File{file1, file2}, first, second)
 
@@ -95,11 +95,11 @@ func TestMine_OnTwoMiners_ShouldReturnResultsBothMiners(t *testing.T) {
 }
 
 type miner struct {
-	typ    entity.MinerType
+	typ    string
 	visits int
 }
 
-func (m *miner) Type() entity.MinerType {
+func (m *miner) Name() string {
 	return m.typ
 }
 
@@ -108,4 +108,8 @@ func (m *miner) SetCurrentFile(f string) {}
 func (m *miner) Visit(n ast.Node) ast.Visitor {
 	m.visits++
 	return m
+}
+
+func (m *miner) Results() interface{} {
+	return m.visits
 }

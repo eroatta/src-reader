@@ -88,7 +88,7 @@ func TestAnalyze_OnAnalyzeProjectUsecase_WhenFailingToCreateSplitters_ShouldRetu
 	uc := analyze.NewAnalyzeProjectUsecase(sourceCodeRepositoryMock, nil)
 
 	results, err := uc.Analyze(context.TODO(), project, &entity.AnalysisConfig{
-		Miners:    []entity.Miner{},
+		Miners:    []string{},
 		Splitters: []string{},
 	})
 
@@ -116,7 +116,7 @@ func TestAnalyze_OnAnalyzeProjectUsecase_WhenFailingToCreateExpanders_ShouldRetu
 	uc := analyze.NewAnalyzeProjectUsecase(sourceCodeRepositoryMock, nil)
 
 	results, err := uc.Analyze(context.TODO(), project, &entity.AnalysisConfig{
-		Miners:                    []entity.Miner{},
+		Miners:                    []string{},
 		Splitters:                 []string{"conserv"},
 		SplittingAlgorithmFactory: splitter.NewSplitterFactory(),
 		Expanders:                 []string{},
@@ -150,7 +150,7 @@ func TestAnalyze_OnAnalyzeProjectUsecase_WhenFailingToSaveIdentifiers_ShouldRetu
 	uc := analyze.NewAnalyzeProjectUsecase(sourceCodeRepositoryMock, identifierRepositoryMock)
 
 	results, err := uc.Analyze(context.TODO(), project, &entity.AnalysisConfig{
-		Miners:                    []entity.Miner{},
+		Miners:                    []string{},
 		ExtractorFactory:          newExtractorMock,
 		Splitters:                 []string{"conserv"},
 		SplittingAlgorithmFactory: splitter.NewSplitterFactory(),
@@ -189,7 +189,7 @@ func TestAnalyze_OnAnalyzeProjectUsecase_WhenAnalyzingIdentifiers_ShouldReturnAn
 	uc := analyze.NewAnalyzeProjectUsecase(sourceCodeRepositoryMock, identifierRepositoryMock)
 
 	results, err := uc.Analyze(context.TODO(), project, &entity.AnalysisConfig{
-		Miners:                    []entity.Miner{},
+		Miners:                    []string{},
 		ExtractorFactory:          newExtractorMock,
 		Splitters:                 []string{"conserv"},
 		SplittingAlgorithmFactory: splitter.NewSplitterFactory(),
@@ -247,7 +247,7 @@ func (e expanderAbstractFactoryMock) Get(name string) (entity.ExpanderFactory, e
 
 type expanderFactoryMock struct{}
 
-func (e expanderFactoryMock) Make(miningResults map[entity.MinerType]entity.Miner) (entity.Expander, error) {
+func (e expanderFactoryMock) Make(miningResults map[string]entity.Miner) (entity.Expander, error) {
 	return expanderMock{}, nil
 }
 

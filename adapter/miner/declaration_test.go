@@ -8,27 +8,30 @@ import (
 
 	"github.com/eroatta/src-reader/adapter/miner"
 	"github.com/eroatta/src-reader/entity"
-	"github.com/eroatta/token/lists"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestNewDeclaration_ShouldReturnDeclarationMiner(t *testing.T) {
-	miner := miner.NewDeclaration(nil)
+func TestNewDeclarationsFactory_ShouldReturnDeclarationsMinerFactory(t *testing.T) {
+	factory := miner.NewDeclarationsFactory()
 
-	assert.NotNil(t, miner)
+	assert.NotNil(t, factory)
 }
 
-func TestType_OnDeclaration_ShouldReturnDeclaration(t *testing.T) {
-	miner := miner.NewDeclaration(nil)
+func TestMake_OnDeclarationsFactory_ShouldReturnMiner(t *testing.T) {
+	factory := miner.NewDeclarationsFactory()
+	miner, err := factory.Make()
 
-	assert.Equal(t, entity.MinerDeclarations, miner.Type())
+	assert.Equal(t, "declarations", miner.Name())
+	assert.NoError(t, err)
 }
 
 func TestSetCurrentFile_OnDeclaration_ShouldSetFile(t *testing.T) {
-	miner := miner.NewDeclaration(nil)
-	miner.SetCurrentFile("new_file.go")
+	factory := miner.NewDeclarationsFactory()
+	mnr, _ := factory.Make()
 
-	assert.Equal(t, "new_file.go", miner.Filename)
+	mnr.SetCurrentFile("new_file.go")
+
+	assert.Equal(t, "new_file.go", mnr.(*miner.Declaration).Filename)
 }
 
 func TestVisit_OnDeclarationWithFunctions_ShouldReturnDecls(t *testing.T) {
@@ -121,11 +124,12 @@ func TestVisit_OnDeclarationWithFunctions_ShouldReturnDecls(t *testing.T) {
 			fs := token.NewFileSet()
 			node, _ := parser.ParseFile(fs, "testfile.go", []byte(fixture.src), parser.ParseComments)
 
-			m := miner.NewDeclaration(lists.Dictionary)
+			factory := miner.NewDeclarationsFactory()
+			m, _ := factory.Make()
 			m.SetCurrentFile("testfile.go")
 			ast.Walk(m, node)
 
-			decls := m.Declarations()
+			decls := m.Results().(map[string]entity.Decl)
 			assert.Equal(t, len(fixture.expected), len(decls))
 			assert.Equal(t, fixture.expected, decls)
 		})
@@ -274,11 +278,12 @@ func TestVisit_OnDeclarationWithVarDecl_ShouldReturnWordsAndPhrases(t *testing.T
 			fs := token.NewFileSet()
 			node, _ := parser.ParseFile(fs, "", []byte(fixture.src), parser.ParseComments)
 
-			m := miner.NewDeclaration(lists.Dictionary)
+			factory := miner.NewDeclarationsFactory()
+			m, _ := factory.Make()
 			m.SetCurrentFile("testfile.go")
 			ast.Walk(m, node)
 
-			decls := m.Declarations()
+			decls := m.Results().(map[string]entity.Decl)
 			assert.Equal(t, len(fixture.expected), len(decls))
 			assert.Equal(t, fixture.expected, decls)
 		})
@@ -436,11 +441,12 @@ func TestVisit_OnDeclarationWithConstDecl_ShouldReturnWordsAndPhrases(t *testing
 			fs := token.NewFileSet()
 			node, _ := parser.ParseFile(fs, "", []byte(fixture.src), parser.ParseComments)
 
-			m := miner.NewDeclaration(lists.Dictionary)
+			factory := miner.NewDeclarationsFactory()
+			m, _ := factory.Make()
 			m.SetCurrentFile("testfile.go")
 			ast.Walk(m, node)
 
-			decls := m.Declarations()
+			decls := m.Results().(map[string]entity.Decl)
 			assert.Equal(t, len(fixture.expected), len(decls))
 			assert.Equal(t, fixture.expected, decls)
 		})
@@ -616,11 +622,12 @@ func TestVisit_OnDeclarationWithTypeDecl_ShouldReturnWordsAndPhrases(t *testing.
 			fs := token.NewFileSet()
 			node, _ := parser.ParseFile(fs, "", []byte(fixture.src), parser.ParseComments)
 
-			m := miner.NewDeclaration(lists.Dictionary)
+			factory := miner.NewDeclarationsFactory()
+			m, _ := factory.Make()
 			m.SetCurrentFile("testfile.go")
 			ast.Walk(m, node)
 
-			decls := m.Declarations()
+			decls := m.Results().(map[string]entity.Decl)
 			assert.Equal(t, len(fixture.expected), len(decls))
 			assert.Equal(t, fixture.expected, decls)
 		})
@@ -796,11 +803,12 @@ func TestVisit_OnDeclarationWithInterfaceDecl_ShouldReturnWordsAndPhrases(t *tes
 			fs := token.NewFileSet()
 			node, _ := parser.ParseFile(fs, "", []byte(fixture.src), parser.ParseComments)
 
-			m := miner.NewDeclaration(lists.Dictionary)
+			factory := miner.NewDeclarationsFactory()
+			m, _ := factory.Make()
 			m.SetCurrentFile("testfile.go")
 			ast.Walk(m, node)
 
-			decls := m.Declarations()
+			decls := m.Results().(map[string]entity.Decl)
 			assert.Equal(t, len(fixture.expected), len(decls))
 			assert.Equal(t, fixture.expected, decls)
 		})

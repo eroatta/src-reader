@@ -1,10 +1,9 @@
 package splitter
 
 import (
-	"fmt"
+	"errors"
 	"strings"
 
-	"github.com/eroatta/src-reader/adapter/miner"
 	"github.com/eroatta/src-reader/entity"
 	"github.com/eroatta/token/lists"
 	"github.com/eroatta/token/samurai"
@@ -18,15 +17,15 @@ func NewSamuraiFactory() entity.SplitterFactory {
 
 type samuraiFactory struct{}
 
-func (f samuraiFactory) Make(miningResults map[entity.MinerType]entity.Miner) (entity.Splitter, error) {
+func (f samuraiFactory) Make(miningResults map[string]entity.Miner) (entity.Splitter, error) {
 	// build local frequency table from word count
-	wordsMiner, ok := miningResults[entity.MinerWordCount]
+	wordsMiner, ok := miningResults["wordcount"]
 	if !ok {
-		return nil, fmt.Errorf("unable to retrieve input from %s", entity.MinerWordCount)
+		return nil, errors.New("unable to retrieve input from wordcount miner")
 	}
 
 	local := samurai.NewFrequencyTable()
-	frequencies := wordsMiner.(miner.WordCount).Results()
+	frequencies := wordsMiner.Results().(map[string]int)
 	for token, count := range frequencies {
 		if len(token) == 1 {
 			continue
@@ -40,11 +39,11 @@ func (f samuraiFactory) Make(miningResults map[entity.MinerType]entity.Miner) (e
 	}
 
 	// extract global frequency table
-	globalFreqTableMiner, ok := miningResults[entity.MinerGlobalFrequencyTable]
+	globalFreqTableMiner, ok := miningResults["global-frequency-table"]
 	if !ok {
-		return nil, fmt.Errorf("unable to retrieve input from %s", entity.MinerGlobalFrequencyTable)
+		return nil, errors.New("unable to retrieve input from global-frequency-table miner")
 	}
-	global := globalFreqTableMiner.(miner.GlobalFreqTable).Table()
+	global := globalFreqTableMiner.Results().(*samurai.FrequencyTable)
 
 	return samuraiSplitter{
 		splitter: splitter{"samurai"},

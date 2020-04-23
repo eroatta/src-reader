@@ -12,21 +12,29 @@ import (
 
 var cleaner = regexp.MustCompile("[^a-zA-Z0-9]")
 
-// WordCount handles the word count mining process.
-type WordCount struct {
-	words map[string]int
+// NewWordcountFactory creates a new wordcount miner factory.
+func NewWordcountFactory() entity.MinerFactory {
+	return wordcountFactory{}
+}
+
+type wordcountFactory struct{}
+
+func (f wordcountFactory) Make() (entity.Miner, error) {
+	return NewWordCount(), nil
 }
 
 // NewWordCount creates a new Count miner.
 func NewWordCount() WordCount {
 	return WordCount{
+		miner: miner{"wordcount"},
 		words: map[string]int{},
 	}
 }
 
-// Type returns the miner type.
-func (m WordCount) Type() entity.MinerType {
-	return entity.MinerWordCount
+// WordCount handles the word count mining process.
+type WordCount struct {
+	miner
+	words map[string]int
 }
 
 // SetCurrentFile specifies the current file being mined.
@@ -220,6 +228,6 @@ func countOnFile(elem *ast.File) []string {
 }
 
 // Results returns the word count.
-func (m WordCount) Results() map[string]int {
+func (m WordCount) Results() interface{} {
 	return m.words
 }

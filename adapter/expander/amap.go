@@ -1,10 +1,9 @@
 package expander
 
 import (
-	"fmt"
+	"errors"
 	"strings"
 
-	"github.com/eroatta/src-reader/adapter/miner"
 	"github.com/eroatta/src-reader/entity"
 	"github.com/eroatta/token/amap"
 )
@@ -16,18 +15,18 @@ func NewAMAPFactory() entity.ExpanderFactory {
 
 type amapFactory struct{}
 
-func (f amapFactory) Make(miningResults map[entity.MinerType]entity.Miner) (entity.Expander, error) {
-	declarationsMiner, ok := miningResults[entity.MinerScopedDeclarations]
+func (f amapFactory) Make(miningResults map[string]entity.Miner) (entity.Expander, error) {
+	declarationsMiner, ok := miningResults["scoped-declarations"]
 	if !ok {
-		return nil, fmt.Errorf("unable to retrieve input from %s", entity.MinerScopedDeclarations)
+		return nil, errors.New("unable to retrieve input from scoped-declartions miner")
 	}
-	scopedDeclarations := declarationsMiner.(*miner.Scope).ScopedDeclarations()
+	scopedDeclarations := declarationsMiner.Results().(map[string]entity.ScopedDecl)
 
-	commentsMiner, ok := miningResults[entity.MinerComments]
+	commentsMiner, ok := miningResults["comments"]
 	if !ok {
-		return nil, fmt.Errorf("unable to retrieve input from %s", entity.MinerComments)
+		return nil, errors.New("unable to retrieve input from comments miner")
 	}
-	referenceText := commentsMiner.(*miner.Comments).Collected()
+	referenceText := commentsMiner.Results().([]string)
 
 	return &amapExpander{
 		expander:           expander{"amap"},

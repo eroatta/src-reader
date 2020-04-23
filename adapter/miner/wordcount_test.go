@@ -8,20 +8,21 @@ import (
 	"testing"
 
 	"github.com/eroatta/src-reader/adapter/miner"
-	"github.com/eroatta/src-reader/entity"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestNewWordCount_ShouldReturnNewWordCountMiner(t *testing.T) {
-	miner := miner.NewWordCount()
+func TestNewWordcountFactory_ShouldReturnWordcountMinerFactory(t *testing.T) {
+	factory := miner.NewWordcountFactory()
 
-	assert.NotNil(t, miner)
+	assert.NotNil(t, factory)
 }
 
-func TestType_OnWordCount_ShouldReturnCount(t *testing.T) {
-	miner := miner.NewWordCount()
+func TestMake_OnWordcountFactory_ShouldReturnMiner(t *testing.T) {
+	factory := miner.NewWordcountFactory()
+	miner, err := factory.Make()
 
-	assert.Equal(t, entity.MinerWordCount, miner.Type())
+	assert.Equal(t, "wordcount", miner.Name())
+	assert.NoError(t, err)
 }
 
 func TestVisit_OnWordCountWithNilNode_ShouldReturnNil(t *testing.T) {
@@ -392,10 +393,11 @@ func TestVisit_OnWordCount_ShouldSplitTheIdentifiers(t *testing.T) {
 			count := miner.NewWordCount()
 			ast.Walk(count, node)
 
-			assert.NotEmpty(t, count.Results())
-			assert.Equal(t, fixture.uniqueWords, len(count.Results()))
+			results := count.Results().(map[string]int)
+			assert.NotEmpty(t, results)
+			assert.Equal(t, fixture.uniqueWords, len(results))
 			for key, value := range fixture.expected {
-				assert.Equal(t, value, count.Results()[key], fmt.Sprintf("invalid number of occurrencies for element: %s", key))
+				assert.Equal(t, value, results[key], fmt.Sprintf("invalid number of occurrencies for element: %s", key))
 			}
 		})
 	}
@@ -820,10 +822,11 @@ func TestVisit_OnWordCountWithFullFile_ShouldSplitCommentsAndIdentifiers(t *test
 	count := miner.NewWordCount()
 	ast.Walk(count, node)
 
-	assert.NotEmpty(t, count.Results())
-	assert.Equal(t, len(expectedWords), len(count.Results()))
+	results := count.Results().(map[string]int)
+	assert.NotEmpty(t, results)
+	assert.Equal(t, len(expectedWords), len(results))
 	for key, value := range expectedWords {
-		assert.Equal(t, value, count.Results()[key], fmt.Sprintf("invalid number of occurrencies for element: %s", key))
+		assert.Equal(t, value, results[key], fmt.Sprintf("invalid number of occurrencies for element: %s", key))
 	}
 }
 
@@ -847,7 +850,7 @@ func TestResults_OnWordCountExtractorAfterExtraction_ShouldReturnWordCount(t *te
 	count := miner.NewWordCount()
 	ast.Walk(count, node)
 
-	wordCount := count.Results()
+	wordCount := count.Results().(map[string]int)
 	assert.NotEmpty(t, wordCount)
 	assert.Equal(t, 1, len(wordCount))
 

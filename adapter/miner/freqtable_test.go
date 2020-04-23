@@ -9,20 +9,21 @@ import (
 	"github.com/eroatta/token/samurai"
 
 	"github.com/eroatta/src-reader/adapter/miner"
-	"github.com/eroatta/src-reader/entity"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestNewGlobalFreqTable_ShouldReturnNewGlobalFreqTableMiner(t *testing.T) {
-	miner := miner.NewGlobalFreqTable(nil)
+func TestNewGlobalFreqTableFactory_ShouldReturnGlobalFreqTableMinerFactory(t *testing.T) {
+	factory := miner.NewGlobalFreqTableFactory()
 
-	assert.NotNil(t, miner)
+	assert.NotNil(t, factory)
 }
 
-func TestType_OnGlobalFreqTable_ShouldReturnMinerType(t *testing.T) {
-	miner := miner.NewGlobalFreqTable(nil)
+func TestMake_OnGlobalFreqTableFactory_ShouldReturnMiner(t *testing.T) {
+	factory := miner.NewGlobalFreqTableFactory()
+	miner, err := factory.Make()
 
-	assert.Equal(t, entity.MinerGlobalFrequencyTable, miner.Type())
+	assert.Equal(t, "global-frequency-table", miner.Name())
+	assert.NoError(t, err)
 }
 
 func TestVisit_OnGlobalFreqTable_ShouldReturnCleanComments(t *testing.T) {
@@ -52,6 +53,6 @@ func TestVisit_OnGlobalFreqTable_ShouldReturnCleanComments(t *testing.T) {
 	miner := miner.NewGlobalFreqTable(ft)
 	ast.Walk(miner, node)
 
-	gft := miner.Table()
+	gft := miner.Results().(*samurai.FrequencyTable)
 	assert.Equal(t, ft, gft)
 }

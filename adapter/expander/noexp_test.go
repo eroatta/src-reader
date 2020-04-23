@@ -15,7 +15,7 @@ func TestNewNoExpansionFactory_ShouldReturnExpanderFactory(t *testing.T) {
 }
 
 func TestMake_OnNoExpansionFactory_ShouldReturnExpander(t *testing.T) {
-	miningResults := map[entity.MinerType]entity.Miner{}
+	miningResults := map[string]entity.Miner{}
 
 	factory := expander.NewNoExpansionFactory()
 	noexp, err := factory.Make(miningResults)
@@ -25,7 +25,7 @@ func TestMake_OnNoExpansionFactory_ShouldReturnExpander(t *testing.T) {
 }
 
 func TestApplicableOn_OnNoExpansion_ShouldReturnConserv(t *testing.T) {
-	miningResults := map[entity.MinerType]entity.Miner{}
+	miningResults := map[string]entity.Miner{}
 
 	factory := expander.NewNoExpansionFactory()
 	noexp, _ := factory.Make(miningResults)
@@ -35,7 +35,7 @@ func TestApplicableOn_OnNoExpansion_ShouldReturnConserv(t *testing.T) {
 }
 
 func TestExpand_OnNoexpWhenNoSplitsApplicable_ShouldReturnEmptyResults(t *testing.T) {
-	miningResults := map[entity.MinerType]entity.Miner{}
+	miningResults := map[string]entity.Miner{}
 
 	factory := expander.NewNoExpansionFactory()
 	noexp, _ := factory.Make(miningResults)
@@ -55,7 +55,7 @@ func TestExpand_OnNoexpWhenNoSplitsApplicable_ShouldReturnEmptyResults(t *testin
 }
 
 func TestExpand_OnNoexp_ShouldReturnSameSplittedValues(t *testing.T) {
-	miningResults := map[entity.MinerType]entity.Miner{}
+	miningResults := map[string]entity.Miner{}
 
 	factory := expander.NewNoExpansionFactory()
 	noexp, _ := factory.Make(miningResults)

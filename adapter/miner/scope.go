@@ -9,49 +9,36 @@ import (
 	"github.com/eroatta/src-reader/entity"
 )
 
+// NewScopesFactory creates a new scopes miner factory.
+func NewScopesFactory() entity.MinerFactory {
+	return scopesFactory{}
+}
+
+type scopesFactory struct{}
+
+func (f scopesFactory) Make() (entity.Miner, error) {
+	return NewScope(), nil
+}
+
+// NewScope initializes a new scopes miner.
+func NewScope() *Scope {
+	return &Scope{
+		miner:           miner{"scoped-declarations"},
+		Scopes:          make(map[string]entity.ScopedDecl),
+		PackageComments: make([]string, 0),
+	}
+}
+
 // Scope represents a scopes miner, which extracts information about
 // the scope for each function/variable/struct/interface declaration.
 type Scope struct {
+	miner
 	Filename        string
 	PackageName     string
 	PackageComments []string
 	Comments        []*ast.CommentGroup
 	Included        []ast.Decl
 	Scopes          map[string]entity.ScopedDecl
-}
-
-// NewScope initializes a new scopes miner.
-func NewScope() *Scope {
-	return &Scope{
-		Scopes:          make(map[string]entity.ScopedDecl),
-		PackageComments: make([]string, 0),
-	}
-}
-
-func newScopedDecl(filename string, pkg string, receiver string, name string, declType token.Token) entity.ScopedDecl {
-	id := entity.NewDeclarationIDBuilder().
-		WithFilename(filename).
-		WithPackage(pkg).
-		WithReceiver(receiver).
-		WithName(name).
-		WithType(declType).
-		Build()
-
-	return entity.ScopedDecl{
-		ID:              id,
-		DeclType:        declType,
-		Name:            name,
-		VariableDecls:   make([]string, 0),
-		Statements:      make([]string, 0),
-		BodyText:        make([]string, 0),
-		Comments:        make([]string, 0),
-		PackageComments: make([]string, 0),
-	}
-}
-
-// Type returns the specific entity.MinerType for the miner.
-func (m *Scope) Type() entity.MinerType {
-	return entity.MinerScopedDeclarations
 }
 
 // SetCurrentFile specifies the current file being mined.
@@ -295,6 +282,27 @@ func (m *Scope) Visit(node ast.Node) ast.Visitor {
 	return m
 }
 
+func newScopedDecl(filename string, pkg string, receiver string, name string, declType token.Token) entity.ScopedDecl {
+	id := entity.NewDeclarationIDBuilder().
+		WithFilename(filename).
+		WithPackage(pkg).
+		WithReceiver(receiver).
+		WithName(name).
+		WithType(declType).
+		Build()
+
+	return entity.ScopedDecl{
+		ID:              id,
+		DeclType:        declType,
+		Name:            name,
+		VariableDecls:   make([]string, 0),
+		Statements:      make([]string, 0),
+		BodyText:        make([]string, 0),
+		Comments:        make([]string, 0),
+		PackageComments: make([]string, 0),
+	}
+}
+
 func (m Scope) shouldMine(elem *ast.GenDecl) bool {
 	var shouldMine bool
 	for _, d := range m.Included {
@@ -307,7 +315,7 @@ func (m Scope) shouldMine(elem *ast.GenDecl) bool {
 	return shouldMine
 }
 
-// ScopedDeclarations returns a map of declaration IDs and the mined scope for each declaration.
-func (m Scope) ScopedDeclarations() map[string]entity.ScopedDecl {
+// Results returns a map of IDs and the mined scope for each declaration.
+func (m Scope) Results() interface{} {
 	return m.Scopes
 }

@@ -17,7 +17,7 @@ func TestNewAMAPFactory_ShouldReturnExpanderFactory(t *testing.T) {
 }
 
 func TestMake_OnAMAPFactory_WhenMissingScopedDeclarations_ShouldReturnError(t *testing.T) {
-	miningResults := map[entity.MinerType]entity.Miner{}
+	miningResults := map[string]entity.Miner{}
 
 	factory := expander.NewAMAPFactory()
 	expander, err := factory.Make(miningResults)
@@ -27,8 +27,8 @@ func TestMake_OnAMAPFactory_WhenMissingScopedDeclarations_ShouldReturnError(t *t
 }
 
 func TestMake_OnAMAPFactory_WhenMissingReferenceText_ShouldReturnError(t *testing.T) {
-	miningResults := map[entity.MinerType]entity.Miner{
-		entity.MinerScopedDeclarations: miner.NewScope(),
+	miningResults := map[string]entity.Miner{
+		"scoped-declarations": miner.NewScope(),
 	}
 
 	factory := expander.NewAMAPFactory()
@@ -39,9 +39,9 @@ func TestMake_OnAMAPFactory_WhenMissingReferenceText_ShouldReturnError(t *testin
 }
 
 func TestApplicablestrOn_OnAMAP_ShouldReturnSamurai(t *testing.T) {
-	miningResults := map[entity.MinerType]entity.Miner{
-		entity.MinerScopedDeclarations: miner.NewScope(),
-		entity.MinerComments:           miner.NewComments(),
+	miningResults := map[string]entity.Miner{
+		"scoped-declarations": miner.NewScope(),
+		"comments":            miner.NewComments(),
 	}
 
 	factory := expander.NewAMAPFactory()
@@ -52,9 +52,9 @@ func TestApplicablestrOn_OnAMAP_ShouldReturnSamurai(t *testing.T) {
 }
 
 func TestExpand_OnAMAPWhenNoSplitsApplicable_ShouldReturnEmptyResults(t *testing.T) {
-	miningResults := map[entity.MinerType]entity.Miner{
-		entity.MinerScopedDeclarations: miner.NewScope(),
-		entity.MinerComments:           miner.NewComments(),
+	miningResults := map[string]entity.Miner{
+		"scoped-declarations": miner.NewScope(),
+		"comments":            miner.NewComments(),
 	}
 
 	factory := expander.NewAMAPFactory()
@@ -76,9 +76,9 @@ func TestExpand_OnAMAPWhenNoSplitsApplicable_ShouldReturnEmptyResults(t *testing
 }
 
 func TestExpand_OnAMAPWhenNoDeclFound_ShouldReturnUnexpandedResults(t *testing.T) {
-	miningResults := map[entity.MinerType]entity.Miner{
-		entity.MinerScopedDeclarations: miner.NewScope(),
-		entity.MinerComments:           miner.NewComments(),
+	miningResults := map[string]entity.Miner{
+		"scoped-declarations": miner.NewScope(),
+		"comments":            miner.NewComments(),
 	}
 
 	factory := expander.NewAMAPFactory()
@@ -100,8 +100,8 @@ func TestExpand_OnAMAPWhenNoDeclFound_ShouldReturnUnexpandedResults(t *testing.T
 }
 
 func TestExpand_OnAMAP_ShouldReturnExpandedResults(t *testing.T) {
-	miningResults := map[entity.MinerType]entity.Miner{
-		entity.MinerScopedDeclarations: &miner.Scope{
+	miningResults := map[string]entity.Miner{
+		"scoped-declarations": &miner.Scope{
 			Scopes: map[string]entity.ScopedDecl{
 				"filename:main.go+++pkg:main+++declType:var+++name:sb": entity.ScopedDecl{
 					ID:       "sb",
@@ -110,7 +110,7 @@ func TestExpand_OnAMAP_ShouldReturnExpandedResults(t *testing.T) {
 				},
 			},
 		},
-		entity.MinerComments: miner.NewComments(),
+		"comments": miner.NewComments(),
 	}
 
 	factory := expander.NewAMAPFactory()
@@ -133,8 +133,8 @@ func TestExpand_OnAMAP_ShouldReturnExpandedResults(t *testing.T) {
 }
 
 func TestExpand_OnAMAP_WhileUsingLocalIdentifier_ShouldReturnExpandedResults(t *testing.T) {
-	miningResults := map[entity.MinerType]entity.Miner{
-		entity.MinerScopedDeclarations: &miner.Scope{
+	miningResults := map[string]entity.Miner{
+		"scoped-declarations": &miner.Scope{
 			Scopes: map[string]entity.ScopedDecl{
 				"filename:main.go+++pkg:main+++declType:var+++name:sb": entity.ScopedDecl{
 					ID:       "sb",
@@ -143,7 +143,7 @@ func TestExpand_OnAMAP_WhileUsingLocalIdentifier_ShouldReturnExpandedResults(t *
 				},
 			},
 		},
-		entity.MinerComments: miner.NewComments(),
+		"comments": miner.NewComments(),
 	}
 
 	factory := expander.NewAMAPFactory()

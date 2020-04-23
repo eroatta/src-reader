@@ -9,7 +9,7 @@ import (
 
 // Mine traverses each Abstract Syntax Tree and applies every given miner to extract
 // the required pre-processing information. It returns a map of miners after work is done.
-func Mine(parsed []entity.File, miners ...entity.Miner) map[entity.MinerType]entity.Miner {
+func Mine(parsed []entity.File, miners ...entity.Miner) map[string]entity.Miner {
 	minersc := make(chan entity.Miner)
 
 	var wg sync.WaitGroup
@@ -36,9 +36,9 @@ func Mine(parsed []entity.File, miners ...entity.Miner) map[entity.MinerType]ent
 		close(minersc)
 	}()
 
-	results := make(map[entity.MinerType]entity.Miner)
+	results := make(map[string]entity.Miner)
 	for miner := range minersc {
-		results[miner.Type()] = miner
+		results[miner.Name()] = miner
 	}
 
 	return results

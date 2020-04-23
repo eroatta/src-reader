@@ -7,20 +7,21 @@ import (
 	"testing"
 
 	"github.com/eroatta/src-reader/adapter/miner"
-	"github.com/eroatta/src-reader/entity"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestNewComments_ShouldReturnNewCommentsMiner(t *testing.T) {
-	miner := miner.NewComments()
+func TestNewCommentsFactory_ShouldReturnCommentsMinerFactory(t *testing.T) {
+	factory := miner.NewCommentsFactory()
 
-	assert.NotNil(t, miner)
+	assert.NotNil(t, factory)
 }
 
-func TestType_OnComments_ShouldReturnMinerType(t *testing.T) {
-	miner := miner.NewComments()
+func TestMake_OnCommentsFactory_ShouldReturnMiner(t *testing.T) {
+	factory := miner.NewCommentsFactory()
+	miner, err := factory.Make()
 
-	assert.Equal(t, entity.MinerComments, miner.Type())
+	assert.Equal(t, "comments", miner.Name())
+	assert.NoError(t, err)
 }
 
 func TestVisit_OnComments_ShouldReturnCleanComments(t *testing.T) {
@@ -55,9 +56,10 @@ func TestVisit_OnComments_ShouldReturnCleanComments(t *testing.T) {
 	fs := token.NewFileSet()
 	node, _ := parser.ParseFile(fs, "testfile", []byte(src), parser.ParseComments)
 
-	c := miner.NewComments()
+	f := miner.NewCommentsFactory()
+	c, _ := f.Make()
 	ast.Walk(c, node)
 
-	collected := c.Collected()
+	collected := c.Results().([]string)
 	assert.ElementsMatch(t, expected, collected)
 }
