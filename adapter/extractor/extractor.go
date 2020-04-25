@@ -49,7 +49,7 @@ func (e *Extractor) Visit(node ast.Node) ast.Visitor {
 			}
 		}
 
-		id := entity.NewDeclarationIDBuilder().WithFilename(e.filename).
+		id := entity.NewIDBuilder().WithFilename(e.filename).
 			WithPackage(e.packageName).WithReceiver(recv).WithName(name).WithType(token.FUNC).Build()
 		e.identifiers = append(e.identifiers, newIdentifier(id, e.filename, elem.Pos(), name, token.FUNC))
 
@@ -72,7 +72,7 @@ func (e *Extractor) Visit(node ast.Node) ast.Visitor {
 				continue
 			}
 
-			id := entity.NewDeclarationIDBuilder().WithFilename(e.filename).
+			id := entity.NewIDBuilder().WithFilename(e.filename).
 				WithPackage(e.packageName).WithName(ident.Name).WithType(token.DEFINE).Build()
 			if ident.Obj != nil && ident.Obj.Pos() == ident.Pos() {
 				e.identifiers = append(e.identifiers,
@@ -101,7 +101,7 @@ func (e *Extractor) fromValueSpec(filename string, token token.Token, decl *ast.
 			continue
 		}
 
-		id := entity.NewDeclarationIDBuilder().WithFilename(e.filename).
+		id := entity.NewIDBuilder().WithFilename(e.filename).
 			WithPackage(e.packageName).WithName(name.String()).WithType(token).Build()
 
 		if obj, ok := e.scopes[name.Name]; ok && obj.Pos() == name.Pos() {
@@ -128,7 +128,7 @@ func (e *Extractor) fromTypeSpec(filename string, decl *ast.TypeSpec) []entity.I
 		return []entity.Identifier{}
 	}
 
-	id := entity.NewDeclarationIDBuilder().WithFilename(e.filename).
+	id := entity.NewIDBuilder().WithFilename(e.filename).
 		WithPackage(e.packageName).WithName(decl.Name.String()).WithType(identifierType).Build()
 
 	if obj, ok := e.scopes[decl.Name.String()]; ok && obj.Pos() == decl.Pos() {

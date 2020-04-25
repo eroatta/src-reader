@@ -315,7 +315,7 @@ func extractWordAndPhrasesFromComment(functionText entity.Decl, comment string, 
 }
 
 func declID(filename string, pkg string, declType token.Token, name string, receiver string) string {
-	return entity.NewDeclarationIDBuilder().
+	return entity.NewIDBuilder().
 		WithFilename(filename).
 		WithPackage(pkg).
 		WithReceiver(receiver).

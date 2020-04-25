@@ -283,7 +283,7 @@ func (m *Scope) Visit(node ast.Node) ast.Visitor {
 }
 
 func newScopedDecl(filename string, pkg string, receiver string, name string, declType token.Token) entity.ScopedDecl {
-	id := entity.NewDeclarationIDBuilder().
+	id := entity.NewIDBuilder().
 		WithFilename(filename).
 		WithPackage(pkg).
 		WithReceiver(receiver).
