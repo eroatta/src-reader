@@ -16,7 +16,7 @@ type AnalysisConfig struct {
 	Expanders                 []string
 }
 
-// File TODO
+// File represents a source code file, including its raw form and also its Abstract Syntax Tree representation.
 type File struct {
 	Name    string
 	Raw     []byte
@@ -25,7 +25,8 @@ type File struct {
 	Error   error
 }
 
-// Identifier TODO
+// Identifier represents an identifier extracted from source code, indicating its origin, type,
+// parent information, and splits/expansions.
 type Identifier struct {
 	ID         string
 	File       string
