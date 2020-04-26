@@ -11,9 +11,10 @@ import (
 	"github.com/eroatta/src-reader/adapter/algorithm/extractor"
 	"github.com/eroatta/src-reader/adapter/algorithm/miner"
 	"github.com/eroatta/src-reader/adapter/algorithm/splitter"
-	"github.com/eroatta/src-reader/adapter/cloner"
-	"github.com/eroatta/src-reader/adapter/github"
-	"github.com/eroatta/src-reader/adapter/persistence"
+	"github.com/eroatta/src-reader/adapter/repository/identifier"
+	"github.com/eroatta/src-reader/adapter/repository/metadata"
+	"github.com/eroatta/src-reader/adapter/repository/project"
+	"github.com/eroatta/src-reader/adapter/repository/sourcecode"
 	"github.com/eroatta/src-reader/entity"
 	"github.com/eroatta/src-reader/usecase/analyze"
 	"github.com/eroatta/src-reader/usecase/create"
@@ -24,9 +25,9 @@ func main() {
 }
 
 func importProjectUsecase(url string) {
-	projectRepository := persistence.NewInMemoryProjectRepository()
-	remoteProjectRepository := github.NewRESTMetadataRepository(&http.Client{}, "https://api.github.com", os.Getenv("GITHUB_TOKEN"))
-	sourceCodeRepository := cloner.NewGogitCloneRepository("/tmp/repositories/github.com", cloner.PlainClonerFunc)
+	projectRepository := project.NewInMemoryProjectRepository()
+	remoteProjectRepository := metadata.NewRESTMetadataRepository(&http.Client{}, "https://api.github.com", os.Getenv("GITHUB_TOKEN"))
+	sourceCodeRepository := sourcecode.NewGogitCloneRepository("/tmp/repositories/github.com", sourcecode.PlainClonerFunc)
 
 	uc := create.NewImportProjectUsecase(projectRepository, remoteProjectRepository, sourceCodeRepository)
 
@@ -54,7 +55,7 @@ func importProjectUsecase(url string) {
 	}
 	defer output.Close()
 
-	identifierRepository := persistence.NewCSVIdentifierRepository(output)
+	identifierRepository := identifier.NewCSVIdentifierRepository(output)
 	analyzeUsecase := analyze.NewAnalyzeProjectUsecase(sourceCodeRepository, identifierRepository)
 
 	analysisResults, err := analyzeUsecase.Analyze(context.TODO(), project, &entity.AnalysisConfig{
