@@ -4,7 +4,7 @@ import (
 	"errors"
 	"strings"
 
-	"github.com/eroatta/src-reader/adapter/miner"
+	"github.com/eroatta/src-reader/adapter/algorithm/miner"
 	"github.com/eroatta/src-reader/entity"
 	"github.com/eroatta/token/amap"
 )

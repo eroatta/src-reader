@@ -3,7 +3,7 @@ package splitter_test
 import (
 	"testing"
 
-	"github.com/eroatta/src-reader/adapter/splitter"
+	"github.com/eroatta/src-reader/adapter/algorithm/splitter"
 	"github.com/eroatta/src-reader/entity"
 	"github.com/stretchr/testify/assert"
 )

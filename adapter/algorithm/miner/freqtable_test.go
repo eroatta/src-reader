@@ -8,7 +8,7 @@ import (
 
 	"github.com/eroatta/token/samurai"
 
-	"github.com/eroatta/src-reader/adapter/miner"
+	"github.com/eroatta/src-reader/adapter/algorithm/miner"
 	"github.com/stretchr/testify/assert"
 )
 

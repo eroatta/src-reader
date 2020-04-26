@@ -4,8 +4,8 @@ import (
 	"go/token"
 	"testing"
 
-	"github.com/eroatta/src-reader/adapter/expander"
-	"github.com/eroatta/src-reader/adapter/miner"
+	"github.com/eroatta/src-reader/adapter/algorithm/expander"
+	"github.com/eroatta/src-reader/adapter/algorithm/miner"
 	"github.com/eroatta/src-reader/entity"
 	"github.com/stretchr/testify/assert"
 )
