@@ -46,11 +46,13 @@ func (i Identifier) IsLocal() bool {
 	return i.Parent != ""
 }
 
+// Split represents a hardword or softword in which the identifier was divided.
 type Split struct {
 	Order int
 	Value string
 }
 
+// Expansion represents a set of expansions from a split.
 type Expansion struct {
 	From   string
 	Values []string
