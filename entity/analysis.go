@@ -3,6 +3,7 @@ package entity
 import (
 	"go/ast"
 	"go/token"
+	"time"
 )
 
 // AnalysisConfig defines the configuration options for an analysis execution.
@@ -56,4 +57,26 @@ type Split struct {
 type Expansion struct {
 	From   string
 	Values []string
+}
+
+// AnalysisResults represents the results for an analysis, indicating its creation date,
+// the configuration provided (URL, miners, splitters, expanders), and information about
+// the processed files and identifiers.
+type AnalysisResults struct {
+	// id
+	// status (?)
+	DateCreated             time.Time
+	ProjectID               string
+	ProjectURL              string
+	PipelineMiners          []string
+	PipelineSplitters       []string
+	PipelineExpanders       []string
+	FilesTotal              int
+	FilesValid              int
+	FilesError              int
+	FilesErrorSamples       []string
+	IdentifiersTotal        int
+	IdentifiersValid        int
+	IdentifiersError        int
+	IdentifiersErrorSamples []string
 }

@@ -20,7 +20,7 @@ var (
 )
 
 type AnalyzeProjectUsecase interface {
-	Analyze(ctx context.Context, project entity.Project, config *entity.AnalysisConfig) (Results, error)
+	Analyze(ctx context.Context, project entity.Project, config *entity.AnalysisConfig) (entity.AnalysisResults, error)
 }
 
 func NewAnalyzeProjectUsecase(scr repository.SourceCodeRepository, ir repository.IdentifierRepository) AnalyzeProjectUsecase {
@@ -35,27 +35,8 @@ type analyzeProjectUsecase struct {
 	identifierRepository repository.IdentifierRepository
 }
 
-type Results struct {
-	// id
-	// status (?)
-	DateCreated             time.Time
-	ProjectID               string
-	ProjectURL              string
-	PipelineMiners          []string
-	PipelineSplitters       []string
-	PipelineExpanders       []string
-	FilesTotal              int
-	FilesValid              int
-	FilesError              int
-	FilesErrorSamples       []string
-	IdentifiersTotal        int
-	IdentifiersValid        int
-	IdentifiersError        int
-	IdentifiersErrorSamples []string
-}
-
-func (uc analyzeProjectUsecase) Analyze(ctx context.Context, project entity.Project, config *entity.AnalysisConfig) (Results, error) {
-	analysisResults := Results{
+func (uc analyzeProjectUsecase) Analyze(ctx context.Context, project entity.Project, config *entity.AnalysisConfig) (entity.AnalysisResults, error) {
+	analysisResults := entity.AnalysisResults{
 		DateCreated:       time.Now(),
 		ProjectID:         project.Metadata.Fullname, // TODO: review
 		ProjectURL:        project.URL,
@@ -90,7 +71,7 @@ func (uc analyzeProjectUsecase) Analyze(ctx context.Context, project entity.Proj
 	if len(valid) == 0 {
 		log.Error(fmt.Sprintf("unable to read or parse any file on %s for project %s",
 			project.SourceCode.Location, project.URL))
-		return Results{}, ErrUnableToBuildASTs
+		return entity.AnalysisResults{}, ErrUnableToBuildASTs
 	}
 
 	// apply the pre-process step (mine them)
@@ -105,7 +86,7 @@ func (uc analyzeProjectUsecase) Analyze(ctx context.Context, project entity.Proj
 	splitters := buildSplittersFromInputAndMiningResults(config, miningResults)
 	if len(splitters) == 0 {
 		log.WithField("desired", config.Splitters).Error("unable to create any splitter")
-		return Results{}, ErrUnableToCreateProcessors
+		return entity.AnalysisResults{}, ErrUnableToCreateProcessors
 	}
 	for _, splitter := range splitters {
 		analysisResults.PipelineSplitters = append(analysisResults.PipelineSplitters, splitter.Name())
@@ -115,7 +96,7 @@ func (uc analyzeProjectUsecase) Analyze(ctx context.Context, project entity.Proj
 	expanders := buildExpandersFromInputAndMiningResults(config, miningResults)
 	if len(expanders) == 0 {
 		log.WithField("desired", config.Expanders).Error("unable to create any expander")
-		return Results{}, ErrUnableToCreateProcessors
+		return entity.AnalysisResults{}, ErrUnableToCreateProcessors
 	}
 	for _, expander := range expanders {
 		analysisResults.PipelineExpanders = append(analysisResults.PipelineExpanders, expander.Name())
@@ -147,7 +128,7 @@ func (uc analyzeProjectUsecase) Analyze(ctx context.Context, project entity.Proj
 		if err != nil {
 			log.WithError(err).Error(fmt.Sprintf("unable to save identifier %s, on file %s for project %s",
 				ident.Name, ident.File, project.URL))
-			return Results{}, ErrUnableToSaveIdentifiers
+			return entity.AnalysisResults{}, ErrUnableToSaveIdentifiers
 		}
 	}
 	analysisResults.IdentifiersValid = analysisResults.IdentifiersTotal - analysisResults.IdentifiersError
