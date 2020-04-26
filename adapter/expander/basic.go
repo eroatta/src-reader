@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/agnivade/levenshtein"
+	"github.com/eroatta/src-reader/adapter/miner"
 	"github.com/eroatta/src-reader/entity"
 	"github.com/eroatta/token/basic"
 	"github.com/eroatta/token/expansion"
@@ -23,7 +24,7 @@ func (f basicFactory) Make(miningResults map[string]entity.Miner) (entity.Expand
 	if !ok {
 		return nil, errors.New("unable to retrieve input from declarations miner")
 	}
-	declarations := declarationsMiner.Results().(map[string]entity.Decl)
+	declarations := declarationsMiner.Results().(map[string]miner.Decl)
 
 	return &basicExpander{
 		expander:     expander{"basic"},
@@ -33,7 +34,7 @@ func (f basicFactory) Make(miningResults map[string]entity.Miner) (entity.Expand
 
 type basicExpander struct {
 	expander
-	declarations map[string]entity.Decl
+	declarations map[string]miner.Decl
 }
 
 // Expand receives a entity.Identifier and processes the available splits that

@@ -57,23 +57,3 @@ type Expansion struct {
 	From   string
 	Values []string
 }
-
-// ScopedDecl represents the related scope for a declaration.
-type ScopedDecl struct {
-	ID              string
-	DeclType        token.Token
-	Name            string
-	VariableDecls   []string
-	Statements      []string
-	BodyText        []string
-	Comments        []string
-	PackageComments []string
-}
-
-// Decl contains the mined text (words and phrases) related to a declaration.
-type Decl struct {
-	ID       string
-	DeclType token.Token
-	Words    map[string]struct{}
-	Phrases  map[string]struct{}
-}

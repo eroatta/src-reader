@@ -29,7 +29,7 @@ func NewDeclaration(dict lists.List) *Declaration {
 	return &Declaration{
 		miner: miner{"declarations"},
 		Dict:  dict,
-		Decls: make(map[string]entity.Decl),
+		Decls: make(map[string]Decl),
 	}
 }
 
@@ -42,7 +42,15 @@ type Declaration struct {
 	PackageName string
 	Comments    []*ast.CommentGroup
 	Included    []ast.Decl
-	Decls       map[string]entity.Decl
+	Decls       map[string]Decl
+}
+
+// Decl contains the mined text (words and phrases) related to a declaration.
+type Decl struct {
+	ID       string
+	DeclType token.Token
+	Words    map[string]struct{}
+	Phrases  map[string]struct{}
 }
 
 // SetCurrentFile specifies the current file being mined.
@@ -143,8 +151,8 @@ func (m *Declaration) Visit(node ast.Node) ast.Visitor {
 	return m
 }
 
-func newDecl(ID string, declType token.Token) entity.Decl {
-	return entity.Decl{
+func newDecl(ID string, declType token.Token) Decl {
+	return Decl{
 		ID:       ID,
 		DeclType: declType,
 		Words:    make(map[string]struct{}),
@@ -164,7 +172,7 @@ func (m Declaration) shouldMine(elem *ast.GenDecl) bool {
 	return shouldMine
 }
 
-func extractDeclFromFunction(elem *ast.FuncDecl, m *Declaration) entity.Decl {
+func extractDeclFromFunction(elem *ast.FuncDecl, m *Declaration) Decl {
 	name := elem.Name.String()
 	receiver := ""
 	if elem.Recv != nil && elem.Recv.NumFields() > 0 {
@@ -202,7 +210,7 @@ func extractDeclFromFunction(elem *ast.FuncDecl, m *Declaration) entity.Decl {
 	return functionText
 }
 
-func extractDeclFromValue(declText entity.Decl, valSpec *ast.ValueSpec, name string, index int, list lists.List) entity.Decl {
+func extractDeclFromValue(declText Decl, valSpec *ast.ValueSpec, name string, index int, list lists.List) Decl {
 	for _, part := range strings.Split(conserv.Split(name), " ") {
 		if list.Contains(part) {
 			declText.Words[part] = struct{}{}
@@ -229,7 +237,7 @@ func extractDeclFromValue(declText entity.Decl, valSpec *ast.ValueSpec, name str
 	return declText
 }
 
-func extractDeclFromStruct(declText entity.Decl, structType *ast.StructType, list lists.List) entity.Decl {
+func extractDeclFromStruct(declText Decl, structType *ast.StructType, list lists.List) Decl {
 	if structType.Fields != nil && structType.Fields.List != nil {
 		for _, field := range structType.Fields.List {
 			for _, fname := range field.Names {
@@ -251,7 +259,7 @@ func extractDeclFromStruct(declText entity.Decl, structType *ast.StructType, lis
 	return declText
 }
 
-func extractDeclFromInterface(declText entity.Decl, interfaceType *ast.InterfaceType, list lists.List) entity.Decl {
+func extractDeclFromInterface(declText Decl, interfaceType *ast.InterfaceType, list lists.List) Decl {
 	if interfaceType.Methods != nil && interfaceType.Methods.List != nil {
 		for _, method := range interfaceType.Methods.List {
 			for _, mname := range method.Names {
@@ -273,7 +281,7 @@ func extractDeclFromInterface(declText entity.Decl, interfaceType *ast.Interface
 	return declText
 }
 
-func merge(a entity.Decl, b entity.Decl) entity.Decl {
+func merge(a Decl, b Decl) Decl {
 	for k, v := range b.Words {
 		a.Words[k] = v
 	}
@@ -294,7 +302,7 @@ func cleanComment(text string) string {
 	return strings.TrimSpace(cleanComment)
 }
 
-func extractWordAndPhrasesFromComment(functionText entity.Decl, comment string, list lists.List) entity.Decl {
+func extractWordAndPhrasesFromComment(functionText Decl, comment string, list lists.List) Decl {
 	cleanComment := cleanComment(comment)
 	for _, word := range strings.Split(cleanComment, " ") {
 		word = cleaner.ReplaceAllString(word, "")

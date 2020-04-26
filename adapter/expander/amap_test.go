@@ -102,8 +102,8 @@ func TestExpand_OnAMAPWhenNoDeclFound_ShouldReturnUnexpandedResults(t *testing.T
 func TestExpand_OnAMAP_ShouldReturnExpandedResults(t *testing.T) {
 	miningResults := map[string]entity.Miner{
 		"scoped-declarations": &miner.Scope{
-			Scopes: map[string]entity.ScopedDecl{
-				"filename:main.go+++pkg:main+++declType:var+++name:sb": entity.ScopedDecl{
+			Scopes: map[string]miner.ScopedDecl{
+				"filename:main.go+++pkg:main+++declType:var+++name:sb": miner.ScopedDecl{
 					ID:       "sb",
 					DeclType: token.FUNC,
 					Comments: []string{"string buffer"},
@@ -135,8 +135,8 @@ func TestExpand_OnAMAP_ShouldReturnExpandedResults(t *testing.T) {
 func TestExpand_OnAMAP_WhileUsingLocalIdentifier_ShouldReturnExpandedResults(t *testing.T) {
 	miningResults := map[string]entity.Miner{
 		"scoped-declarations": &miner.Scope{
-			Scopes: map[string]entity.ScopedDecl{
-				"filename:main.go+++pkg:main+++declType:var+++name:sb": entity.ScopedDecl{
+			Scopes: map[string]miner.ScopedDecl{
+				"filename:main.go+++pkg:main+++declType:var+++name:sb": miner.ScopedDecl{
 					ID:       "sb",
 					DeclType: token.FUNC,
 					Comments: []string{"string buffer"},

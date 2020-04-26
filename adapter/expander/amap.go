@@ -4,6 +4,7 @@ import (
 	"errors"
 	"strings"
 
+	"github.com/eroatta/src-reader/adapter/miner"
 	"github.com/eroatta/src-reader/entity"
 	"github.com/eroatta/token/amap"
 )
@@ -20,7 +21,7 @@ func (f amapFactory) Make(miningResults map[string]entity.Miner) (entity.Expande
 	if !ok {
 		return nil, errors.New("unable to retrieve input from scoped-declartions miner")
 	}
-	scopedDeclarations := declarationsMiner.Results().(map[string]entity.ScopedDecl)
+	scopedDeclarations := declarationsMiner.Results().(map[string]miner.ScopedDecl)
 
 	commentsMiner, ok := miningResults["comments"]
 	if !ok {
@@ -37,7 +38,7 @@ func (f amapFactory) Make(miningResults map[string]entity.Miner) (entity.Expande
 
 type amapExpander struct {
 	expander
-	scopedDeclarations map[string]entity.ScopedDecl
+	scopedDeclarations map[string]miner.ScopedDecl
 	referenceText      []string
 }
 

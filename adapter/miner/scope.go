@@ -24,9 +24,21 @@ func (f scopesFactory) Make() (entity.Miner, error) {
 func NewScope() *Scope {
 	return &Scope{
 		miner:           miner{"scoped-declarations"},
-		Scopes:          make(map[string]entity.ScopedDecl),
+		Scopes:          make(map[string]ScopedDecl),
 		PackageComments: make([]string, 0),
 	}
+}
+
+// ScopedDecl represents the related scope for a declaration.
+type ScopedDecl struct {
+	ID              string
+	DeclType        token.Token
+	Name            string
+	VariableDecls   []string
+	Statements      []string
+	BodyText        []string
+	Comments        []string
+	PackageComments []string
 }
 
 // Scope represents a scopes miner, which extracts information about
@@ -38,7 +50,7 @@ type Scope struct {
 	PackageComments []string
 	Comments        []*ast.CommentGroup
 	Included        []ast.Decl
-	Scopes          map[string]entity.ScopedDecl
+	Scopes          map[string]ScopedDecl
 }
 
 // SetCurrentFile specifies the current file being mined.
@@ -282,7 +294,7 @@ func (m *Scope) Visit(node ast.Node) ast.Visitor {
 	return m
 }
 
-func newScopedDecl(filename string, pkg string, receiver string, name string, declType token.Token) entity.ScopedDecl {
+func newScopedDecl(filename string, pkg string, receiver string, name string, declType token.Token) ScopedDecl {
 	id := entity.NewIDBuilder().
 		WithFilename(filename).
 		WithPackage(pkg).
@@ -291,7 +303,7 @@ func newScopedDecl(filename string, pkg string, receiver string, name string, de
 		WithType(declType).
 		Build()
 
-	return entity.ScopedDecl{
+	return ScopedDecl{
 		ID:              id,
 		DeclType:        declType,
 		Name:            name,

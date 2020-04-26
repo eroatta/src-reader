@@ -89,8 +89,8 @@ func TestExpand_OnBasicWhenNoDeclFound_ShouldReturnUnexpandedResults(t *testing.
 func TestExpand_OnBasic_ShouldReturnExpandedResultsFromWords(t *testing.T) {
 	miningResults := map[string]entity.Miner{
 		"declarations": &miner.Declaration{
-			Decls: map[string]entity.Decl{
-				"filename:main.go+++pkg:main+++declType:var+++name:strbuff": entity.Decl{
+			Decls: map[string]miner.Decl{
+				"filename:main.go+++pkg:main+++declType:var+++name:strbuff": miner.Decl{
 					ID:       "strbuff",
 					DeclType: token.FUNC,
 					Words: map[string]struct{}{
@@ -127,8 +127,8 @@ func TestExpand_OnBasic_ShouldReturnExpandedResultsFromWords(t *testing.T) {
 func TestExpand_OnBasic_WhileUsingLocalVariables_ShouldReturnExpandedResultsFromWords(t *testing.T) {
 	miningResults := map[string]entity.Miner{
 		"declarations": &miner.Declaration{
-			Decls: map[string]entity.Decl{
-				"filename:main.go+++pkg:main+++declType:var+++name:strbuff": entity.Decl{
+			Decls: map[string]miner.Decl{
+				"filename:main.go+++pkg:main+++declType:var+++name:strbuff": miner.Decl{
 					ID:       "filename:main.go+++pkg:main+++declType:var+++name:strbuff",
 					DeclType: token.FUNC,
 					Words: map[string]struct{}{
@@ -166,8 +166,8 @@ func TestExpand_OnBasic_WhileUsingLocalVariables_ShouldReturnExpandedResultsFrom
 func TestExpand_OnBasic_ShouldReturnExpandedResultsFromPhrases(t *testing.T) {
 	miningResults := map[string]entity.Miner{
 		"declarations": &miner.Declaration{
-			Decls: map[string]entity.Decl{
-				"filename:main.go+++pkg:main+++declType:var+++name:sb": entity.Decl{
+			Decls: map[string]miner.Decl{
+				"filename:main.go+++pkg:main+++declType:var+++name:sb": miner.Decl{
 					ID:       "sb",
 					DeclType: token.FUNC,
 					Words:    map[string]struct{}{},
@@ -201,8 +201,8 @@ func TestExpand_OnBasic_ShouldReturnExpandedResultsFromPhrases(t *testing.T) {
 func TestExpand_OnBasicWhenMultipleResults_ShouldReturnClosestThreePerWord(t *testing.T) {
 	miningResults := map[string]entity.Miner{
 		"declarations": &miner.Declaration{
-			Decls: map[string]entity.Decl{
-				"filename:main.go+++pkg:main+++declType:var+++name:contrl": entity.Decl{
+			Decls: map[string]miner.Decl{
+				"filename:main.go+++pkg:main+++declType:var+++name:contrl": miner.Decl{
 					ID:       "contrl",
 					DeclType: token.FUNC,
 					Words:    map[string]struct{}{},
