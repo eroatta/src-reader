@@ -8,6 +8,7 @@ require (
 	github.com/eroatta/token v0.0.0-20200414231506-a6cba19b8140
 	github.com/sirupsen/logrus v1.5.0
 	github.com/stretchr/testify v1.3.0
+	go.mongodb.org/mongo-driver v1.3.2
 	gopkg.in/src-d/go-billy.v4 v4.3.2
 	gopkg.in/src-d/go-git.v4 v4.13.1
 )
