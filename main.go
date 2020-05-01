@@ -58,7 +58,7 @@ func importProjectUsecase(url string) {
 	}
 	defer output.Close()
 
-	identifierRepository := identifier.NewCSVIdentifierRepository(output)
+	identifierRepository := identifier.NewMongoDB(clt, "reader") //identifier.NewCSVIdentifierRepository(output)
 	analyzeUsecase := analyze.NewAnalyzeProjectUsecase(sourceCodeRepository, identifierRepository)
 
 	analysisResults, err := analyzeUsecase.Analyze(context.TODO(), project, &entity.AnalysisConfig{
