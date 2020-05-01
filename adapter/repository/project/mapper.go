@@ -41,6 +41,35 @@ func (pm *projectMapper) toDTO(ent entity.Project) projectDTO {
 	}
 }
 
+// toEntity maps the Data Transfer Object for Project into a domain entity.
+func (pm *projectMapper) toEntity(dto projectDTO) entity.Project {
+	return entity.Project{
+		Status: dto.Status,
+		URL:    dto.Url,
+		Metadata: entity.Metadata{
+			RemoteID:      dto.Metadata.RemoteID,
+			Owner:         dto.Metadata.Owner,
+			Fullname:      dto.Metadata.Fullname,
+			Description:   dto.Metadata.Description,
+			CloneURL:      dto.Metadata.CloneURL,
+			DefaultBranch: dto.Metadata.DefaultBranch,
+			License:       dto.Metadata.License,
+			CreatedAt:     dto.Metadata.CreatedAt,
+			UpdatedAt:     dto.Metadata.UpdatedAt,
+			IsFork:        dto.Metadata.IsFork,
+			Size:          dto.Metadata.Size,
+			Stargazers:    dto.Metadata.Stargazers,
+			Watchers:      dto.Metadata.Watchers,
+			Forks:         dto.Metadata.Forks,
+		},
+		SourceCode: entity.SourceCode{
+			Hash:     dto.SourceCode.Hash,
+			Location: dto.SourceCode.Location,
+			Files:    dto.SourceCode.Files,
+		},
+	}
+}
+
 // projectDTO is the database representation for a Project.
 type projectDTO struct {
 	ID         string        `bson:"_id"`

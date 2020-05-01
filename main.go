@@ -25,32 +25,23 @@ func main() {
 }
 
 func importProjectUsecase(url string) {
-	projectRepository := proj.NewInMemoryProjectRepository()
+	clt, err := proj.NewMongoClient("mongodb://localhost:27017")
+	if err != nil {
+		log.Fatalln(err)
+	}
+	projectRepository := proj.NewMongoDB(clt, "reader")
 	remoteProjectRepository := metadata.NewRESTMetadataRepository(&http.Client{}, "https://api.github.com", os.Getenv("GITHUB_TOKEN"))
 	sourceCodeRepository := sourcecode.NewGogitCloneRepository("/tmp/repositories/github.com", sourcecode.PlainClonerFunc)
 
 	uc := create.NewImportProjectUsecase(projectRepository, remoteProjectRepository, sourceCodeRepository)
 
-	_, err := uc.Import(context.TODO(), url)
+	_, err = uc.Import(context.TODO(), url)
 	if err != nil {
 		log.Fatalln(err)
 	}
 
 	project, _ := projectRepository.GetByURL(context.TODO(), url)
-
-	clt, err := proj.NewMongoClient("mongodb://localhost:27017")
-	if err != nil {
-		log.Fatalln(err)
-	}
-
-	mdb := proj.NewMongoDB(clt)
-	err = mdb.Add(context.TODO(), project)
-	if err != nil {
-		log.Fatalln(err)
-	}
-
 	log.Println(project.Metadata.Owner)
-
 	log.Println(project.SourceCode.Hash)
 	log.Println(project.SourceCode.Location)
 	for i, f := range project.SourceCode.Files {
