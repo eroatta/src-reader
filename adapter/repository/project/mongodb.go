@@ -18,15 +18,17 @@ var (
 )
 
 type mongodb struct {
-	db *mongo.Client
-	pm *projectMapper
+	db         *mongo.Client
+	pm         *projectMapper
+	collection *mongo.Collection
 }
 
 // NewMongoDB creates a repository.ProjectRepository backed up by a MongoDB database.
 func NewMongoDB(client *mongo.Client) repository.ProjectRepository {
 	return &mongodb{
-		db: client,
-		pm: &projectMapper{},
+		db:         client,
+		pm:         &projectMapper{},
+		collection: client.Database("reader").Collection("projects"),
 	}
 }
 
@@ -50,8 +52,7 @@ func NewMongoClient(url string) (*mongo.Client, error) {
 
 // TODO: improve
 func (m *mongodb) Add(ctx context.Context, project entity.Project) error {
-	projects := m.db.Database("reader").Collection("projects")
-	_, err := projects.InsertOne(ctx, m.pm.toDTO(project))
+	_, err := m.collection.InsertOne(ctx, m.pm.toDTO(project))
 	if err != nil {
 		log.WithError(err).Error(fmt.Sprintf("error inserting record %v", project))
 		return repository.ErrProjectUnexpected
