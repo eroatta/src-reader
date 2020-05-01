@@ -40,7 +40,7 @@ func TestImport_OnImportProjectUsecase_ShouldReturnImportResults(t *testing.T) {
 	project, err := uc.Import(context.TODO(), "https://github.com/test/mytest")
 
 	assert.NoError(t, err)
-	assert.Equal(t, "imported", project.Status)
+	assert.Equal(t, "done", project.Status)
 	assert.Equal(t, "https://github.com/test/mytest", project.URL)
 	assert.Equal(t, "test/mytest", project.Metadata.Fullname)
 	assert.Equal(t, "asdasda", project.SourceCode.Hash)

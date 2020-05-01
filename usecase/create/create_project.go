@@ -64,6 +64,7 @@ func (uc importProjectUsecase) Import(ctx context.Context, url string) (entity.P
 	project = entity.Project{
 		URL:      url,
 		Metadata: metadata,
+		Status:   "in_process",
 	}
 
 	// clone the source code
@@ -73,6 +74,7 @@ func (uc importProjectUsecase) Import(ctx context.Context, url string) (entity.P
 		return entity.Project{}, ErrUnableToCloneSourceCode
 	}
 	project.SourceCode = sourceCode
+	project.Status = "done"
 
 	// store the results
 	err = uc.projectRepository.Add(ctx, project)
@@ -81,9 +83,6 @@ func (uc importProjectUsecase) Import(ctx context.Context, url string) (entity.P
 		log.WithError(err).Error(fmt.Sprintf("unable to save project for %s", url))
 		return entity.Project{}, ErrUnableToSaveProject
 	}
-
-	// after every step is completed, the import process is done
-	project.Status = "imported"
 
 	return project, nil
 }

@@ -13,7 +13,7 @@ import (
 	"github.com/eroatta/src-reader/adapter/algorithm/splitter"
 	"github.com/eroatta/src-reader/adapter/repository/identifier"
 	"github.com/eroatta/src-reader/adapter/repository/metadata"
-	"github.com/eroatta/src-reader/adapter/repository/project"
+	proj "github.com/eroatta/src-reader/adapter/repository/project"
 	"github.com/eroatta/src-reader/adapter/repository/sourcecode"
 	"github.com/eroatta/src-reader/entity"
 	"github.com/eroatta/src-reader/usecase/analyze"
@@ -25,7 +25,7 @@ func main() {
 }
 
 func importProjectUsecase(url string) {
-	projectRepository := project.NewInMemoryProjectRepository()
+	projectRepository := proj.NewInMemoryProjectRepository()
 	remoteProjectRepository := metadata.NewRESTMetadataRepository(&http.Client{}, "https://api.github.com", os.Getenv("GITHUB_TOKEN"))
 	sourceCodeRepository := sourcecode.NewGogitCloneRepository("/tmp/repositories/github.com", sourcecode.PlainClonerFunc)
 
@@ -37,6 +37,18 @@ func importProjectUsecase(url string) {
 	}
 
 	project, _ := projectRepository.GetByURL(context.TODO(), url)
+
+	clt, err := proj.NewMongoClient("mongodb://localhost:27017")
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	mdb := proj.NewMongoDB(clt)
+	err = mdb.Add(context.TODO(), project)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
 	log.Println(project.Metadata.Owner)
 
 	log.Println(project.SourceCode.Hash)

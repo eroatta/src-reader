@@ -1,0 +1,76 @@
+package project
+
+import (
+	"crypto/md5"
+	"fmt"
+	"time"
+
+	"github.com/eroatta/src-reader/entity"
+)
+
+// projectMapper maps a Project between its model and database representations.
+type projectMapper struct{}
+
+// toDTO maps the entity for Project into a Data Transfer Object.
+func (pm *projectMapper) toDTO(ent entity.Project) projectDTO {
+	return projectDTO{
+		ID:     fmt.Sprintf("%x", md5.Sum([]byte(ent.Metadata.Fullname))),
+		Status: ent.Status,
+		Url:    ent.URL,
+		Metadata: metadataDTO{
+			RemoteID:      ent.Metadata.RemoteID,
+			Owner:         ent.Metadata.Owner,
+			Fullname:      ent.Metadata.Fullname,
+			Description:   ent.Metadata.Description,
+			CloneURL:      ent.Metadata.CloneURL,
+			DefaultBranch: ent.Metadata.DefaultBranch,
+			License:       ent.Metadata.License,
+			CreatedAt:     ent.Metadata.CreatedAt,
+			UpdatedAt:     ent.Metadata.UpdatedAt,
+			IsFork:        ent.Metadata.IsFork,
+			Size:          ent.Metadata.Size,
+			Stargazers:    ent.Metadata.Stargazers,
+			Watchers:      ent.Metadata.Watchers,
+			Forks:         ent.Metadata.Forks,
+		},
+		SourceCode: sourceCodeDTO{
+			Hash:     ent.SourceCode.Hash,
+			Location: ent.SourceCode.Location,
+			Files:    ent.SourceCode.Files,
+		},
+	}
+}
+
+// projectDTO is the database representation for a Project.
+type projectDTO struct {
+	ID         string        `bson:"_id"`
+	Status     string        `bson:"status"`
+	Url        string        `bson:"url"`
+	Metadata   metadataDTO   `bson:"metadata"`
+	SourceCode sourceCodeDTO `bson:"source_code"`
+}
+
+// metadataDTO is the database representation for a Project's Metadata.
+type metadataDTO struct {
+	RemoteID      string     `bson:"remote_id"`
+	Owner         string     `bson:"owner"`
+	Fullname      string     `bson:"fullname"`
+	Description   string     `bson:"description"`
+	CloneURL      string     `bson:"clone_url"`
+	DefaultBranch string     `bson:"branch"`
+	License       string     `bson:"license"`
+	CreatedAt     *time.Time `bson:"created_at"`
+	UpdatedAt     *time.Time `bson:"updated_at"`
+	IsFork        bool       `bson:"is_fork"`
+	Size          int32      `bson:"size"`
+	Stargazers    int32      `bson:"stargazers"`
+	Watchers      int32      `bson:"watches"`
+	Forks         int32      `bson:"forks"`
+}
+
+// sourceCodeDTO is the database representation for a Project's Source Code.
+type sourceCodeDTO struct {
+	Hash     string   `bson:"hash"`
+	Location string   `bson:"location"`
+	Files    []string `bson:"files"`
+}
