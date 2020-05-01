@@ -42,9 +42,14 @@ func (e *Extractor) Visit(node ast.Node) ast.Visitor {
 		recv := ""
 		if elem.Recv != nil && elem.Recv.NumFields() > 0 {
 			for _, r := range elem.Recv.List {
-				typ, ok := r.Type.(*ast.Ident)
-				if ok {
-					recv = typ.Name
+				switch exp := r.Type.(type) {
+				case *ast.Ident:
+					recv = exp.Name
+				case *ast.StarExpr:
+					typ, ok := exp.X.(*ast.Ident)
+					if ok {
+						recv = typ.Name
+					}
 				}
 			}
 		}

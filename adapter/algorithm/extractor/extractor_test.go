@@ -79,7 +79,7 @@ func TestVisit_OnExtractorWithFuncDeclUsingSameFuncName_ShouldReturnFoundIdentif
 
 		type boat struct{}
 
-		func (b boat) name() {
+		func (b *boat) name() {
 			// do nothing
 		}
 	`
