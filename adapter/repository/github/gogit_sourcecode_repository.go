@@ -16,8 +16,8 @@ import (
 
 // NewGogitSourceCodeRepository creates a new instance of SourceCodeRepository that clones source code
 // using the src-d/go-git tool.
-func NewGogitSourceCodeRepository(baseDir string, clonerFunc ClonerFunc) *GogitCloneRepository {
-	return &GogitCloneRepository{
+func NewGogitSourceCodeRepository(baseDir string, clonerFunc ClonerFunc) *GogitSourceCodeRepository {
+	return &GogitSourceCodeRepository{
 		baseDir:    baseDir,
 		clonerFunc: clonerFunc,
 	}
@@ -26,9 +26,9 @@ func NewGogitSourceCodeRepository(baseDir string, clonerFunc ClonerFunc) *GogitC
 // ClonerFunc defines the interface for cloning a remote Git repository.
 type ClonerFunc func(ctx context.Context, path string, url string) (*git.Repository, error)
 
-// GogitCloneRepository clones the remote source code repository into the local file system,
+// GogitSourceCodeRepository clones the remote source code repository into the local file system,
 // using the src-d/go-git tool.
-type GogitCloneRepository struct {
+type GogitSourceCodeRepository struct {
 	baseDir    string
 	clonerFunc ClonerFunc
 }
@@ -40,7 +40,7 @@ func PlainClonerFunc(ctx context.Context, path string, url string) (*git.Reposit
 	})
 }
 
-func (r GogitCloneRepository) Clone(ctx context.Context, fullname string, cloneURL string) (entity.SourceCode, error) {
+func (r GogitSourceCodeRepository) Clone(ctx context.Context, fullname string, cloneURL string) (entity.SourceCode, error) {
 	path := fmt.Sprintf("%s/%s", r.baseDir, fullname)
 	err := os.MkdirAll(path, os.ModePerm)
 	if err != nil {
@@ -107,7 +107,7 @@ func read(fs billy.Filesystem, rootDir string) ([]string, error) {
 	return names, nil
 }
 
-func (r GogitCloneRepository) Remove(ctx context.Context, location string) error {
+func (r GogitSourceCodeRepository) Remove(ctx context.Context, location string) error {
 	if !strings.HasPrefix(location, r.baseDir) {
 		return repository.ErrSourceCodeUnableToRemove
 	}
@@ -121,7 +121,7 @@ func (r GogitCloneRepository) Remove(ctx context.Context, location string) error
 	return nil
 }
 
-func (r GogitCloneRepository) Read(ctx context.Context, location string, filename string) ([]byte, error) {
+func (r GogitSourceCodeRepository) Read(ctx context.Context, location string, filename string) ([]byte, error) {
 	if !strings.HasPrefix(location, r.baseDir) {
 		return []byte{}, repository.ErrSourceCodeUnableReadFile
 	}
