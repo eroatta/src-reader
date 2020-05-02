@@ -49,13 +49,6 @@ func importProjectUsecase(url string) {
 	log.Println("Import::: Done")
 
 	log.Println("Analysis::: Start")
-	output, err := os.OpenFile("csv_identifiers_repository.csv",
-		os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
-	if err != nil {
-		log.Fatalln(err)
-	}
-	defer output.Close()
-
 	identifierRepository := mongodb.NewMongoDBIdentifierRepository(clt, "reader")
 	analyzeUsecase := analyze.NewAnalyzeProjectUsecase(sourceCodeRepository, identifierRepository)
 
@@ -73,7 +66,8 @@ func importProjectUsecase(url string) {
 	}
 
 	log.Println("Analysis::: Done")
-	log.Println(fmt.Sprintf("Results -	Project -		ID: %s", analysisResults.ProjectID))
+	log.Println(fmt.Sprintf("Results -					ID: %s", analysisResults.ID))
+	log.Println(fmt.Sprintf("Results -	Project -		Name: %s", analysisResults.ProjectName))
 	log.Println(fmt.Sprintf("Results -	Project -		URL: %s", analysisResults.ProjectURL))
 	log.Println(fmt.Sprintf("Results -	Files -			Total: %d", analysisResults.FilesTotal))
 	log.Println(fmt.Sprintf("Results -	Files -			Valid: %d", analysisResults.FilesValid))

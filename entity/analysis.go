@@ -63,10 +63,9 @@ type Expansion struct {
 // the configuration provided (URL, miners, splitters, expanders), and information about
 // the processed files and identifiers.
 type AnalysisResults struct {
-	// id
-	// status (?)
+	ID                      string
 	DateCreated             time.Time
-	ProjectID               string
+	ProjectName             string
 	ProjectURL              string
 	PipelineMiners          []string
 	PipelineSplitters       []string

@@ -44,6 +44,7 @@ func (pm *projectMapper) toDTO(ent entity.Project) projectDTO {
 // toEntity maps the Data Transfer Object for Project into a domain entity.
 func (pm *projectMapper) toEntity(dto projectDTO) entity.Project {
 	return entity.Project{
+		ID:     dto.ID,
 		Status: dto.Status,
 		URL:    dto.Url,
 		Metadata: entity.Metadata{

@@ -5,6 +5,7 @@ import "time"
 // Project represents a GitHub repository, which contains metadata about it
 // and references to locally stored source code.
 type Project struct {
+	ID         string
 	Status     string
 	URL        string
 	Metadata   Metadata

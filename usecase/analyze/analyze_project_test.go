@@ -164,6 +164,7 @@ func TestAnalyze_OnAnalyzeProjectUsecase_WhenFailingToSaveIdentifiers_ShouldRetu
 
 func TestAnalyze_OnAnalyzeProjectUsecase_WhenAnalyzingIdentifiers_ShouldReturnAnalysisResults(t *testing.T) {
 	project := entity.Project{
+		ID:  "asadfasa345asdfasdfa",
 		URL: "https://github.com/eroatta/test",
 		Metadata: entity.Metadata{
 			Fullname: "eroatta/test",
@@ -198,7 +199,8 @@ func TestAnalyze_OnAnalyzeProjectUsecase_WhenAnalyzingIdentifiers_ShouldReturnAn
 	})
 
 	assert.NoError(t, err)
-	assert.Equal(t, "eroatta/test", results.ProjectID)
+	assert.Equal(t, "asadfasa345asdfasdfa", results.ID)
+	assert.Equal(t, "eroatta/test", results.ProjectName)
 	assert.Equal(t, "https://github.com/eroatta/test", results.ProjectURL)
 	assert.Equal(t, 1, results.FilesTotal)
 	assert.Equal(t, 1, results.FilesValid)

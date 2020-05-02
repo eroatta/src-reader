@@ -37,8 +37,9 @@ type analyzeProjectUsecase struct {
 
 func (uc analyzeProjectUsecase) Analyze(ctx context.Context, project entity.Project, config *entity.AnalysisConfig) (entity.AnalysisResults, error) {
 	analysisResults := entity.AnalysisResults{
+		ID:                project.ID,
 		DateCreated:       time.Now(),
-		ProjectID:         project.Metadata.Fullname, // TODO: review
+		ProjectName:       project.Metadata.Fullname,
 		ProjectURL:        project.URL,
 		PipelineMiners:    make([]string, 0),
 		PipelineSplitters: make([]string, 0),
