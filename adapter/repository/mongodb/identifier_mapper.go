@@ -2,6 +2,7 @@ package mongodb
 
 import (
 	"go/token"
+	"time"
 
 	"github.com/eroatta/src-reader/entity"
 )
@@ -33,7 +34,7 @@ func (im *identifierMapper) fromTokenToString(tok token.Token) string {
 }
 
 // toDTO maps the entity for Identifier into a Data Transfer Object.
-func (im *identifierMapper) toDTO(ent entity.Identifier, projectFullname string) identifierDTO {
+func (im *identifierMapper) toDTO(ent entity.Identifier, projectEnt entity.Project) identifierDTO {
 	// setup direct mappings
 	dto := identifierDTO{
 		ID:         ent.ID,
@@ -43,7 +44,9 @@ func (im *identifierMapper) toDTO(ent entity.Identifier, projectFullname string)
 		Type:       im.fromTokenToString(ent.Type),
 		Parent:     ent.Parent,
 		ParentPos:  ent.ParentPos,
-		ProjectRef: projectFullname, // TODO: review approach
+		AnalysisID: projectEnt.ID,
+		ProjectRef: projectEnt.Metadata.Fullname,
+		CreatedAt:  time.Now(),
 	}
 
 	splits := make(map[string][]splitDTO, len(ent.Splits))
@@ -87,7 +90,9 @@ type identifierDTO struct {
 	Splits     map[string][]splitDTO     `bson:"splits"`
 	Expansions map[string][]expansionDTO `bson:"expansions"`
 	Error      string                    `bson:"error_value,omitempty"`
-	ProjectRef string                    `bson:"project_ref_id"`
+	AnalysisID string                    `bson:"analysis_id"`
+	ProjectRef string                    `bson:"project_ref"`
+	CreatedAt  time.Time                 `bson:"created_at"`
 }
 
 // splitDTO is the database representation for an Identifier's Split results.

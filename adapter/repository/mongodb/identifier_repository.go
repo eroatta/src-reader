@@ -25,7 +25,7 @@ func NewMongoDBIdentifierRepository(client *mongo.Client, dbname string) *Identi
 }
 
 func (idb *IdentifierDB) Add(ctx context.Context, project entity.Project, ident entity.Identifier) error {
-	dto := idb.mapper.toDTO(ident, project.Metadata.Fullname) // TODO: review approach
+	dto := idb.mapper.toDTO(ident, project)
 	_, err := idb.collection.InsertOne(ctx, dto)
 	if err != nil {
 		log.WithError(err).Error(fmt.Sprintf("error inserting record %v", ident))
