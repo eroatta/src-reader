@@ -11,10 +11,8 @@ import (
 	"github.com/eroatta/src-reader/adapter/algorithm/extractor"
 	"github.com/eroatta/src-reader/adapter/algorithm/miner"
 	"github.com/eroatta/src-reader/adapter/algorithm/splitter"
-	"github.com/eroatta/src-reader/adapter/repository/identifier"
-	"github.com/eroatta/src-reader/adapter/repository/metadata"
-	proj "github.com/eroatta/src-reader/adapter/repository/project"
-	"github.com/eroatta/src-reader/adapter/repository/sourcecode"
+	"github.com/eroatta/src-reader/adapter/repository/github"
+	"github.com/eroatta/src-reader/adapter/repository/mongodb"
 	"github.com/eroatta/src-reader/entity"
 	"github.com/eroatta/src-reader/usecase/analyze"
 	"github.com/eroatta/src-reader/usecase/create"
@@ -25,13 +23,13 @@ func main() {
 }
 
 func importProjectUsecase(url string) {
-	clt, err := proj.NewMongoClient("mongodb://localhost:27017")
+	clt, err := mongodb.NewMongoClient("mongodb://localhost:27017")
 	if err != nil {
 		log.Fatalln(err)
 	}
-	projectRepository := proj.NewMongoDB(clt, "reader")
-	remoteProjectRepository := metadata.NewRESTMetadataRepository(&http.Client{}, "https://api.github.com", os.Getenv("GITHUB_TOKEN"))
-	sourceCodeRepository := sourcecode.NewGogitCloneRepository("/tmp/repositories/github.com", sourcecode.PlainClonerFunc)
+	projectRepository := mongodb.NewMongoDBProjecRepository(clt, "reader")
+	remoteProjectRepository := github.NewRESTMetadataRepository(&http.Client{}, "https://api.github.com", os.Getenv("GITHUB_TOKEN"))
+	sourceCodeRepository := github.NewGogitSourceCodeRepository("/tmp/repositories/github.com", github.PlainClonerFunc)
 
 	uc := create.NewImportProjectUsecase(projectRepository, remoteProjectRepository, sourceCodeRepository)
 
@@ -58,7 +56,7 @@ func importProjectUsecase(url string) {
 	}
 	defer output.Close()
 
-	identifierRepository := identifier.NewMongoDB(clt, "reader") //identifier.NewCSVIdentifierRepository(output)
+	identifierRepository := mongodb.NewMongoDBIdentifierRepository(clt, "reader")
 	analyzeUsecase := analyze.NewAnalyzeProjectUsecase(sourceCodeRepository, identifierRepository)
 
 	analysisResults, err := analyzeUsecase.Analyze(context.TODO(), project, &entity.AnalysisConfig{

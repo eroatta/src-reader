@@ -1,4 +1,4 @@
-package project
+package mongodb
 
 import (
 	"crypto/md5"

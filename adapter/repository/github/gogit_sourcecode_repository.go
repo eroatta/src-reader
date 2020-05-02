@@ -1,4 +1,4 @@
-package sourcecode
+package github
 
 import (
 	"context"
@@ -14,9 +14,9 @@ import (
 	"gopkg.in/src-d/go-git.v4"
 )
 
-// NewGogitCloneRepository creates a new instance of GitCloneRepository that clones source code
+// NewGogitSourceCodeRepository creates a new instance of SourceCodeRepository that clones source code
 // using the src-d/go-git tool.
-func NewGogitCloneRepository(baseDir string, clonerFunc ClonerFunc) *GogitCloneRepository {
+func NewGogitSourceCodeRepository(baseDir string, clonerFunc ClonerFunc) *GogitCloneRepository {
 	return &GogitCloneRepository{
 		baseDir:    baseDir,
 		clonerFunc: clonerFunc,

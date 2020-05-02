@@ -1,4 +1,4 @@
-package identifier
+package csv
 
 import (
 	"context"

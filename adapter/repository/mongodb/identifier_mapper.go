@@ -1,4 +1,4 @@
-package identifier
+package mongodb
 
 import (
 	"go/token"

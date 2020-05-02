@@ -1,4 +1,4 @@
-package sourcecode
+package github
 
 import (
 	"context"
@@ -17,14 +17,14 @@ import (
 	"gopkg.in/src-d/go-git.v4/storage/memory"
 )
 
-func TestNewGitCloneRepository_ShouldReturnNewInstance(t *testing.T) {
-	sourceCodeRepository := NewGogitCloneRepository("/tmp/test", nil)
+func TestNewGogitSourceCodeRepository_ShouldReturnNewInstance(t *testing.T) {
+	sourceCodeRepository := NewGogitSourceCodeRepository("/tmp/test", nil)
 
 	assert.NotNil(t, sourceCodeRepository)
 	assert.Equal(t, "/tmp/test", sourceCodeRepository.baseDir)
 }
 
-func TestClone_OnGogitCloneRepository_WhenUnableToCreateDestinationPath_ShouldReturnError(t *testing.T) {
+func TestClone_OnGogitSourceCodeRepository_WhenUnableToCreateDestinationPath_ShouldReturnError(t *testing.T) {
 	tmpDir, err := ioutil.TempDir(os.TempDir(), "test-fail-create-folder-")
 	if err != nil {
 		assert.FailNow(t, "unexpected error creating temp folder", err)
@@ -37,7 +37,7 @@ func TestClone_OnGogitCloneRepository_WhenUnableToCreateDestinationPath_ShouldRe
 	}
 	defer os.Remove(tmpFile.Name())
 
-	sourceCodeRepository := NewGogitCloneRepository(tmpDir, nil)
+	sourceCodeRepository := NewGogitSourceCodeRepository(tmpDir, nil)
 	existingFilename := strings.ReplaceAll(tmpFile.Name(), fmt.Sprintf("%s/", tmpDir), "")
 
 	sourceCode, err := sourceCodeRepository.Clone(context.TODO(), existingFilename, "clone_url")
@@ -46,7 +46,7 @@ func TestClone_OnGogitCloneRepository_WhenUnableToCreateDestinationPath_ShouldRe
 	assert.Empty(t, sourceCode)
 }
 
-func TestClone_OnGogitCloneRepository_WhenUnableToCloneRemoteRepository_ShouldReturnError(t *testing.T) {
+func TestClone_OnGogitSourceCodeRepository_WhenUnableToCloneRemoteRepository_ShouldReturnError(t *testing.T) {
 	tmpDir, err := ioutil.TempDir(os.TempDir(), "test-fail-clone-")
 	if err != nil {
 		assert.FailNow(t, "unexpected error creating temp folder", err)
@@ -56,7 +56,7 @@ func TestClone_OnGogitCloneRepository_WhenUnableToCloneRemoteRepository_ShouldRe
 	errorFunc := func(ctx context.Context, path string, url string) (*git.Repository, error) {
 		return nil, errors.New("oops! something failed...")
 	}
-	sourceCodeRepository := NewGogitCloneRepository(tmpDir, errorFunc)
+	sourceCodeRepository := NewGogitSourceCodeRepository(tmpDir, errorFunc)
 
 	sourceCode, err := sourceCodeRepository.Clone(context.TODO(), "eroatta/testrepo", "clone_url")
 
@@ -64,7 +64,7 @@ func TestClone_OnGogitCloneRepository_WhenUnableToCloneRemoteRepository_ShouldRe
 	assert.Empty(t, sourceCode)
 }
 
-func TestClone_OnGogitCloneRepository_WhenUnableAccessHeadRef_ShouldReturnError(t *testing.T) {
+func TestClone_OnGogitSourceCodeRepository_WhenUnableAccessHeadRef_ShouldReturnError(t *testing.T) {
 	tmpDir, err := ioutil.TempDir(os.TempDir(), "test-fail-accessing-head-")
 	if err != nil {
 		assert.FailNow(t, "unexpected error creating temp folder", err)
@@ -76,7 +76,7 @@ func TestClone_OnGogitCloneRepository_WhenUnableAccessHeadRef_ShouldReturnError(
 	clonerFunc := func(ctx context.Context, path string, url string) (*git.Repository, error) {
 		return rep, nil
 	}
-	sourceCodeRepository := NewGogitCloneRepository(tmpDir, clonerFunc)
+	sourceCodeRepository := NewGogitSourceCodeRepository(tmpDir, clonerFunc)
 
 	sourceCode, err := sourceCodeRepository.Clone(context.TODO(), "eroatta/testrepo", "clone_url")
 
@@ -84,7 +84,7 @@ func TestClone_OnGogitCloneRepository_WhenUnableAccessHeadRef_ShouldReturnError(
 	assert.Empty(t, sourceCode)
 }
 
-func TestClone_OnGogitCloneRepository_WhenUnableRetrieveWorktree_ShouldReturnError(t *testing.T) {
+func TestClone_OnGogitSourceCodeRepository_WhenUnableRetrieveWorktree_ShouldReturnError(t *testing.T) {
 	tmpDir, err := ioutil.TempDir(os.TempDir(), "test-fail-reading-files-")
 	if err != nil {
 		assert.FailNow(t, "unexpected error creating temp folder", err)
@@ -102,7 +102,7 @@ func TestClone_OnGogitCloneRepository_WhenUnableRetrieveWorktree_ShouldReturnErr
 	clonerFunc := func(ctx context.Context, path string, url string) (*git.Repository, error) {
 		return rep, nil
 	}
-	sourceCodeRepository := NewGogitCloneRepository(tmpDir, clonerFunc)
+	sourceCodeRepository := NewGogitSourceCodeRepository(tmpDir, clonerFunc)
 
 	sourceCode, err := sourceCodeRepository.Clone(context.TODO(), "eroatta/testrepo", "clone_url")
 
@@ -110,7 +110,7 @@ func TestClone_OnGogitCloneRepository_WhenUnableRetrieveWorktree_ShouldReturnErr
 	assert.Empty(t, sourceCode)
 }
 
-func TestClone_OnGogitCloneRepository_ShouldReturnSourceCode(t *testing.T) {
+func TestClone_OnGogitSourceCodeRepository_ShouldReturnSourceCode(t *testing.T) {
 	tmpDir, err := ioutil.TempDir(os.TempDir(), "test-clone-success")
 	if err != nil {
 		assert.FailNow(t, "unexpected error creating temp folder", err)
@@ -136,7 +136,7 @@ func TestClone_OnGogitCloneRepository_ShouldReturnSourceCode(t *testing.T) {
 	clonerFunc := func(ctx context.Context, path string, url string) (*git.Repository, error) {
 		return rep, nil
 	}
-	sourceCodeRepository := NewGogitCloneRepository(tmpDir, clonerFunc)
+	sourceCodeRepository := NewGogitSourceCodeRepository(tmpDir, clonerFunc)
 
 	sourceCode, err := sourceCodeRepository.Clone(context.TODO(), "eroatta/testrepo", "clone_url")
 
@@ -146,43 +146,43 @@ func TestClone_OnGogitCloneRepository_ShouldReturnSourceCode(t *testing.T) {
 	assert.ElementsMatch(t, []string{"main.go", "file.go", "file_test.go", "README.md"}, sourceCode.Files)
 }
 
-func TestRemove_OnGogitCloneRepository_WithNonSharedBaseDir_ShouldReturnError(t *testing.T) {
-	sourceCodeRepository := NewGogitCloneRepository("/tmp/mydir", nil)
+func TestRemove_OnGogitSourceCodeRepository_WithNonSharedBaseDir_ShouldReturnError(t *testing.T) {
+	sourceCodeRepository := NewGogitSourceCodeRepository("/tmp/mydir", nil)
 	err := sourceCodeRepository.Remove(context.TODO(), "/tmp/another/dir")
 
 	assert.EqualError(t, err, repository.ErrSourceCodeUnableToRemove.Error())
 }
 
-func TestRemove_OnGogitCloneRepository_WithExistingLocation_ShouldRemoveLocation(t *testing.T) {
+func TestRemove_OnGogitSourceCodeRepository_WithExistingLocation_ShouldRemoveLocation(t *testing.T) {
 	tmp, err := ioutil.TempDir(os.TempDir(), "")
 	if err != nil {
 		assert.FailNow(t, "unexpected error creating temp folder", err)
 	}
 	defer os.Remove(tmp)
 
-	sourceCodeRepository := NewGogitCloneRepository(os.TempDir(), nil)
+	sourceCodeRepository := NewGogitSourceCodeRepository(os.TempDir(), nil)
 	err = sourceCodeRepository.Remove(context.TODO(), tmp)
 
 	assert.NoError(t, err)
 }
 
-func TestRead_OnGogitCloneRepository_WithNonSharedBaseDir_ShouldReturnError(t *testing.T) {
-	sourceCodeRepository := NewGogitCloneRepository("/tmp/mydir", nil)
+func TestRead_OnGogitSourceCodeRepository_WithNonSharedBaseDir_ShouldReturnError(t *testing.T) {
+	sourceCodeRepository := NewGogitSourceCodeRepository("/tmp/mydir", nil)
 	rawFile, err := sourceCodeRepository.Read(context.TODO(), "/tmp/another/dir", "file.go")
 
 	assert.EqualError(t, err, repository.ErrSourceCodeUnableReadFile.Error())
 	assert.Empty(t, rawFile)
 }
 
-func TestRead_OnGogitCloneRepository_WithNoExistingFile_ShouldReturnError(t *testing.T) {
-	sourceCodeRepository := NewGogitCloneRepository("/tmp/mydir", nil)
+func TestRead_OnGogitSourceCodeRepository_WithNoExistingFile_ShouldReturnError(t *testing.T) {
+	sourceCodeRepository := NewGogitSourceCodeRepository("/tmp/mydir", nil)
 	rawFile, err := sourceCodeRepository.Read(context.TODO(), "/tmp/mydir", "file.go")
 
 	assert.EqualError(t, err, repository.ErrSourceCodeUnableReadFile.Error())
 	assert.Empty(t, rawFile)
 }
 
-func TestRead_OnGogitCloneRepository_WithExistingFile_ShouldReturnBytes(t *testing.T) {
+func TestRead_OnGogitSourceCodeRepository_WithExistingFile_ShouldReturnBytes(t *testing.T) {
 	tmp, err := ioutil.TempFile(os.TempDir(), "test-ok")
 	if err != nil {
 		assert.FailNow(t, "unexpected error creating temp file", err)
@@ -197,7 +197,7 @@ func TestRead_OnGogitCloneRepository_WithExistingFile_ShouldReturnBytes(t *testi
 	filename := strings.ReplaceAll(tmp.Name(), os.TempDir(), "")
 	filename = strings.TrimPrefix(filename, "/")
 
-	sourceCodeRepository := NewGogitCloneRepository(os.TempDir(), nil)
+	sourceCodeRepository := NewGogitSourceCodeRepository(os.TempDir(), nil)
 	rawFile, err := sourceCodeRepository.Read(context.TODO(), os.TempDir(), filename)
 
 	assert.NoError(t, err)
