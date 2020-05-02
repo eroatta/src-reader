@@ -6,8 +6,10 @@ import (
 	"github.com/eroatta/src-reader/entity"
 )
 
+// identifierMapper maps an Identifier between its model and database representations.
 type identifierMapper struct{}
 
+// fromTokenToString transforms a token.Token value into a human-readable string.
 func (im *identifierMapper) fromTokenToString(tok token.Token) string {
 	var tokenString string
 	switch tok {
@@ -30,6 +32,7 @@ func (im *identifierMapper) fromTokenToString(tok token.Token) string {
 	return tokenString
 }
 
+// toDTO maps the entity for Identifier into a Data Transfer Object.
 func (im *identifierMapper) toDTO(ent entity.Identifier, projectFullname string) identifierDTO {
 	// setup direct mappings
 	dto := identifierDTO{
@@ -72,6 +75,7 @@ func (im *identifierMapper) toDTO(ent entity.Identifier, projectFullname string)
 	return dto
 }
 
+// identifierDTO is the database representation for an Identifier.
 type identifierDTO struct {
 	ID         string                    `bson:"identifier_id"`
 	File       string                    `bson:"file"`
@@ -86,11 +90,13 @@ type identifierDTO struct {
 	ProjectRef string                    `bson:"project_ref_id"`
 }
 
+// splitDTO is the database representation for an Identifier's Split results.
 type splitDTO struct {
 	Order int    `bson:"order"`
 	Value string `bson:"value"`
 }
 
+// expansionDTO is the database representation for an Identifier's Expansion results.
 type expansionDTO struct {
 	From   string   `bson:"from"`
 	Values []string `bson:"values"`
