@@ -397,7 +397,7 @@ func TestVisit_OnWordCount_ShouldSplitTheIdentifiers(t *testing.T) {
 			assert.NotEmpty(t, results)
 			assert.Equal(t, fixture.uniqueWords, len(results))
 			for key, value := range fixture.expected {
-				assert.Equal(t, value, results[key], fmt.Sprintf("invalid number of occurrencies for element: %s", key))
+				assert.Equal(t, value, results[key], fmt.Sprintf("invalid number of occurrences for element: %s", key))
 			}
 		})
 	}
@@ -826,7 +826,7 @@ func TestVisit_OnWordCountWithFullFile_ShouldSplitCommentsAndIdentifiers(t *test
 	assert.NotEmpty(t, results)
 	assert.Equal(t, len(expectedWords), len(results))
 	for key, value := range expectedWords {
-		assert.Equal(t, value, results[key], fmt.Sprintf("invalid number of occurrencies for element: %s", key))
+		assert.Equal(t, value, results[key], fmt.Sprintf("invalid number of occurrences for element: %s", key))
 	}
 }
 
@@ -854,5 +854,5 @@ func TestResults_OnWordCountExtractorAfterExtraction_ShouldReturnWordCount(t *te
 	assert.NotEmpty(t, wordCount)
 	assert.Equal(t, 1, len(wordCount))
 
-	assert.Equal(t, 1, wordCount["main"], fmt.Sprintf("invalid number of occurrencies for element: main"))
+	assert.Equal(t, 1, wordCount["main"], fmt.Sprintf("invalid number of occurrences for element: main"))
 }
