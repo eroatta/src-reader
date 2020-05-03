@@ -45,13 +45,13 @@ func TestToDTO_OnIdentifierMapper_ShouldReturnIdentifierDTO(t *testing.T) {
 		Parent:    "",
 		ParentPos: token.NoPos,
 		Splits: map[string][]entity.Split{
-			"conserv": []entity.Split{
+			"conserv": {
 				{Order: 1, Value: "default"},
 				{Order: 2, Value: "output"},
 			},
 		},
 		Expansions: map[string][]entity.Expansion{
-			"noexp": []entity.Expansion{
+			"noexp": {
 				{From: "default", Values: []string{"default"}},
 				{From: "output", Values: []string{"output"}},
 			},
