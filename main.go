@@ -68,7 +68,6 @@ func importProjectUsecase(url string) {
 	log.Println("Analysis::: Done")
 	log.Println(fmt.Sprintf("Results -					ID: %s", analysisResults.ID))
 	log.Println(fmt.Sprintf("Results -	Project -		Name: %s", analysisResults.ProjectName))
-	log.Println(fmt.Sprintf("Results -	Project -		URL: %s", analysisResults.ProjectURL))
 	log.Println(fmt.Sprintf("Results -	Files -			Total: %d", analysisResults.FilesTotal))
 	log.Println(fmt.Sprintf("Results -	Files -			Valid: %d", analysisResults.FilesValid))
 	log.Println(fmt.Sprintf("Results -	Files -			With Error: %d", analysisResults.FilesError))

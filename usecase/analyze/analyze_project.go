@@ -40,7 +40,6 @@ func (uc analyzeProjectUsecase) Analyze(ctx context.Context, project entity.Proj
 		ID:                project.ID,
 		DateCreated:       time.Now(),
 		ProjectName:       project.Metadata.Fullname,
-		ProjectURL:        project.URL,
 		PipelineMiners:    make([]string, 0),
 		PipelineSplitters: make([]string, 0),
 		PipelineExpanders: make([]string, 0),

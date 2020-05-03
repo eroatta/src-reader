@@ -201,7 +201,6 @@ func TestAnalyze_OnAnalyzeProjectUsecase_WhenAnalyzingIdentifiers_ShouldReturnAn
 	assert.NoError(t, err)
 	assert.Equal(t, "asadfasa345asdfasdfa", results.ID)
 	assert.Equal(t, "eroatta/test", results.ProjectName)
-	assert.Equal(t, "https://github.com/eroatta/test", results.ProjectURL)
 	assert.Equal(t, 1, results.FilesTotal)
 	assert.Equal(t, 1, results.FilesValid)
 	assert.Equal(t, 0, results.FilesError)

@@ -66,7 +66,6 @@ type AnalysisResults struct {
 	ID                      string
 	DateCreated             time.Time
 	ProjectName             string
-	ProjectURL              string
 	PipelineMiners          []string
 	PipelineSplitters       []string
 	PipelineExpanders       []string
