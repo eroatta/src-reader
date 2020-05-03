@@ -9,7 +9,7 @@ import (
 
 var (
 	// ErrIdentifierUnexpected indicates that an error occurred while trying to perform an operation on IdentifierRepository.
-	ErrIdentifierUnexpected = errors.New("unexpect error performing the current operation on IdentifierRepository")
+	ErrIdentifierUnexpected = errors.New("unexpected error performing the current operation on IdentifierRepository")
 )
 
 // IdentifierRepository represents a repository able to store and retrieve identifiers.

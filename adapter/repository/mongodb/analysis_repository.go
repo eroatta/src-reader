@@ -33,7 +33,7 @@ func (adb *AnalysisDB) Add(ctx context.Context, analysis entity.AnalysisResults)
 	_, err := adb.collection.InsertOne(ctx, adb.mapper.toDTO(analysis))
 	if err != nil {
 		log.WithError(err).Error(fmt.Sprintf("error inserting record %v", analysis))
-		return repository.ErrProjectUnexpected // TODO: change for specific repository error
+		return repository.ErrAnalysisUnexpected
 	}
 
 	return nil
