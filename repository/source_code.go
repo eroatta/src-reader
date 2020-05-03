@@ -8,11 +8,16 @@ import (
 )
 
 var (
-	ErrSourceCodeUnableCreateDestination     = errors.New("unable to create destination for source code")
+	// ErrSourceCodeUnableCreateDestination indicates that the underlying cloned source code destination couldn't be created.
+	ErrSourceCodeUnableCreateDestination = errors.New("unable to create destination for source code")
+	// ErrSourceCodeUnableCloneRemoteRepository indicates the remote repository couldn't be reached.
 	ErrSourceCodeUnableCloneRemoteRepository = errors.New("unable to clone remote repository")
-	ErrSourceCodeUnableAccessMetadata        = errors.New("unable to access source code metadata information")
-	ErrSourceCodeUnableToRemove              = errors.New("unable to remove source code")
-	ErrSourceCodeUnableReadFile              = errors.New("unable to access or read file")
+	// ErrSourceCodeUnableAccessMetadata indicates that the metadata for the current remote repository couldn't be reached.
+	ErrSourceCodeUnableAccessMetadata = errors.New("unable to access source code metadata information")
+	// ErrSourceCodeUnableToRemove indicates the source code couldn't be removed from the underlying storage.
+	ErrSourceCodeUnableToRemove = errors.New("unable to remove source code")
+	// ErrSourceCodeUnableReadFile indicates that the requested file couldn't be accessed or read from the underlying storage.
+	ErrSourceCodeUnableReadFile = errors.New("unable to access or read file")
 )
 
 // SourceCodeRepository represents a repository capable of handle source code.

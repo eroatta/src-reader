@@ -20,10 +20,13 @@ var (
 	ErrUnableToSaveAnalysis     = errors.New("unable to save analysis results after completed processing")
 )
 
+// AnalyzeProjectUsecase defines the contract for the use case related to the analysis process of a project.
 type AnalyzeProjectUsecase interface {
+	// Analyze processes the given Project, based on the configuration provided by the AnalysisConfig.
 	Analyze(ctx context.Context, project entity.Project, config *entity.AnalysisConfig) (entity.AnalysisResults, error)
 }
 
+// NewAnalyzeProjectUsecase initializes a new AnalyzeProjectUsecase handler.
 func NewAnalyzeProjectUsecase(scr repository.SourceCodeRepository, ir repository.IdentifierRepository, ar repository.AnalysisRepository) AnalyzeProjectUsecase {
 	return &analyzeProjectUsecase{
 		sourceCodeRepository: scr,
@@ -38,6 +41,9 @@ type analyzeProjectUsecase struct {
 	analysisRepository   repository.AnalysisRepository
 }
 
+// Analyze processes the given Project, based on the configuration provided by the AnalysisConfig.
+// The process reads the source code, applies the given miners, splitters and expanders and then stores the results.
+// It's the default implementation for the use case.
 func (uc analyzeProjectUsecase) Analyze(ctx context.Context, project entity.Project, config *entity.AnalysisConfig) (entity.AnalysisResults, error) {
 	analysisResults := entity.AnalysisResults{
 		ID:                project.ID,
@@ -86,7 +92,7 @@ func (uc analyzeProjectUsecase) Analyze(ctx context.Context, project entity.Proj
 	miningResults := step.Mine(valid, miners...)
 
 	// make the splitters from input and mining results
-	splitters := buildSplittersFromInputAndMiningResults(config, miningResults)
+	splitters := buildSplittersFromMiningResults(config, miningResults)
 	if len(splitters) == 0 {
 		log.WithField("desired", config.Splitters).Error("unable to create any splitter")
 		return entity.AnalysisResults{}, ErrUnableToCreateProcessors
@@ -96,7 +102,7 @@ func (uc analyzeProjectUsecase) Analyze(ctx context.Context, project entity.Proj
 	}
 
 	// make the expanders from input and mining results
-	expanders := buildExpandersFromInputAndMiningResults(config, miningResults)
+	expanders := buildExpandersFromMiningResults(config, miningResults)
 	if len(expanders) == 0 {
 		log.WithField("desired", config.Expanders).Error("unable to create any expander")
 		return entity.AnalysisResults{}, ErrUnableToCreateProcessors
@@ -146,6 +152,7 @@ func (uc analyzeProjectUsecase) Analyze(ctx context.Context, project entity.Proj
 	return analysisResults, nil
 }
 
+// buildMiners initializes a set of miners, making them exclusives on current process.
 func buildMiners(config *entity.AnalysisConfig) []entity.Miner {
 	miners := make([]entity.Miner, 0)
 	for _, name := range config.Miners {
@@ -167,7 +174,8 @@ func buildMiners(config *entity.AnalysisConfig) []entity.Miner {
 	return miners
 }
 
-func buildSplittersFromInputAndMiningResults(config *entity.AnalysisConfig, miningResults map[string]entity.Miner) []entity.Splitter {
+// buildSplittersFromMiningResults initializes a set of splitters from the mining results, making them exclusives on current process.
+func buildSplittersFromMiningResults(config *entity.AnalysisConfig, miningResults map[string]entity.Miner) []entity.Splitter {
 	splitters := make([]entity.Splitter, 0)
 	for _, name := range config.Splitters {
 		factory, err := config.SplittingAlgorithmFactory.Get(name)
@@ -188,7 +196,8 @@ func buildSplittersFromInputAndMiningResults(config *entity.AnalysisConfig, mini
 	return splitters
 }
 
-func buildExpandersFromInputAndMiningResults(config *entity.AnalysisConfig, miningResults map[string]entity.Miner) []entity.Expander {
+// buildExpandersFromMiningResults initializes a set of expanders from the mining results, making them exclusives on current process.
+func buildExpandersFromMiningResults(config *entity.AnalysisConfig, miningResults map[string]entity.Miner) []entity.Expander {
 	expanders := make([]entity.Expander, 0)
 	for _, name := range config.Expanders {
 		factory, err := config.ExpansionAlgorithmFactory.Get(name)

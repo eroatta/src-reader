@@ -21,7 +21,7 @@ var (
 // for a project.
 type ImportProjectUsecase interface {
 	// Import executes the pipeline to import a project from GitHub and
-	// extract the identifiers. It returns the project informartion.
+	// extract the identifiers. It returns the project information.
 	Import(ctx context.Context, url string) (entity.Project, error)
 }
 
@@ -41,6 +41,8 @@ type importProjectUsecase struct {
 	sourceCodeRepository repository.SourceCodeRepository
 }
 
+// Import executes the pipeline to import a project from GitHub and extract the identifiers.
+// It returns the project information. It's the current default implementation for the use case.
 func (uc importProjectUsecase) Import(ctx context.Context, url string) (entity.Project, error) {
 	// check if not previously imported
 	project, err := uc.projectRepository.GetByURL(ctx, url)
