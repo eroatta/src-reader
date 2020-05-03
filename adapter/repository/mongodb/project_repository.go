@@ -11,23 +11,26 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-type projectDB struct {
+const projectsCollection string = "projects"
+
+// ProjectDB represents a MongoDB database, focused on the collection handling the project documents.
+type ProjectDB struct {
 	client     *mongo.Client
 	mapper     *projectMapper
 	collection *mongo.Collection
 }
 
 // NewMongoDBProjecRepository creates a repository.ProjectRepository backed up by a MongoDB database.
-func NewMongoDBProjecRepository(client *mongo.Client, dbname string) repository.ProjectRepository {
-	return &projectDB{
+func NewMongoDBProjecRepository(client *mongo.Client, dbname string) *ProjectDB {
+	return &ProjectDB{
 		client:     client,
 		mapper:     &projectMapper{},
-		collection: client.Database(dbname).Collection("projects"),
+		collection: client.Database(dbname).Collection(projectsCollection),
 	}
 }
 
 // Add transforms and stores a Project entity into a document on the underlying MongoDB collection.
-func (pdb *projectDB) Add(ctx context.Context, project entity.Project) error {
+func (pdb *ProjectDB) Add(ctx context.Context, project entity.Project) error {
 	_, err := pdb.collection.InsertOne(ctx, pdb.mapper.toDTO(project))
 	if err != nil {
 		log.WithError(err).Error(fmt.Sprintf("error inserting record %v", project))
@@ -38,7 +41,7 @@ func (pdb *projectDB) Add(ctx context.Context, project entity.Project) error {
 }
 
 // GetByURL finds an existing Project using the given URL as filter.
-func (pdb *projectDB) GetByURL(ctx context.Context, url string) (entity.Project, error) {
+func (pdb *ProjectDB) GetByURL(ctx context.Context, url string) (entity.Project, error) {
 	res := pdb.collection.FindOne(ctx, bson.M{"url": url})
 	switch res.Err() {
 	case nil:

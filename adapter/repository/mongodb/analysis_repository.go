@@ -10,17 +10,21 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
+const analysisCollection string = "analysis"
+
+// AnalysisDB represents a MongoDB database, focused on the collection handling the analysis documents.
 type AnalysisDB struct {
 	client     *mongo.Client
 	mapper     *analysisMapper
 	collection *mongo.Collection
 }
 
+// NewMongoDBAnalysisRepository creates a repository.AnalysisRepository backed up by a MongoDB database.
 func NewMongoDBAnalysisRepository(client *mongo.Client, dbname string) *AnalysisDB {
 	return &AnalysisDB{
 		client:     client,
 		mapper:     &analysisMapper{},
-		collection: client.Database(dbname).Collection("analysis"),
+		collection: client.Database(dbname).Collection(analysisCollection),
 	}
 }
 
