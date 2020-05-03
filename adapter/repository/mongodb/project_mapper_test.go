@@ -64,3 +64,60 @@ func TestToDTO_OnProjectMapper_ShouldReturnProjectDTO(t *testing.T) {
 	assert.Equal(t, "/tmp/repositories/github.com/src-d/go-siva", dto.SourceCode.Location)
 	assert.ElementsMatch(t, []string{"common_test.go", "common.go"}, dto.SourceCode.Files)
 }
+
+func TestToEntity_OnProjectMapper_ShouldReturnProjectEntity(t *testing.T) {
+	now := time.Now()
+	dto := projectDTO{
+		ID:     "715f17550be5f7222a815ff80966adaf",
+		Status: "done",
+		Url:    "https://github.com/src-d/go-siva",
+		Metadata: metadataDTO{
+			RemoteID:      "69565817",
+			Owner:         "src-d",
+			Fullname:      "src-d/go-siva",
+			Description:   "siva - seekable indexed verifiable archiver",
+			CloneURL:      "https://github.com/src-d/go-siva.git",
+			DefaultBranch: "master",
+			License:       "mit",
+			CreatedAt:     &now,
+			UpdatedAt:     &now,
+			IsFork:        false,
+			Size:          102,
+			Stargazers:    88,
+			Watchers:      88,
+			Forks:         16,
+		},
+		SourceCode: sourceCodeDTO{
+			Hash:     "4ba248c1cf1003995d356f11935287b3e99decca",
+			Location: "/tmp/repositories/github.com/src-d/go-siva",
+			Files: []string{
+				"common.go",
+				"common_test.go",
+			},
+		},
+	}
+
+	pm := &projectMapper{}
+	ent := pm.toEntity(dto)
+
+	assert.Equal(t, "715f17550be5f7222a815ff80966adaf", ent.ID)
+	assert.Equal(t, "done", ent.Status)
+	assert.Equal(t, "https://github.com/src-d/go-siva", ent.URL)
+	assert.Equal(t, "69565817", ent.Metadata.RemoteID)
+	assert.Equal(t, "src-d", ent.Metadata.Owner)
+	assert.Equal(t, "src-d/go-siva", ent.Metadata.Fullname)
+	assert.Equal(t, "siva - seekable indexed verifiable archiver", ent.Metadata.Description)
+	assert.Equal(t, "https://github.com/src-d/go-siva.git", ent.Metadata.CloneURL)
+	assert.Equal(t, "master", ent.Metadata.DefaultBranch)
+	assert.Equal(t, "mit", ent.Metadata.License)
+	assert.Equal(t, now, *ent.Metadata.CreatedAt)
+	assert.Equal(t, now, *ent.Metadata.UpdatedAt)
+	assert.False(t, ent.Metadata.IsFork)
+	assert.Equal(t, int32(102), ent.Metadata.Size)
+	assert.Equal(t, int32(88), ent.Metadata.Stargazers)
+	assert.Equal(t, int32(88), ent.Metadata.Watchers)
+	assert.Equal(t, int32(16), ent.Metadata.Forks)
+	assert.Equal(t, "4ba248c1cf1003995d356f11935287b3e99decca", ent.SourceCode.Hash)
+	assert.Equal(t, "/tmp/repositories/github.com/src-d/go-siva", ent.SourceCode.Location)
+	assert.ElementsMatch(t, []string{"common_test.go", "common.go"}, ent.SourceCode.Files)
+}
