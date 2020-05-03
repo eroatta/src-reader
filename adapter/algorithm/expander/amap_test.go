@@ -64,7 +64,7 @@ func TestExpand_OnAMAPWhenNoSplitsApplicable_ShouldReturnEmptyResults(t *testing
 		ID:   "filename:main.go+++pkg:main+++declType:var+++name:str",
 		Name: "str",
 		Splits: map[string][]entity.Split{
-			"gentest": []entity.Split{
+			"gentest": {
 				{Order: 1, Value: "str"},
 			},
 		},
@@ -87,7 +87,7 @@ func TestExpand_OnAMAPWhenNoDeclFound_ShouldReturnUnexpandedResults(t *testing.T
 		ID:   "filename:main.go+++pkg:main+++declType:var+++name:str",
 		Name: "str",
 		Splits: map[string][]entity.Split{
-			"samurai": []entity.Split{
+			"samurai": {
 				{Order: 1, Value: "str"},
 			},
 		},
@@ -103,7 +103,7 @@ func TestExpand_OnAMAP_ShouldReturnExpandedResults(t *testing.T) {
 	miningResults := map[string]entity.Miner{
 		"scoped-declarations": &miner.Scope{
 			Scopes: map[string]miner.ScopedDecl{
-				"filename:main.go+++pkg:main+++declType:var+++name:sb": miner.ScopedDecl{
+				"filename:main.go+++pkg:main+++declType:var+++name:sb": {
 					ID:       "sb",
 					DeclType: token.FUNC,
 					Comments: []string{"string buffer"},
@@ -120,7 +120,7 @@ func TestExpand_OnAMAP_ShouldReturnExpandedResults(t *testing.T) {
 		ID:   "filename:main.go+++pkg:main+++declType:var+++name:sb",
 		Name: "sb",
 		Splits: map[string][]entity.Split{
-			"samurai": []entity.Split{
+			"samurai": {
 				{Order: 1, Value: "sb"},
 			},
 		},
@@ -136,7 +136,7 @@ func TestExpand_OnAMAP_WhileUsingLocalIdentifier_ShouldReturnExpandedResults(t *
 	miningResults := map[string]entity.Miner{
 		"scoped-declarations": &miner.Scope{
 			Scopes: map[string]miner.ScopedDecl{
-				"filename:main.go+++pkg:main+++declType:var+++name:sb": miner.ScopedDecl{
+				"filename:main.go+++pkg:main+++declType:var+++name:sb": {
 					ID:       "sb",
 					DeclType: token.FUNC,
 					Comments: []string{"string buffer"},
@@ -153,7 +153,7 @@ func TestExpand_OnAMAP_WhileUsingLocalIdentifier_ShouldReturnExpandedResults(t *
 		ID:   "filename:main.go+++pkg:main+++declType:var+++name:sb+++local:45",
 		Name: "sb",
 		Splits: map[string][]entity.Split{
-			"samurai": []entity.Split{
+			"samurai": {
 				{Order: 1, Value: "sb"},
 			},
 		},

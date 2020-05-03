@@ -51,7 +51,7 @@ func TestExpand_OnBasicWhenNoSplitsApplicable_ShouldReturnEmptyResults(t *testin
 		ID:   "filename:main.go+++pkg:main+++declType:var+++name:str",
 		Name: "str",
 		Splits: map[string][]entity.Split{
-			"gentest": []entity.Split{
+			"gentest": {
 				{Order: 1, Value: "str"},
 			},
 		},
@@ -74,7 +74,7 @@ func TestExpand_OnBasicWhenNoDeclFound_ShouldReturnUnexpandedResults(t *testing.
 		ID:   "filename:main.go+++pkg:main+++declType:var+++name:str",
 		Name: "str",
 		Splits: map[string][]entity.Split{
-			"greedy": []entity.Split{
+			"greedy": {
 				{Order: 1, Value: "str"},
 			},
 		},
@@ -90,12 +90,12 @@ func TestExpand_OnBasic_ShouldReturnExpandedResultsFromWords(t *testing.T) {
 	miningResults := map[string]entity.Miner{
 		"declarations": &miner.Declaration{
 			Decls: map[string]miner.Decl{
-				"filename:main.go+++pkg:main+++declType:var+++name:strbuff": miner.Decl{
+				"filename:main.go+++pkg:main+++declType:var+++name:strbuff": {
 					ID:       "strbuff",
 					DeclType: token.FUNC,
 					Words: map[string]struct{}{
-						"string": struct{}{},
-						"buffer": struct{}{},
+						"string": {},
+						"buffer": {},
 					},
 					Phrases: map[string]struct{}{},
 				},
@@ -110,7 +110,7 @@ func TestExpand_OnBasic_ShouldReturnExpandedResultsFromWords(t *testing.T) {
 		ID:   "filename:main.go+++pkg:main+++declType:var+++name:strbuff",
 		Name: "strbuff",
 		Splits: map[string][]entity.Split{
-			"greedy": []entity.Split{
+			"greedy": {
 				{Order: 1, Value: "str"},
 				{Order: 2, Value: "buff"},
 			},
@@ -128,12 +128,12 @@ func TestExpand_OnBasic_WhileUsingLocalVariables_ShouldReturnExpandedResultsFrom
 	miningResults := map[string]entity.Miner{
 		"declarations": &miner.Declaration{
 			Decls: map[string]miner.Decl{
-				"filename:main.go+++pkg:main+++declType:var+++name:strbuff": miner.Decl{
+				"filename:main.go+++pkg:main+++declType:var+++name:strbuff": {
 					ID:       "filename:main.go+++pkg:main+++declType:var+++name:strbuff",
 					DeclType: token.FUNC,
 					Words: map[string]struct{}{
-						"string": struct{}{},
-						"buffer": struct{}{},
+						"string": {},
+						"buffer": {},
 					},
 					Phrases: map[string]struct{}{},
 				},
@@ -148,7 +148,7 @@ func TestExpand_OnBasic_WhileUsingLocalVariables_ShouldReturnExpandedResultsFrom
 		ID:   "filename:main.go+++pkg:main+++declType:var+++name:sb+++local:43",
 		Name: "sb",
 		Splits: map[string][]entity.Split{
-			"greedy": []entity.Split{
+			"greedy": {
 				{Order: 1, Value: "s"},
 				{Order: 2, Value: "b"},
 			},
@@ -167,12 +167,12 @@ func TestExpand_OnBasic_ShouldReturnExpandedResultsFromPhrases(t *testing.T) {
 	miningResults := map[string]entity.Miner{
 		"declarations": &miner.Declaration{
 			Decls: map[string]miner.Decl{
-				"filename:main.go+++pkg:main+++declType:var+++name:sb": miner.Decl{
+				"filename:main.go+++pkg:main+++declType:var+++name:sb": {
 					ID:       "sb",
 					DeclType: token.FUNC,
 					Words:    map[string]struct{}{},
 					Phrases: map[string]struct{}{
-						"string buffer": struct{}{},
+						"string buffer": {},
 					},
 				},
 			},
@@ -186,7 +186,7 @@ func TestExpand_OnBasic_ShouldReturnExpandedResultsFromPhrases(t *testing.T) {
 		ID:   "filename:main.go+++pkg:main+++declType:var+++name:sb",
 		Name: "sb",
 		Splits: map[string][]entity.Split{
-			"greedy": []entity.Split{
+			"greedy": {
 				{Order: 1, Value: "sb"},
 			},
 		},
@@ -202,7 +202,7 @@ func TestExpand_OnBasicWhenMultipleResults_ShouldReturnClosestThreePerWord(t *te
 	miningResults := map[string]entity.Miner{
 		"declarations": &miner.Declaration{
 			Decls: map[string]miner.Decl{
-				"filename:main.go+++pkg:main+++declType:var+++name:contrl": miner.Decl{
+				"filename:main.go+++pkg:main+++declType:var+++name:contrl": {
 					ID:       "contrl",
 					DeclType: token.FUNC,
 					Words:    map[string]struct{}{},
@@ -219,7 +219,7 @@ func TestExpand_OnBasicWhenMultipleResults_ShouldReturnClosestThreePerWord(t *te
 		ID:   "filename:main.go+++pkg:main+++declType:var+++name:contrl",
 		Name: "contrl",
 		Splits: map[string][]entity.Split{
-			"greedy": []entity.Split{
+			"greedy": {
 				{Order: 1, Value: "contrl"},
 			},
 		},

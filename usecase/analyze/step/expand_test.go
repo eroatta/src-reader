@@ -28,7 +28,7 @@ func TestExpand_OnEmptyExpander_ShouldSendElementsWithoutExpansions(t *testing.T
 		identc <- entity.Identifier{
 			Name: "crtfile",
 			Splits: map[string][]entity.Split{
-				"test": []entity.Split{
+				"test": {
 					{Order: 1, Value: "crt"},
 					{Order: 2, Value: "file"},
 				},
@@ -55,7 +55,7 @@ func TestExpand_OnOneIdentifierAndTwoExpanders_ShouldSendElementsWithOneExpansio
 		identc <- entity.Identifier{
 			Name: "ctrldel",
 			Splits: map[string][]entity.Split{
-				"custom": []entity.Split{
+				"custom": {
 					{Order: 1, Value: "ctrl"},
 					{Order: 2, Value: "del"},
 				},

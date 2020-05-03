@@ -48,7 +48,7 @@ func TestVisit_OnScopeWithPlainFuncDecl_ShouldReturnScopedDeclaration(t *testing
 	`
 
 	expected := map[string]miner.ScopedDecl{
-		"filename:testfile.go+++pkg:main+++declType:func+++name:main": miner.ScopedDecl{
+		"filename:testfile.go+++pkg:main+++declType:func+++name:main": {
 			ID:              "filename:testfile.go+++pkg:main+++declType:func+++name:main",
 			DeclType:        token.FUNC,
 			Name:            "main",
@@ -84,7 +84,7 @@ func TestVisit_OnScopeWithFuncDeclWithComments_ShouldReturnScopedDeclaration(t *
 	`
 
 	expected := map[string]miner.ScopedDecl{
-		"filename:testfile.go+++pkg:main+++declType:func+++name:main": miner.ScopedDecl{
+		"filename:testfile.go+++pkg:main+++declType:func+++name:main": {
 			ID:            "filename:testfile.go+++pkg:main+++declType:func+++name:main",
 			DeclType:      token.FUNC,
 			Name:          "main",
@@ -130,7 +130,7 @@ func TestVisit_OnScopeWithMultipleFuncDeclWithComments_ShouldReturnScopedDeclara
 	`
 
 	expected := map[string]miner.ScopedDecl{
-		"filename:testfile.go+++pkg:main+++declType:func+++name:main": miner.ScopedDecl{
+		"filename:testfile.go+++pkg:main+++declType:func+++name:main": {
 			ID:            "filename:testfile.go+++pkg:main+++declType:func+++name:main",
 			DeclType:      token.FUNC,
 			Name:          "main",
@@ -145,7 +145,7 @@ func TestVisit_OnScopeWithMultipleFuncDeclWithComments_ShouldReturnScopedDeclara
 				"package comment line 2",
 			},
 		},
-		"filename:testfile.go+++pkg:main+++declType:func+++name:another": miner.ScopedDecl{
+		"filename:testfile.go+++pkg:main+++declType:func+++name:another": {
 			ID:            "filename:testfile.go+++pkg:main+++declType:func+++name:another",
 			DeclType:      token.FUNC,
 			Name:          "another",
@@ -197,7 +197,7 @@ func TestVisit_OnScopeWithMultipleFuncDeclWithFullBody_ShouldReturnScopedDeclara
 	`
 
 	expected := map[string]miner.ScopedDecl{
-		"filename:testfile.go+++pkg:main+++declType:func+++name:main": miner.ScopedDecl{
+		"filename:testfile.go+++pkg:main+++declType:func+++name:main": {
 			ID:            "filename:testfile.go+++pkg:main+++declType:func+++name:main",
 			DeclType:      token.FUNC,
 			Name:          "main",
@@ -212,7 +212,7 @@ func TestVisit_OnScopeWithMultipleFuncDeclWithFullBody_ShouldReturnScopedDeclara
 				"package comment line 2",
 			},
 		},
-		"filename:testfile.go+++pkg:main+++declType:func+++name:another": miner.ScopedDecl{
+		"filename:testfile.go+++pkg:main+++declType:func+++name:another": {
 			ID:            "filename:testfile.go+++pkg:main+++declType:func+++name:another",
 			DeclType:      token.FUNC,
 			Name:          "another",
@@ -228,7 +228,7 @@ func TestVisit_OnScopeWithMultipleFuncDeclWithFullBody_ShouldReturnScopedDeclara
 				"package comment line 2",
 			},
 		},
-		"filename:testfile.go+++pkg:main+++declType:func+++name:Miner.apply": miner.ScopedDecl{
+		"filename:testfile.go+++pkg:main+++declType:func+++name:Miner.apply": {
 			ID:       "filename:testfile.go+++pkg:main+++declType:func+++name:Miner.apply",
 			DeclType: token.FUNC,
 			Name:     "apply",
@@ -268,7 +268,7 @@ func TestVisit_OnScopeWithPlainVarDecl_ShouldReturnScopedDeclaration(t *testing.
 	`
 
 	expected := map[string]miner.ScopedDecl{
-		"filename:testfile.go+++pkg:main+++declType:var+++name:Common": miner.ScopedDecl{
+		"filename:testfile.go+++pkg:main+++declType:var+++name:Common": {
 			ID:              "filename:testfile.go+++pkg:main+++declType:var+++name:Common",
 			DeclType:        token.VAR,
 			Name:            "Common",
@@ -301,7 +301,7 @@ func TestVisit_OnScopeWithFullyCommentedVarDecl_ShouldReturnScopedDeclaration(t 
 	`
 
 	expected := map[string]miner.ScopedDecl{
-		"filename:testfile.go+++pkg:main+++declType:var+++name:Common": miner.ScopedDecl{
+		"filename:testfile.go+++pkg:main+++declType:var+++name:Common": {
 			ID:            "filename:testfile.go+++pkg:main+++declType:var+++name:Common",
 			DeclType:      token.VAR,
 			Name:          "Common",
@@ -340,7 +340,7 @@ func TestVisit_OnScopeWithVarBlockDecl_ShouldReturnScopedDeclaration(t *testing.
 	`
 
 	expected := map[string]miner.ScopedDecl{
-		"filename:testfile.go+++pkg:main+++declType:var+++name:common": miner.ScopedDecl{
+		"filename:testfile.go+++pkg:main+++declType:var+++name:common": {
 			ID:              "filename:testfile.go+++pkg:main+++declType:var+++name:common",
 			DeclType:        token.VAR,
 			Name:            "common",
@@ -350,7 +350,7 @@ func TestVisit_OnScopeWithVarBlockDecl_ShouldReturnScopedDeclaration(t *testing.
 			Comments:        []string{"outer comment"},
 			PackageComments: make([]string, 0),
 		},
-		"filename:testfile.go+++pkg:main+++declType:var+++name:regular": miner.ScopedDecl{
+		"filename:testfile.go+++pkg:main+++declType:var+++name:regular": {
 			ID:              "filename:testfile.go+++pkg:main+++declType:var+++name:regular",
 			DeclType:        token.VAR,
 			Name:            "regular",
@@ -360,7 +360,7 @@ func TestVisit_OnScopeWithVarBlockDecl_ShouldReturnScopedDeclaration(t *testing.
 			Comments:        []string{"outer comment"},
 			PackageComments: make([]string, 0),
 		},
-		"filename:testfile.go+++pkg:main+++declType:var+++name:nrzXXZ": miner.ScopedDecl{
+		"filename:testfile.go+++pkg:main+++declType:var+++name:nrzXXZ": {
 			ID:              "filename:testfile.go+++pkg:main+++declType:var+++name:nrzXXZ",
 			DeclType:        token.VAR,
 			Name:            "nrzXXZ",
@@ -391,7 +391,7 @@ func TestVisit_OnScopeWithPlainConstDecl_ShouldReturnScopedDeclaration(t *testin
 	`
 
 	expected := map[string]miner.ScopedDecl{
-		"filename:testfile.go+++pkg:main+++declType:const+++name:Common": miner.ScopedDecl{
+		"filename:testfile.go+++pkg:main+++declType:const+++name:Common": {
 			ID:              "filename:testfile.go+++pkg:main+++declType:const+++name:Common",
 			DeclType:        token.CONST,
 			Name:            "Common",
@@ -424,7 +424,7 @@ func TestVisit_OnScopeWithFullyCommentedConstDecl_ShouldReturnScopedDeclaration(
 	`
 
 	expected := map[string]miner.ScopedDecl{
-		"filename:testfile.go+++pkg:main+++declType:const+++name:Common": miner.ScopedDecl{
+		"filename:testfile.go+++pkg:main+++declType:const+++name:Common": {
 			ID:            "filename:testfile.go+++pkg:main+++declType:const+++name:Common",
 			DeclType:      token.CONST,
 			Name:          "Common",
@@ -463,7 +463,7 @@ func TestVisit_OnScopeWithConstBlockDecl_ShouldReturnScopedDeclaration(t *testin
 	`
 
 	expected := map[string]miner.ScopedDecl{
-		"filename:testfile.go+++pkg:main+++declType:const+++name:common": miner.ScopedDecl{
+		"filename:testfile.go+++pkg:main+++declType:const+++name:common": {
 			ID:              "filename:testfile.go+++pkg:main+++declType:const+++name:common",
 			DeclType:        token.CONST,
 			Name:            "common",
@@ -473,7 +473,7 @@ func TestVisit_OnScopeWithConstBlockDecl_ShouldReturnScopedDeclaration(t *testin
 			Comments:        []string{"outer comment"},
 			PackageComments: make([]string, 0),
 		},
-		"filename:testfile.go+++pkg:main+++declType:const+++name:regular": miner.ScopedDecl{
+		"filename:testfile.go+++pkg:main+++declType:const+++name:regular": {
 			ID:              "filename:testfile.go+++pkg:main+++declType:const+++name:regular",
 			DeclType:        token.CONST,
 			Name:            "regular",
@@ -483,7 +483,7 @@ func TestVisit_OnScopeWithConstBlockDecl_ShouldReturnScopedDeclaration(t *testin
 			Comments:        []string{"outer comment"},
 			PackageComments: make([]string, 0),
 		},
-		"filename:testfile.go+++pkg:main+++declType:const+++name:notRegular": miner.ScopedDecl{
+		"filename:testfile.go+++pkg:main+++declType:const+++name:notRegular": {
 			ID:              "filename:testfile.go+++pkg:main+++declType:const+++name:notRegular",
 			DeclType:        token.CONST,
 			Name:            "notRegular",
@@ -493,7 +493,7 @@ func TestVisit_OnScopeWithConstBlockDecl_ShouldReturnScopedDeclaration(t *testin
 			Comments:        []string{"outer comment"},
 			PackageComments: make([]string, 0),
 		},
-		"filename:testfile.go+++pkg:main+++declType:const+++name:nrzXXZ": miner.ScopedDecl{
+		"filename:testfile.go+++pkg:main+++declType:const+++name:nrzXXZ": {
 			ID:              "filename:testfile.go+++pkg:main+++declType:const+++name:nrzXXZ",
 			DeclType:        token.CONST,
 			Name:            "nrzXXZ",
@@ -524,7 +524,7 @@ func TestVisit_OnScopeWithPlainStructDecl_ShouldReturnScopedDeclaration(t *testi
 	`
 
 	expected := map[string]miner.ScopedDecl{
-		"filename:testfile.go+++pkg:main+++declType:struct+++name:selector": miner.ScopedDecl{
+		"filename:testfile.go+++pkg:main+++declType:struct+++name:selector": {
 			ID:              "filename:testfile.go+++pkg:main+++declType:struct+++name:selector",
 			DeclType:        token.STRUCT,
 			Name:            "selector",
@@ -560,7 +560,7 @@ func TestVisit_OnScopeWithFullyCommentedStructDecl_ShouldReturnScopedDeclaration
 	`
 
 	expected := map[string]miner.ScopedDecl{
-		"filename:testfile.go+++pkg:main+++declType:struct+++name:selector": miner.ScopedDecl{
+		"filename:testfile.go+++pkg:main+++declType:struct+++name:selector": {
 			ID:            "filename:testfile.go+++pkg:main+++declType:struct+++name:selector",
 			DeclType:      token.STRUCT,
 			Name:          "selector",
@@ -611,7 +611,7 @@ func TestVisit_OnScopeWithStructBlockDecl_ShouldReturnScopedDeclaration(t *testi
 	`
 
 	expected := map[string]miner.ScopedDecl{
-		"filename:testfile.go+++pkg:main+++declType:struct+++name:selector": miner.ScopedDecl{
+		"filename:testfile.go+++pkg:main+++declType:struct+++name:selector": {
 			ID:            "filename:testfile.go+++pkg:main+++declType:struct+++name:selector",
 			DeclType:      token.STRUCT,
 			Name:          "selector",
@@ -625,7 +625,7 @@ func TestVisit_OnScopeWithStructBlockDecl_ShouldReturnScopedDeclaration(t *testi
 			},
 			PackageComments: []string{"package comment"},
 		},
-		"filename:testfile.go+++pkg:main+++declType:struct+++name:httpClient": miner.ScopedDecl{
+		"filename:testfile.go+++pkg:main+++declType:struct+++name:httpClient": {
 			ID:       "filename:testfile.go+++pkg:main+++declType:struct+++name:httpClient",
 			DeclType: token.STRUCT,
 			Name:     "httpClient",
@@ -641,7 +641,7 @@ func TestVisit_OnScopeWithStructBlockDecl_ShouldReturnScopedDeclaration(t *testi
 			},
 			PackageComments: []string{"package comment"},
 		},
-		"filename:testfile.go+++pkg:main+++declType:func+++name:selector.print": miner.ScopedDecl{
+		"filename:testfile.go+++pkg:main+++declType:func+++name:selector.print": {
 			ID:            "filename:testfile.go+++pkg:main+++declType:func+++name:selector.print",
 			DeclType:      token.FUNC,
 			Name:          "print",
@@ -674,7 +674,7 @@ func TestVisit_OnScopeWithPlainInterfaceDecl_ShouldReturnScopedDeclaration(t *te
 	`
 
 	expected := map[string]miner.ScopedDecl{
-		"filename:testfile.go+++pkg:main+++declType:interface+++name:selector": miner.ScopedDecl{
+		"filename:testfile.go+++pkg:main+++declType:interface+++name:selector": {
 			ID:              "filename:testfile.go+++pkg:main+++declType:interface+++name:selector",
 			DeclType:        token.INTERFACE,
 			Name:            "selector",
@@ -710,7 +710,7 @@ func TestVisit_OnScopeWithFullyCommentedInterfaceDecl_ShouldReturnScopedDeclarat
 	`
 
 	expected := map[string]miner.ScopedDecl{
-		"filename:testfile.go+++pkg:main+++declType:interface+++name:selector": miner.ScopedDecl{
+		"filename:testfile.go+++pkg:main+++declType:interface+++name:selector": {
 			ID:            "filename:testfile.go+++pkg:main+++declType:interface+++name:selector",
 			DeclType:      token.INTERFACE,
 			Name:          "selector",
@@ -758,7 +758,7 @@ func TestVisit_OnScopeWithInterfaceBlockDecl_ShouldReturnScopedDeclaration(t *te
 	`
 
 	expected := map[string]miner.ScopedDecl{
-		"filename:testfile.go+++pkg:main+++declType:interface+++name:selector": miner.ScopedDecl{
+		"filename:testfile.go+++pkg:main+++declType:interface+++name:selector": {
 			ID:            "filename:testfile.go+++pkg:main+++declType:interface+++name:selector",
 			DeclType:      token.INTERFACE,
 			Name:          "selector",
@@ -772,7 +772,7 @@ func TestVisit_OnScopeWithInterfaceBlockDecl_ShouldReturnScopedDeclaration(t *te
 			},
 			PackageComments: []string{"package comment"},
 		},
-		"filename:testfile.go+++pkg:main+++declType:interface+++name:httpClient": miner.ScopedDecl{
+		"filename:testfile.go+++pkg:main+++declType:interface+++name:httpClient": {
 			ID:            "filename:testfile.go+++pkg:main+++declType:interface+++name:httpClient",
 			DeclType:      token.INTERFACE,
 			Name:          "httpClient",
