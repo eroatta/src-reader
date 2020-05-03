@@ -17,22 +17,25 @@ var (
 	ErrUnableToMineASTs         = errors.New("unable to apply one or more miners to the ASTs")
 	ErrUnableToCreateProcessors = errors.New("unable to create splitting or expansion algorithms")
 	ErrUnableToSaveIdentifiers  = errors.New("unable to save extracted and processed indentifiers")
+	ErrUnableToSaveAnalysis     = errors.New("unable to save analysis results after completed processing")
 )
 
 type AnalyzeProjectUsecase interface {
 	Analyze(ctx context.Context, project entity.Project, config *entity.AnalysisConfig) (entity.AnalysisResults, error)
 }
 
-func NewAnalyzeProjectUsecase(scr repository.SourceCodeRepository, ir repository.IdentifierRepository) AnalyzeProjectUsecase {
+func NewAnalyzeProjectUsecase(scr repository.SourceCodeRepository, ir repository.IdentifierRepository, ar repository.AnalysisRepository) AnalyzeProjectUsecase {
 	return &analyzeProjectUsecase{
 		sourceCodeRepository: scr,
 		identifierRepository: ir,
+		analysisRepository:   ar,
 	}
 }
 
 type analyzeProjectUsecase struct {
 	sourceCodeRepository repository.SourceCodeRepository
 	identifierRepository repository.IdentifierRepository
+	analysisRepository   repository.AnalysisRepository
 }
 
 func (uc analyzeProjectUsecase) Analyze(ctx context.Context, project entity.Project, config *entity.AnalysisConfig) (entity.AnalysisResults, error) {
@@ -70,7 +73,7 @@ func (uc analyzeProjectUsecase) Analyze(ctx context.Context, project entity.Proj
 	// if every file can't be parsed, then fail
 	if len(valid) == 0 {
 		log.Error(fmt.Sprintf("unable to read or parse any file on %s for project %s",
-			project.SourceCode.Location, project.URL))
+			project.SourceCode.Location, analysisResults.ProjectName))
 		return entity.AnalysisResults{}, ErrUnableToBuildASTs
 	}
 
@@ -127,12 +130,18 @@ func (uc analyzeProjectUsecase) Analyze(ctx context.Context, project entity.Proj
 		err := uc.identifierRepository.Add(ctx, project, ident)
 		if err != nil {
 			log.WithError(err).Error(fmt.Sprintf("unable to save identifier %s, on file %s for project %s",
-				ident.Name, ident.File, project.URL))
+				ident.Name, ident.File, analysisResults.ProjectName))
 			return entity.AnalysisResults{}, ErrUnableToSaveIdentifiers
 		}
 	}
 	analysisResults.IdentifiersValid = analysisResults.IdentifiersTotal - analysisResults.IdentifiersError
 	analysisResults.IdentifiersErrorSamples = identErrorSamples
+
+	err := uc.analysisRepository.Add(ctx, analysisResults)
+	if err != nil {
+		log.WithError(err).Error(fmt.Sprintf("unable to save analysis results for project %s", analysisResults.ProjectName))
+		return entity.AnalysisResults{}, ErrUnableToSaveAnalysis
+	}
 
 	return analysisResults, nil
 }

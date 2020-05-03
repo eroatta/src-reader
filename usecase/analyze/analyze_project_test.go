@@ -15,7 +15,7 @@ import (
 )
 
 func TestNewAnalyzeProjectUsecase_ShouldReturnNewInstance(t *testing.T) {
-	uc := analyze.NewAnalyzeProjectUsecase(nil, nil)
+	uc := analyze.NewAnalyzeProjectUsecase(nil, nil, nil)
 
 	assert.Empty(t, uc)
 }
@@ -35,7 +35,7 @@ func TestAnalyze_OnAnalyzeProjectUsecase_WhenFailingToReadFiles_ShouldReturnErro
 		err:   repository.ErrSourceCodeUnableReadFile,
 	}
 
-	uc := analyze.NewAnalyzeProjectUsecase(sourceCodeRepositoryMock, nil)
+	uc := analyze.NewAnalyzeProjectUsecase(sourceCodeRepositoryMock, nil, nil)
 
 	results, err := uc.Analyze(context.TODO(), project, &entity.AnalysisConfig{})
 
@@ -60,7 +60,7 @@ func TestAnalyze_OnAnalyzeProjectUsecase_WhenFailingToParseFiles_ShouldReturnErr
 		err: nil,
 	}
 
-	uc := analyze.NewAnalyzeProjectUsecase(sourceCodeRepositoryMock, nil)
+	uc := analyze.NewAnalyzeProjectUsecase(sourceCodeRepositoryMock, nil, nil)
 
 	results, err := uc.Analyze(context.TODO(), project, &entity.AnalysisConfig{})
 
@@ -85,7 +85,7 @@ func TestAnalyze_OnAnalyzeProjectUsecase_WhenFailingToCreateSplitters_ShouldRetu
 		err: nil,
 	}
 
-	uc := analyze.NewAnalyzeProjectUsecase(sourceCodeRepositoryMock, nil)
+	uc := analyze.NewAnalyzeProjectUsecase(sourceCodeRepositoryMock, nil, nil)
 
 	results, err := uc.Analyze(context.TODO(), project, &entity.AnalysisConfig{
 		Miners:    []string{},
@@ -113,7 +113,7 @@ func TestAnalyze_OnAnalyzeProjectUsecase_WhenFailingToCreateExpanders_ShouldRetu
 		err: nil,
 	}
 
-	uc := analyze.NewAnalyzeProjectUsecase(sourceCodeRepositoryMock, nil)
+	uc := analyze.NewAnalyzeProjectUsecase(sourceCodeRepositoryMock, nil, nil)
 
 	results, err := uc.Analyze(context.TODO(), project, &entity.AnalysisConfig{
 		Miners:                    []string{},
@@ -147,7 +147,7 @@ func TestAnalyze_OnAnalyzeProjectUsecase_WhenFailingToSaveIdentifiers_ShouldRetu
 		err: repository.ErrIdentifierUnexpected,
 	}
 
-	uc := analyze.NewAnalyzeProjectUsecase(sourceCodeRepositoryMock, identifierRepositoryMock)
+	uc := analyze.NewAnalyzeProjectUsecase(sourceCodeRepositoryMock, identifierRepositoryMock, nil)
 
 	results, err := uc.Analyze(context.TODO(), project, &entity.AnalysisConfig{
 		Miners:                    []string{},
@@ -159,6 +159,46 @@ func TestAnalyze_OnAnalyzeProjectUsecase_WhenFailingToSaveIdentifiers_ShouldRetu
 	})
 
 	assert.EqualError(t, err, analyze.ErrUnableToSaveIdentifiers.Error())
+	assert.Empty(t, results)
+}
+
+func TestAnalyze_OnAnalyzeProjectUsecase_WhenFailingToSaveAnalysis_ShouldReturnError(t *testing.T) {
+	project := entity.Project{
+		URL: "https://github.com/eroatta/test",
+		SourceCode: entity.SourceCode{
+			Hash:     "asdf1234asdf",
+			Location: "/tmp/repositories/eroatta/test",
+			Files:    []string{"main.go"},
+		},
+	}
+
+	sourceCodeRepositoryMock := sourceCodeFileReaderMock{
+		files: map[string][]byte{
+			"main.go": []byte("package main"),
+		},
+		err: nil,
+	}
+
+	identifierRepositoryMock := identifierRepositoryMock{
+		err: nil,
+	}
+
+	analysisRepositoryMock := analysisRepositoryMock{
+		err: repository.ErrAnalysisUnexpected,
+	}
+
+	uc := analyze.NewAnalyzeProjectUsecase(sourceCodeRepositoryMock, identifierRepositoryMock, analysisRepositoryMock)
+
+	results, err := uc.Analyze(context.TODO(), project, &entity.AnalysisConfig{
+		Miners:                    []string{},
+		ExtractorFactory:          newExtractorMock,
+		Splitters:                 []string{"conserv"},
+		SplittingAlgorithmFactory: splitter.NewSplitterFactory(),
+		Expanders:                 []string{"mock"},
+		ExpansionAlgorithmFactory: expanderAbstractFactoryMock{},
+	})
+
+	assert.EqualError(t, err, analyze.ErrUnableToSaveAnalysis.Error())
 	assert.Empty(t, results)
 }
 
@@ -187,7 +227,11 @@ func TestAnalyze_OnAnalyzeProjectUsecase_WhenAnalyzingIdentifiers_ShouldReturnAn
 		err: nil,
 	}
 
-	uc := analyze.NewAnalyzeProjectUsecase(sourceCodeRepositoryMock, identifierRepositoryMock)
+	analysisRepositoryMock := analysisRepositoryMock{
+		err: nil,
+	}
+
+	uc := analyze.NewAnalyzeProjectUsecase(sourceCodeRepositoryMock, identifierRepositoryMock, analysisRepositoryMock)
 
 	results, err := uc.Analyze(context.TODO(), project, &entity.AnalysisConfig{
 		Miners:                    []string{},
@@ -305,4 +349,12 @@ type identifierRepositoryMock struct {
 
 func (i identifierRepositoryMock) Add(ctx context.Context, project entity.Project, ident entity.Identifier) error {
 	return i.err
+}
+
+type analysisRepositoryMock struct {
+	err error
+}
+
+func (a analysisRepositoryMock) Add(ctx context.Context, analysis entity.AnalysisResults) error {
+	return a.err
 }
