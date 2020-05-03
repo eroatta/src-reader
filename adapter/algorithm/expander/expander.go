@@ -7,6 +7,11 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+// NewExpanderFactory creates a new entity.ExpanderAbstractFactory, including the available expander factories.
+// It supports:
+// 	* "noexp"
+//	* "basic"
+//	* "amap"
 func NewExpanderFactory() entity.ExpanderAbstractFactory {
 	return &expanderFactory{
 		factories: map[string]entity.ExpanderFactory{
@@ -21,6 +26,7 @@ type expanderFactory struct {
 	factories map[string]entity.ExpanderFactory
 }
 
+// Get retrieves an entity.ExpanderFactory matching the algorithm name.
 func (f expanderFactory) Get(name string) (entity.ExpanderFactory, error) {
 	factory, ok := f.factories[name]
 	if !ok {

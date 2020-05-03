@@ -11,10 +11,17 @@ import (
 )
 
 var (
-	ErrUnableToReadProject      = errors.New("Unable to check against existing projects")
+	// ErrUnableToReadProject indicates that an error occurred while trying to read the entity.Project
+	// from any repository.
+	ErrUnableToReadProject = errors.New("Unable to check against existing projects")
+	// ErrUnableToRetrieveMetadata indicates that an error occurred while trying to retrieve Metadata information
+	// related to the imported project.
 	ErrUnableToRetrieveMetadata = errors.New("Unable to retrieve project metadata")
-	ErrUnableToCloneSourceCode  = errors.New("Unable to access or clone the source code")
-	ErrUnableToSaveProject      = errors.New("Unable to store project changes")
+	// ErrUnableToCloneSourceCode indicates that an error occurred while trying to retrieve or store the source code
+	// related to the imported project.
+	ErrUnableToCloneSourceCode = errors.New("Unable to access or clone the source code")
+	// ErrUnableToSaveProject indicates that an error occurred while trying to save the imported entity.Project.
+	ErrUnableToSaveProject = errors.New("Unable to store project changes")
 )
 
 // ImportProjectUsecase defines the contract for the use case related to the import process

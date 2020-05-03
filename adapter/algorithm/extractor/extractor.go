@@ -8,6 +8,14 @@ import (
 	"github.com/eroatta/src-reader/entity"
 )
 
+// Extractor represents an extraction algorithm, capable of retriving several definitions/declarations.
+// The current implementation handles:
+//	* function declaration
+//	* variable declaration
+//	* constant declaration
+//	* struct definition
+//	* interface definition
+//	* local variable declaration and initialization (with token ':=')
 type Extractor struct {
 	filename      string
 	packageName   string

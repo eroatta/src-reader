@@ -15,7 +15,7 @@ var (
 	// ErrMongoDBConnection represents an error while attempting to create a connection to the
 	// given MongoDB server.
 	ErrMongoDBConnection = errors.New("MongoDB connection error")
-	// ErrorMongoDBValidation represents an error while attempting to check the existing connection
+	// ErrMongoDBValidation represents an error while attempting to check the existing connection
 	// to the given MongoDB server.
 	ErrMongoDBValidation = errors.New("MongoDB connection validation error")
 )

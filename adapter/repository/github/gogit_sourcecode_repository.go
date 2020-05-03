@@ -40,6 +40,8 @@ func PlainClonerFunc(ctx context.Context, path string, url string) (*git.Reposit
 	})
 }
 
+// Clone clones the source code, under a given name, using the provided clone URL, and stores the files on the
+// OS folder.
 func (r GogitSourceCodeRepository) Clone(ctx context.Context, fullname string, cloneURL string) (entity.SourceCode, error) {
 	path := fmt.Sprintf("%s/%s", r.baseDir, fullname)
 	err := os.MkdirAll(path, os.ModePerm)
@@ -107,6 +109,7 @@ func read(fs billy.Filesystem, rootDir string) ([]string, error) {
 	return names, nil
 }
 
+// Remove removes all the source code files on the OS location folder.
 func (r GogitSourceCodeRepository) Remove(ctx context.Context, location string) error {
 	if !strings.HasPrefix(location, r.baseDir) {
 		return repository.ErrSourceCodeUnableToRemove
@@ -121,6 +124,7 @@ func (r GogitSourceCodeRepository) Remove(ctx context.Context, location string) 
 	return nil
 }
 
+// Read opens and reads a file on the provided location, stored on the OS filesystem.
 func (r GogitSourceCodeRepository) Read(ctx context.Context, location string, filename string) ([]byte, error) {
 	if !strings.HasPrefix(location, r.baseDir) {
 		return []byte{}, repository.ErrSourceCodeUnableReadFile

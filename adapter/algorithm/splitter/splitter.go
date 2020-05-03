@@ -7,6 +7,11 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+// NewSplitterFactory creates a new entity.SplitterAbstractFactory, including the available splitter factories.
+// It supports:
+// 	* "conserv"
+//	* "greedy"
+//	* "samurai"
 func NewSplitterFactory() entity.SplitterAbstractFactory {
 	return &splitterFactory{
 		factories: map[string]entity.SplitterFactory{
@@ -21,6 +26,7 @@ type splitterFactory struct {
 	factories map[string]entity.SplitterFactory
 }
 
+// Get retrieves an entity.SplitterFactory matching the algorithm name.
 func (f splitterFactory) Get(name string) (entity.SplitterFactory, error) {
 	factory, ok := f.factories[name]
 	if !ok {

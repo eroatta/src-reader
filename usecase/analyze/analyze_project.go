@@ -13,11 +13,19 @@ import (
 )
 
 var (
-	ErrUnableToBuildASTs        = errors.New("unable to create ASTs from input")
-	ErrUnableToMineASTs         = errors.New("unable to apply one or more miners to the ASTs")
+	// ErrUnableToBuildASTs indicates that an error occurred while trying to read or parse the source code files to
+	// build the required Abstract Syntax Trees.
+	ErrUnableToBuildASTs = errors.New("unable to create ASTs from input")
+	// ErrUnableToMineASTs indicates that an error occurred while trying to create or apply the miners specified
+	// during the import process.
+	ErrUnableToMineASTs = errors.New("unable to apply one or more miners to the ASTs")
+	// ErrUnableToCreateProcessors indicates that an error occurred while trying to create or apply the splitters or
+	// expanders during the import process.
 	ErrUnableToCreateProcessors = errors.New("unable to create splitting or expansion algorithms")
-	ErrUnableToSaveIdentifiers  = errors.New("unable to save extracted and processed indentifiers")
-	ErrUnableToSaveAnalysis     = errors.New("unable to save analysis results after completed processing")
+	// ErrUnableToSaveIdentifiers indicates that an error occurred while trying to save an already processed identifier.
+	ErrUnableToSaveIdentifiers = errors.New("unable to save extracted and processed indentifiers")
+	// ErrUnableToSaveAnalysis indicates that an error occurred while trying to store the results for an import process.
+	ErrUnableToSaveAnalysis = errors.New("unable to save analysis results after completed processing")
 )
 
 // AnalyzeProjectUsecase defines the contract for the use case related to the analysis process of a project.

@@ -7,6 +7,13 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+// NewMinerFactory creates a new entity.MinerAbstractFactory, including the available miner factories.
+// It supports:
+// 	* "comments"
+//	* "declarations"
+//	* "global-frequency-table"
+//	* "scoped-declarations"
+//	* "wordcount"
 func NewMinerFactory() entity.MinerAbstractFactory {
 	return &minerFactory{
 		factories: map[string]entity.MinerFactory{
