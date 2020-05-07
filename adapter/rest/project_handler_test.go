@@ -7,6 +7,7 @@ import (
 	"net/http/httptest"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/eroatta/src-reader/adapter/rest"
 	"github.com/eroatta/src-reader/entity"
@@ -122,19 +123,34 @@ func TestPOST_OnProjectCreationHandler_WithInternalError_ShouldReturnHTTP500(t *
 }
 
 func TestPOST_OnProjectCreationHandler_WithSuccess_ShouldReturnHTTP201(t *testing.T) {
+	now := time.Date(2020, time.May, 5, 22, 0, 0, 0, time.UTC)
 	router := rest.NewServer(mockUsecase{
 		p: entity.Project{
-			ID:     "13132dfadfasfasf",
+			ID:     "715f17550be5f7222a815ff80966adaf",
 			Status: "done",
+			URL:    "https://github.com/src-d/go-siva",
 			Metadata: entity.Metadata{
-				Stargazers: 123,
+				RemoteID:      "69565817",
+				Owner:         "src-d",
+				Fullname:      "src-d/go-siva",
+				Description:   "siva - seekable indexed verifiable archiver",
+				CloneURL:      "https://github.com/src-d/go-siva.git",
+				DefaultBranch: "master",
+				License:       "mit",
+				CreatedAt:     &now,
+				UpdatedAt:     &now,
+				IsFork:        false,
+				Size:          102,
+				Stargazers:    88,
+				Watchers:      88,
+				Forks:         16,
 			},
 			SourceCode: entity.SourceCode{
-				Hash:     "adfasdf9234adaf",
-				Location: "/tmp/repositories/eroatta/src-reader",
+				Hash:     "4ba248c1cf1003995d356f11935287b3e99decca",
+				Location: "/tmp/repositories/github.com/src-d/go-siva",
 				Files: []string{
-					"main.go",
-					"README.md",
+					"common.go",
+					"common_test.go",
 				},
 			},
 		},
@@ -143,7 +159,7 @@ func TestPOST_OnProjectCreationHandler_WithSuccess_ShouldReturnHTTP201(t *testin
 
 	w := httptest.NewRecorder()
 	body := `{
-		"repository": "https://github.com/eroatta/src-reader"
+		"repository": "https://github.com/src-d/go-siva"
 	}`
 	req, _ := http.NewRequest("POST", "/projects", strings.NewReader(body))
 	router.ServeHTTP(w, req)
@@ -151,17 +167,31 @@ func TestPOST_OnProjectCreationHandler_WithSuccess_ShouldReturnHTTP201(t *testin
 	assert.Equal(t, http.StatusCreated, w.Code)
 	assert.JSONEq(t, `
 		{
-			"id": "13132dfadfasfasf",
+			"id": "715f17550be5f7222a815ff80966adaf",
 			"status": "done",
+			"url": "https://github.com/src-d/go-siva",
 			"metadata": {
-				"stargazers": 123
+				"remote_id": "69565817",
+				"owner": "src-d",
+				"fullname": "src-d/go-siva",
+				"description": "siva - seekable indexed verifiable archiver",
+				"clone_url": "https://github.com/src-d/go-siva.git",
+				"branch": "master",
+				"license": "mit",
+				"created_at": "2020-05-05T22:00:00Z",
+				"updated_at": "2020-05-05T22:00:00Z",
+				"is_fork": false,
+				"size": 102,
+				"stargazers": 88,
+				"watchers": 88,
+				"forks": 16
 			},
 			"source_code": {
-				"hash": "adfasdf9234adaf",
-				"location": "/tmp/repositories/eroatta/src-reader",
+				"hash": "4ba248c1cf1003995d356f11935287b3e99decca",
+				"location": "/tmp/repositories/github.com/src-d/go-siva",
 				"files": [
-					"main.go",
-					"README.md"
+					"common.go",
+					"common_test.go"
 				]
 			}
 		}`,
