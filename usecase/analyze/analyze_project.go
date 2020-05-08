@@ -13,6 +13,8 @@ import (
 )
 
 var (
+	// ErrProjectNotFound indicates that the requested project is not accessible.
+	ErrProjectNotFound = errors.New("unable to retrieve requested Project")
 	// ErrUnableToBuildASTs indicates that an error occurred while trying to read or parse the source code files to
 	// build the required Abstract Syntax Trees.
 	ErrUnableToBuildASTs = errors.New("unable to create ASTs from input")
@@ -26,33 +28,51 @@ var (
 	ErrUnableToSaveIdentifiers = errors.New("unable to save extracted and processed indentifiers")
 	// ErrUnableToSaveAnalysis indicates that an error occurred while trying to store the results for an import process.
 	ErrUnableToSaveAnalysis = errors.New("unable to save analysis results after completed processing")
+	// ErrUnexpected indicates that an unexpected error ocurring while analyzing the project.
+	ErrUnexpected = errors.New("unexpected error")
 )
 
 // AnalyzeProjectUsecase defines the contract for the use case related to the analysis process of a project.
 type AnalyzeProjectUsecase interface {
 	// Analyze processes the given Project, based on the configuration provided by the AnalysisConfig.
-	Analyze(ctx context.Context, project entity.Project, config *entity.AnalysisConfig) (entity.AnalysisResults, error)
+	Analyze(ctx context.Context, url string) (entity.AnalysisResults, error)
 }
 
 // NewAnalyzeProjectUsecase initializes a new AnalyzeProjectUsecase handler.
-func NewAnalyzeProjectUsecase(scr repository.SourceCodeRepository, ir repository.IdentifierRepository, ar repository.AnalysisRepository) AnalyzeProjectUsecase {
+func NewAnalyzeProjectUsecase(pr repository.ProjectRepository, scr repository.SourceCodeRepository,
+	ir repository.IdentifierRepository, ar repository.AnalysisRepository, config *entity.AnalysisConfig) AnalyzeProjectUsecase {
 	return &analyzeProjectUsecase{
+		projectRepository:    pr,
 		sourceCodeRepository: scr,
 		identifierRepository: ir,
 		analysisRepository:   ar,
+		defaultConfig:        config,
 	}
 }
 
 type analyzeProjectUsecase struct {
+	projectRepository    repository.ProjectRepository
 	sourceCodeRepository repository.SourceCodeRepository
 	identifierRepository repository.IdentifierRepository
 	analysisRepository   repository.AnalysisRepository
+	defaultConfig        *entity.AnalysisConfig
 }
 
 // Analyze processes the given Project, based on the configuration provided by the AnalysisConfig.
 // The process reads the source code, applies the given miners, splitters and expanders and then stores the results.
 // It's the default implementation for the use case.
-func (uc analyzeProjectUsecase) Analyze(ctx context.Context, project entity.Project, config *entity.AnalysisConfig) (entity.AnalysisResults, error) {
+func (uc analyzeProjectUsecase) Analyze(ctx context.Context, url string) (entity.AnalysisResults, error) {
+	project, err := uc.projectRepository.GetByURL(ctx, url)
+	switch err {
+	case nil:
+		// do nothing
+	case repository.ErrProjectNoResults:
+		return entity.AnalysisResults{}, ErrProjectNotFound
+	default:
+		log.WithError(err).Error(fmt.Sprintf("unable to retrieve project %s", url))
+		return entity.AnalysisResults{}, ErrUnexpected
+	}
+
 	analysisResults := entity.AnalysisResults{
 		ID:                project.ID,
 		DateCreated:       time.Now(),
@@ -92,7 +112,7 @@ func (uc analyzeProjectUsecase) Analyze(ctx context.Context, project entity.Proj
 	}
 
 	// apply the pre-process step (mine them)
-	miners := buildMiners(config)
+	miners := buildMiners(uc.defaultConfig)
 	for _, miner := range miners {
 		analysisResults.PipelineMiners = append(analysisResults.PipelineMiners, miner.Name())
 	}
@@ -100,9 +120,9 @@ func (uc analyzeProjectUsecase) Analyze(ctx context.Context, project entity.Proj
 	miningResults := step.Mine(valid, miners...)
 
 	// make the splitters from input and mining results
-	splitters := buildSplittersFromMiningResults(config, miningResults)
+	splitters := buildSplittersFromMiningResults(uc.defaultConfig, miningResults)
 	if len(splitters) == 0 {
-		log.WithField("desired", config.Splitters).Error("unable to create any splitter")
+		log.WithField("desired", uc.defaultConfig.Splitters).Error("unable to create any splitter")
 		return entity.AnalysisResults{}, ErrUnableToCreateProcessors
 	}
 	for _, splitter := range splitters {
@@ -110,9 +130,9 @@ func (uc analyzeProjectUsecase) Analyze(ctx context.Context, project entity.Proj
 	}
 
 	// make the expanders from input and mining results
-	expanders := buildExpandersFromMiningResults(config, miningResults)
+	expanders := buildExpandersFromMiningResults(uc.defaultConfig, miningResults)
 	if len(expanders) == 0 {
-		log.WithField("desired", config.Expanders).Error("unable to create any expander")
+		log.WithField("desired", uc.defaultConfig.Expanders).Error("unable to create any expander")
 		return entity.AnalysisResults{}, ErrUnableToCreateProcessors
 	}
 	for _, expander := range expanders {
@@ -120,7 +140,7 @@ func (uc analyzeProjectUsecase) Analyze(ctx context.Context, project entity.Proj
 	}
 
 	// analyze each identifier
-	identc := step.Extract(valid, config.ExtractorFactory)
+	identc := step.Extract(valid, uc.defaultConfig.ExtractorFactory)
 	splittedc := step.Split(identc, splitters...)
 	expandedc := step.Expand(splittedc, expanders...)
 
@@ -151,7 +171,7 @@ func (uc analyzeProjectUsecase) Analyze(ctx context.Context, project entity.Proj
 	analysisResults.IdentifiersValid = analysisResults.IdentifiersTotal - analysisResults.IdentifiersError
 	analysisResults.IdentifiersErrorSamples = identErrorSamples
 
-	err := uc.analysisRepository.Add(ctx, analysisResults)
+	err = uc.analysisRepository.Add(ctx, analysisResults)
 	if err != nil {
 		log.WithError(err).Error(fmt.Sprintf("unable to save analysis results for project %s", analysisResults.ProjectName))
 		return entity.AnalysisResults{}, ErrUnableToSaveAnalysis

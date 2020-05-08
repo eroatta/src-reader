@@ -15,7 +15,7 @@ import (
 )
 
 func TestPOST_OnProjectCreationHandler_WithoutBody_ShouldReturnHTTP400(t *testing.T) {
-	router := rest.NewServer(nil)
+	router := rest.NewServer(nil, nil)
 
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("POST", "/projects", nil)
@@ -34,7 +34,7 @@ func TestPOST_OnProjectCreationHandler_WithoutBody_ShouldReturnHTTP400(t *testin
 }
 
 func TestPOST_OnProjectCreationHandler_WithEmptyBody_ShouldReturnHTTP400(t *testing.T) {
-	router := rest.NewServer(nil)
+	router := rest.NewServer(nil, nil)
 
 	w := httptest.NewRecorder()
 	body := `{}`
@@ -54,7 +54,7 @@ func TestPOST_OnProjectCreationHandler_WithEmptyBody_ShouldReturnHTTP400(t *test
 }
 
 func TestPOST_OnProjectCreationHandler_WithWrongDataType_ShouldReturnHTTP400(t *testing.T) {
-	router := rest.NewServer(nil)
+	router := rest.NewServer(nil, nil)
 
 	w := httptest.NewRecorder()
 	body := `{
@@ -76,7 +76,7 @@ func TestPOST_OnProjectCreationHandler_WithWrongDataType_ShouldReturnHTTP400(t *
 }
 
 func TestPOST_OnProjectCreationHandler_WithInvalidRepository_ShouldReturnHTTP400(t *testing.T) {
-	router := rest.NewServer(nil)
+	router := rest.NewServer(nil, nil)
 
 	w := httptest.NewRecorder()
 	body := `{
@@ -98,10 +98,10 @@ func TestPOST_OnProjectCreationHandler_WithInvalidRepository_ShouldReturnHTTP400
 }
 
 func TestPOST_OnProjectCreationHandler_WithInternalError_ShouldReturnHTTP500(t *testing.T) {
-	router := rest.NewServer(mockUsecase{
+	router := rest.NewServer(mockCreateUsecase{
 		p:   entity.Project{},
 		err: errors.New("error accessing repository http://github.com/eroatta/src-reader"),
-	})
+	}, nil)
 
 	w := httptest.NewRecorder()
 	body := `{
@@ -124,7 +124,7 @@ func TestPOST_OnProjectCreationHandler_WithInternalError_ShouldReturnHTTP500(t *
 
 func TestPOST_OnProjectCreationHandler_WithSuccess_ShouldReturnHTTP201(t *testing.T) {
 	now := time.Date(2020, time.May, 5, 22, 0, 0, 0, time.UTC)
-	router := rest.NewServer(mockUsecase{
+	router := rest.NewServer(mockCreateUsecase{
 		p: entity.Project{
 			ID:     "715f17550be5f7222a815ff80966adaf",
 			Status: "done",
@@ -155,7 +155,7 @@ func TestPOST_OnProjectCreationHandler_WithSuccess_ShouldReturnHTTP201(t *testin
 			},
 		},
 		err: nil,
-	})
+	}, nil)
 
 	w := httptest.NewRecorder()
 	body := `{
@@ -198,11 +198,11 @@ func TestPOST_OnProjectCreationHandler_WithSuccess_ShouldReturnHTTP201(t *testin
 		w.Body.String())
 }
 
-type mockUsecase struct {
+type mockCreateUsecase struct {
 	p   entity.Project
 	err error
 }
 
-func (m mockUsecase) Import(ctx context.Context, url string) (entity.Project, error) {
+func (m mockCreateUsecase) Import(ctx context.Context, url string) (entity.Project, error) {
 	return m.p, m.err
 }

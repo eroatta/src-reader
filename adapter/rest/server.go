@@ -16,18 +16,19 @@ import (
 // request bodies.
 var requestValidator = validator.New()
 
-func NewServer(ipUsecase create.ImportProjectUsecase) *gin.Engine {
+func NewServer(ipUsecase create.ImportProjectUsecase, apUsecase analyze.AnalyzeProjectUsecase) *gin.Engine {
 	r := gin.Default()
 	r.GET("/ping", pingHandler)
 
 	internal := server{
-		createProjectUsecase: ipUsecase,
+		createProjectUsecase:  ipUsecase,
+		analyzeProjectUsecase: apUsecase,
 	}
 
 	r.POST("/projects", internal.createProject)
 	// r.GET("/projects/$id", internal.getProject)
 	// r.DELETE("/projects/$id", internal.deleteProject)
-	// r.POST("/analysis", internal.createAnalysis)
+	r.POST("/analysis", internal.createAnalysis)
 	// r.GET("/analysis/$id", internal.getAnalysis)
 	// r.DELETE("/analysis/$id", internal.deleteAnalysis)
 	// r.GET("/analysis/$id/identifiers", internal.getIdentifiers)
@@ -55,7 +56,7 @@ func newBadRequestResponse() errorResponse {
 	}
 }
 
-func setBadRequestOnBindingResponse(ctx *gin.Context, err error) {
+func setBadRequestResponse(ctx *gin.Context, err error) {
 	errResponse := newBadRequestResponse()
 	errResponse.Details = append(errResponse.Details, err.Error())
 
@@ -92,8 +93,4 @@ func setInternalErrorResponse(ctx *gin.Context, err error) {
 type server struct {
 	createProjectUsecase  create.ImportProjectUsecase
 	analyzeProjectUsecase analyze.AnalyzeProjectUsecase
-}
-
-func (s server) createAnalysis(ctx *gin.Context) {
-
 }

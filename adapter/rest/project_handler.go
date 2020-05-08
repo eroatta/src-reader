@@ -48,7 +48,7 @@ func (s server) createProject(ctx *gin.Context) {
 
 	if err := ctx.ShouldBindJSON(&cmd); err != nil {
 		log.WithError(err).Debug("failed to bind JSON body")
-		setBadRequestOnBindingResponse(ctx, err)
+		setBadRequestResponse(ctx, err)
 		return
 	}
 

@@ -49,11 +49,7 @@ func importProjectUsecase(url string) {
 	log.Println("Import::: Done")
 
 	log.Println("Analysis::: Start")
-	identifierRepository := mongodb.NewMongoDBIdentifierRepository(clt, "reader")
-	analysisRepository := mongodb.NewMongoDBAnalysisRepository(clt, "reader")
-	analyzeUsecase := analyze.NewAnalyzeProjectUsecase(sourceCodeRepository, identifierRepository, analysisRepository)
-
-	analysisResults, err := analyzeUsecase.Analyze(context.TODO(), project, &entity.AnalysisConfig{
+	config := &entity.AnalysisConfig{
 		Miners:                    []string{"wordcount", "scoped-declarations", "comments", "declarations", "global-frequency-table"},
 		MinerAlgorithmFactory:     miner.NewMinerFactory(),
 		ExtractorFactory:          extractor.New,
@@ -61,7 +57,13 @@ func importProjectUsecase(url string) {
 		SplittingAlgorithmFactory: splitter.NewSplitterFactory(),
 		Expanders:                 []string{"noexp", "basic", "amap"},
 		ExpansionAlgorithmFactory: expander.NewExpanderFactory(),
-	})
+	}
+	identifierRepository := mongodb.NewMongoDBIdentifierRepository(clt, "reader")
+	analysisRepository := mongodb.NewMongoDBAnalysisRepository(clt, "reader")
+	analyzeUsecase := analyze.NewAnalyzeProjectUsecase(projectRepository, sourceCodeRepository,
+		identifierRepository, analysisRepository, config)
+
+	analysisResults, err := analyzeUsecase.Analyze(context.TODO(), project.URL)
 	if err != nil {
 		log.Fatalln(err)
 	}
