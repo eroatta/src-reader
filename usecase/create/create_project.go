@@ -2,6 +2,7 @@ package create
 
 import (
 	"context"
+	"crypto/md5"
 	"errors"
 	"fmt"
 
@@ -71,6 +72,7 @@ func (uc importProjectUsecase) Import(ctx context.Context, url string) (entity.P
 	}
 
 	project = entity.Project{
+		ID:       fmt.Sprintf("%x", md5.Sum([]byte(metadata.Fullname))),
 		URL:      url,
 		Metadata: metadata,
 		Status:   "in_process",

@@ -1,8 +1,6 @@
 package mongodb
 
 import (
-	"crypto/md5"
-	"fmt"
 	"time"
 
 	"github.com/eroatta/src-reader/entity"
@@ -14,7 +12,7 @@ type projectMapper struct{}
 // toDTO maps the entity for Project into a Data Transfer Object.
 func (pm *projectMapper) toDTO(ent entity.Project) projectDTO {
 	return projectDTO{
-		ID:     fmt.Sprintf("%x", md5.Sum([]byte(ent.Metadata.Fullname))),
+		ID:     ent.ID,
 		Status: ent.Status,
 		Url:    ent.URL,
 		Metadata: metadataDTO{
