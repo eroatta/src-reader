@@ -7,7 +7,7 @@ import (
 	"go/token"
 	"testing"
 
-	"github.com/eroatta/src-reader/adapter/algorithm/miner"
+	"github.com/eroatta/src-reader/port/outgoing/adapter/algorithm/miner"
 	"github.com/stretchr/testify/assert"
 )
 

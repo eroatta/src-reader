@@ -3,8 +3,8 @@ package miner
 import (
 	"go/ast"
 
-	"github.com/eroatta/src-reader/adapter/frequencytable"
 	"github.com/eroatta/src-reader/entity"
+	"github.com/eroatta/src-reader/port/outgoing/adapter/frequencytable"
 	"github.com/eroatta/token/samurai"
 )
 

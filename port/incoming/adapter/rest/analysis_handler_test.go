@@ -9,8 +9,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/eroatta/src-reader/adapter/rest"
 	"github.com/eroatta/src-reader/entity"
+	"github.com/eroatta/src-reader/port/incoming/adapter/rest"
 	"github.com/eroatta/src-reader/usecase/analyze"
 	"github.com/stretchr/testify/assert"
 )

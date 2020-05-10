@@ -6,8 +6,8 @@ import (
 	"strings"
 
 	"github.com/agnivade/levenshtein"
-	"github.com/eroatta/src-reader/adapter/algorithm/miner"
 	"github.com/eroatta/src-reader/entity"
+	"github.com/eroatta/src-reader/port/outgoing/adapter/algorithm/miner"
 	"github.com/eroatta/token/basic"
 	"github.com/eroatta/token/expansion"
 )

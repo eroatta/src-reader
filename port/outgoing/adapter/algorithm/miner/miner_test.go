@@ -3,8 +3,8 @@ package miner_test
 import (
 	"testing"
 
-	"github.com/eroatta/src-reader/adapter/algorithm/miner"
 	"github.com/eroatta/src-reader/entity"
+	"github.com/eroatta/src-reader/port/outgoing/adapter/algorithm/miner"
 	"github.com/stretchr/testify/assert"
 )
 
