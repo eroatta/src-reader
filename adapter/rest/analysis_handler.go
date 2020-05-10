@@ -32,7 +32,18 @@ type summaryResponse struct {
 	ErrorSamples []string `json:"error_samples"`
 }
 
-func (s server) createAnalysis(ctx *gin.Context) {
+func RegisterAnalyzeProjectUsecase(r *gin.Engine, uc analyze.AnalyzeProjectUsecase) *gin.Engine {
+	r.POST("/analysis", func(c *gin.Context) {
+		createAnalysis(c, uc)
+	})
+	// r.GET("/analysis/$id", internal.getAnalysis)
+	// r.DELETE("/analysis/$id", internal.deleteAnalysis)
+	// r.GET("/analysis/$id/identifiers", internal.getIdentifiers)
+
+	return r
+}
+
+func createAnalysis(ctx *gin.Context, uc analyze.AnalyzeProjectUsecase) {
 	var cmd createAnalysisCommand
 
 	if err := ctx.ShouldBindJSON(&cmd); err != nil {
@@ -47,7 +58,7 @@ func (s server) createAnalysis(ctx *gin.Context) {
 		return
 	}
 
-	analysis, err := s.analyzeProjectUsecase.Analyze(ctx, cmd.Repository)
+	analysis, err := uc.Analyze(ctx, cmd.Repository)
 	switch err {
 	case nil:
 		// do nothing

@@ -16,7 +16,8 @@ import (
 )
 
 func TestPOST_OnAnalysisCreationHandler_WithoutBody_ShouldReturnHTTP400(t *testing.T) {
-	router := rest.NewServer(nil, nil)
+	router := rest.NewServer()
+	rest.RegisterAnalyzeProjectUsecase(router, nil)
 
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("POST", "/analysis", nil)
@@ -35,7 +36,8 @@ func TestPOST_OnAnalysisCreationHandler_WithoutBody_ShouldReturnHTTP400(t *testi
 }
 
 func TestPOST_OnAnalysisCreationHandler_WithEmptyBody_ShouldReturnHTTP400(t *testing.T) {
-	router := rest.NewServer(nil, nil)
+	router := rest.NewServer()
+	rest.RegisterAnalyzeProjectUsecase(router, nil)
 
 	w := httptest.NewRecorder()
 	body := `{}`
@@ -55,7 +57,8 @@ func TestPOST_OnAnalysisCreationHandler_WithEmptyBody_ShouldReturnHTTP400(t *tes
 }
 
 func TestPOST_OnAnalysisCreationHandler_WithWrongDataType_ShouldReturnHTTP400(t *testing.T) {
-	router := rest.NewServer(nil, nil)
+	router := rest.NewServer()
+	rest.RegisterAnalyzeProjectUsecase(router, nil)
 
 	w := httptest.NewRecorder()
 	body := `{
@@ -77,7 +80,8 @@ func TestPOST_OnAnalysisCreationHandler_WithWrongDataType_ShouldReturnHTTP400(t 
 }
 
 func TestPOST_OnAnalysisCreationHandler_WithInvalidRepository_ShouldReturnHTTP400(t *testing.T) {
-	router := rest.NewServer(nil, nil)
+	router := rest.NewServer()
+	rest.RegisterAnalyzeProjectUsecase(router, nil)
 
 	w := httptest.NewRecorder()
 	body := `{
@@ -99,7 +103,8 @@ func TestPOST_OnAnalysisCreationHandler_WithInvalidRepository_ShouldReturnHTTP40
 }
 
 func TestPOST_OnAnalysisCreationHandler_WithNotFoundProject_ShouldReturnHTTP400(t *testing.T) {
-	router := rest.NewServer(nil, mockAnalyzeUsecase{
+	router := rest.NewServer()
+	rest.RegisterAnalyzeProjectUsecase(router, mockAnalyzeUsecase{
 		a:   entity.AnalysisResults{},
 		err: analyze.ErrProjectNotFound,
 	})
@@ -124,7 +129,8 @@ func TestPOST_OnAnalysisCreationHandler_WithNotFoundProject_ShouldReturnHTTP400(
 }
 
 func TestPOST_OnAnalysisCreationHandler_WithInternalError_ShouldReturnHTTP500(t *testing.T) {
-	router := rest.NewServer(nil, mockAnalyzeUsecase{
+	router := rest.NewServer()
+	rest.RegisterAnalyzeProjectUsecase(router, mockAnalyzeUsecase{
 		a:   entity.AnalysisResults{},
 		err: errors.New("error analyzing repository http://github.com/eroatta/src-reader"),
 	})
@@ -150,7 +156,8 @@ func TestPOST_OnAnalysisCreationHandler_WithInternalError_ShouldReturnHTTP500(t 
 
 func TestPOST_OnAnalysisCreationHandler_WithSuccess_ShouldReturnHTTP201(t *testing.T) {
 	now := time.Date(2020, time.May, 5, 22, 0, 0, 0, time.UTC)
-	router := rest.NewServer(nil, mockAnalyzeUsecase{
+	router := rest.NewServer()
+	rest.RegisterAnalyzeProjectUsecase(router, mockAnalyzeUsecase{
 		a: entity.AnalysisResults{
 			ID:                      "715f17550be5f7222a815ff80966adaf",
 			ProjectName:             "src-d/go-siva",

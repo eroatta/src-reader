@@ -5,8 +5,6 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/eroatta/src-reader/usecase/analyze"
-	"github.com/eroatta/src-reader/usecase/create"
 	"github.com/eroatta/token/conserv"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator"
@@ -16,22 +14,9 @@ import (
 // request bodies.
 var requestValidator = validator.New()
 
-func NewServer(ipUsecase create.ImportProjectUsecase, apUsecase analyze.AnalyzeProjectUsecase) *gin.Engine {
+func NewServer() *gin.Engine {
 	r := gin.Default()
 	r.GET("/ping", pingHandler)
-
-	internal := server{
-		createProjectUsecase:  ipUsecase,
-		analyzeProjectUsecase: apUsecase,
-	}
-
-	r.POST("/projects", internal.createProject)
-	// r.GET("/projects/$id", internal.getProject)
-	// r.DELETE("/projects/$id", internal.deleteProject)
-	r.POST("/analysis", internal.createAnalysis)
-	// r.GET("/analysis/$id", internal.getAnalysis)
-	// r.DELETE("/analysis/$id", internal.deleteAnalysis)
-	// r.GET("/analysis/$id/identifiers", internal.getIdentifiers)
 
 	return r
 }
@@ -88,9 +73,4 @@ func setInternalErrorResponse(ctx *gin.Context, err error) {
 	}
 
 	ctx.JSON(http.StatusInternalServerError, errResponse)
-}
-
-type server struct {
-	createProjectUsecase  create.ImportProjectUsecase
-	analyzeProjectUsecase analyze.AnalyzeProjectUsecase
 }

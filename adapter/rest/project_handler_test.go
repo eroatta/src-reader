@@ -15,7 +15,8 @@ import (
 )
 
 func TestPOST_OnProjectCreationHandler_WithoutBody_ShouldReturnHTTP400(t *testing.T) {
-	router := rest.NewServer(nil, nil)
+	router := rest.NewServer()
+	rest.RegisterCreateProjectUsecase(router, nil)
 
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("POST", "/projects", nil)
@@ -34,7 +35,8 @@ func TestPOST_OnProjectCreationHandler_WithoutBody_ShouldReturnHTTP400(t *testin
 }
 
 func TestPOST_OnProjectCreationHandler_WithEmptyBody_ShouldReturnHTTP400(t *testing.T) {
-	router := rest.NewServer(nil, nil)
+	router := rest.NewServer()
+	rest.RegisterCreateProjectUsecase(router, nil)
 
 	w := httptest.NewRecorder()
 	body := `{}`
@@ -54,7 +56,8 @@ func TestPOST_OnProjectCreationHandler_WithEmptyBody_ShouldReturnHTTP400(t *test
 }
 
 func TestPOST_OnProjectCreationHandler_WithWrongDataType_ShouldReturnHTTP400(t *testing.T) {
-	router := rest.NewServer(nil, nil)
+	router := rest.NewServer()
+	rest.RegisterCreateProjectUsecase(router, nil)
 
 	w := httptest.NewRecorder()
 	body := `{
@@ -76,7 +79,8 @@ func TestPOST_OnProjectCreationHandler_WithWrongDataType_ShouldReturnHTTP400(t *
 }
 
 func TestPOST_OnProjectCreationHandler_WithInvalidRepository_ShouldReturnHTTP400(t *testing.T) {
-	router := rest.NewServer(nil, nil)
+	router := rest.NewServer()
+	rest.RegisterCreateProjectUsecase(router, nil)
 
 	w := httptest.NewRecorder()
 	body := `{
@@ -98,10 +102,11 @@ func TestPOST_OnProjectCreationHandler_WithInvalidRepository_ShouldReturnHTTP400
 }
 
 func TestPOST_OnProjectCreationHandler_WithInternalError_ShouldReturnHTTP500(t *testing.T) {
-	router := rest.NewServer(mockCreateUsecase{
+	router := rest.NewServer()
+	rest.RegisterCreateProjectUsecase(router, mockCreateUsecase{
 		p:   entity.Project{},
 		err: errors.New("error accessing repository http://github.com/eroatta/src-reader"),
-	}, nil)
+	})
 
 	w := httptest.NewRecorder()
 	body := `{
@@ -124,7 +129,8 @@ func TestPOST_OnProjectCreationHandler_WithInternalError_ShouldReturnHTTP500(t *
 
 func TestPOST_OnProjectCreationHandler_WithSuccess_ShouldReturnHTTP201(t *testing.T) {
 	now := time.Date(2020, time.May, 5, 22, 0, 0, 0, time.UTC)
-	router := rest.NewServer(mockCreateUsecase{
+	router := rest.NewServer()
+	rest.RegisterCreateProjectUsecase(router, mockCreateUsecase{
 		p: entity.Project{
 			ID:     "715f17550be5f7222a815ff80966adaf",
 			Status: "done",
@@ -155,7 +161,7 @@ func TestPOST_OnProjectCreationHandler_WithSuccess_ShouldReturnHTTP201(t *testin
 			},
 		},
 		err: nil,
-	}, nil)
+	})
 
 	w := httptest.NewRecorder()
 	body := `{
