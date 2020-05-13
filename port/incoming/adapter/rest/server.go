@@ -8,6 +8,7 @@ import (
 	"github.com/eroatta/token/conserv"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 // requestValidator represents a validator capable of analyzing the values of the incoming
@@ -17,6 +18,9 @@ var requestValidator = validator.New()
 func NewServer() *gin.Engine {
 	r := gin.Default()
 	r.GET("/ping", pingHandler)
+	r.GET("/app_metrics", func(c *gin.Context) {
+		promhttp.Handler().ServeHTTP(c.Writer, c.Request)
+	})
 
 	return r
 }

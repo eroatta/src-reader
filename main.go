@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 	"os"
 
@@ -19,7 +20,11 @@ import (
 
 func main() {
 	// create MongoDB client
-	clt, err := mongodb.NewMongoClient("mongodb://localhost:27017")
+	dbHost := os.Getenv("MONGODB_HOST")
+	dbUsername := os.Getenv("MONGODB_USER")
+	dbPassword := os.Getenv("MONGODB_PASSWORD")
+	dbName := os.Getenv("MONGODB_DATABASE")
+	clt, err := mongodb.NewMongoClient(fmt.Sprintf("mongodb://%s:%s@%s:27017/%s", dbUsername, dbPassword, dbHost, dbName))
 	if err != nil {
 		log.WithError(err).Fatal("Unable to start MongoDB client")
 	}
