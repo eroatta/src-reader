@@ -18,9 +18,7 @@ var requestValidator = validator.New()
 func NewServer() *gin.Engine {
 	r := gin.Default()
 	r.GET("/ping", pingHandler)
-	r.GET("/metrics", func(c *gin.Context) {
-		promhttp.Handler().ServeHTTP(c.Writer, c.Request)
-	})
+	r.GET("/metrics", gin.WrapH(promhttp.Handler()))
 
 	return r
 }
