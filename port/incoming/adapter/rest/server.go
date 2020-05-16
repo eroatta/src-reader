@@ -17,6 +17,8 @@ var requestValidator = validator.New()
 
 func NewServer() *gin.Engine {
 	r := gin.Default()
+	r.Use(httpMetricsHandler)
+
 	r.GET("/ping", pingHandler)
 	r.GET("/metrics", gin.WrapH(promhttp.Handler()))
 
@@ -75,4 +77,14 @@ func setInternalErrorResponse(ctx *gin.Context, err error) {
 	}
 
 	ctx.JSON(http.StatusInternalServerError, errResponse)
+}
+
+func httpMetricsHandler(c *gin.Context) {
+	if c.Request.URL.Path == "metrics" {
+		c.Next()
+		return
+	}
+
+	// metric by endpoint, status code, time, p95, p99
+	c.Next()
 }
