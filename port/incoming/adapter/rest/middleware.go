@@ -6,7 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/prometheus/client_golang/prometheus"
-	"github.com/sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 )
 
 var (
@@ -33,7 +33,7 @@ func setMetricsCollectors(r *gin.Engine) {
 	for _, coll := range collectors {
 		err := prometheus.Register(coll)
 		if err != nil {
-			logrus.WithError(err).Warn("unable to setup metric collector")
+			log.WithError(err).Warn("unable to setup metric collector")
 		}
 	}
 
