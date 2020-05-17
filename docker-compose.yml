@@ -14,17 +14,64 @@ services:
 
     mongodb:
         image: mongo:latest
+        hostname: mongodb
         env_file: 
             - .env
         environment: 
             MONGO_INITDB_ROOT_USERNAME: ${MONGODB_ROOT_USER}
             MONGO_INITDB_ROOT_PASSWORD: ${MONGODB_ROOT_PASSWORD}
             MONGO_INITDB_DATABASE: ${MONGODB_DATABASE}
-        ports: 
-            - 27017:27017
         volumes: 
             - mongodb_data:/data/db
+            - mongodb_data:/var/log/mongodb
             - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js
+        ports: 
+            - 27017:27017
+        healthcheck:
+            test: test $$(echo "rs.initiate().ok || rs.status().ok" | mongo -u $${MONGODB_ROOT_USER} -p $${MONGODB_ROOT_PASSWORD} --quiet) -eq 1
+            interval: 10s
+            #start_period: 30s
+        command: ["--replSet", "rs0", "--bind_ip_all"]
+        restart: always
+
+    # Elasticsearch Docker Images: https://www.docker.elastic.co/
+    elasticsearch:
+        image: docker.elastic.co/elasticsearch/elasticsearch:7.7.0
+        container_name: elasticsearch
+        environment:
+            - xpack.security.enabled=false
+            - discovery.type=single-node
+        ulimits:
+            memlock:
+                soft: -1
+                hard: -1
+            nofile:
+                soft: 65536
+                hard: 65536
+        cap_add:
+            - IPC_LOCK
+        volumes:
+            - elasticsearch_data:/usr/share/elasticsearch/data
+        ports:
+            - 9200:9200
+            - 9300:9300
+        restart: always
+
+    monstache:
+        image: rwynn/monstache:rel6
+        env_file: 
+            - .env
+        expose:
+            - 8000
+        ports: 
+            - 8000:8080
+        environment: 
+            - MONSTACHE_MONGO_URL=mongodb://${MONGODB_ROOT_USER}:${MONGODB_ROOT_PASSWORD}@${MONGODB_HOST}:27017
+            - MONSTACHE_ES_URLS=http://elasticsearch:9200
+            - MONSTACHE_DIRECT_READ_NS=reader.projects,reader.analysis,reader.identifiers
+        depends_on: 
+            - mongodb
+            - elasticsearch
         restart: always
 
     prometheus:
@@ -53,5 +100,6 @@ services:
 
 volumes: 
     mongodb_data: {}
+    elasticsearch_data: {}
     prometheus_data: {}
     grafana_data: {}
