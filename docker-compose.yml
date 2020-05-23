@@ -92,6 +92,7 @@ services:
         environment: 
             - GF_SECURITY_ADMIN_PASSWORD=admin
             - GF_USERS_ALLOW_SIGN_UP=false
+            - GF_INSTALL_PLUGINS=ryantxu-ajax-panel
         ports: 
             - 3000:3000
         volumes: 
