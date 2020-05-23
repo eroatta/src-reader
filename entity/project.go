@@ -8,6 +8,7 @@ type Project struct {
 	ID         string
 	Status     string
 	URL        string
+	CreatedAt  time.Time
 	Metadata   Metadata
 	SourceCode SourceCode
 }

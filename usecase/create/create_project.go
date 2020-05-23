@@ -5,6 +5,7 @@ import (
 	"crypto/md5"
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/eroatta/src-reader/entity"
 	"github.com/eroatta/src-reader/repository"
@@ -72,10 +73,11 @@ func (uc importProjectUsecase) Import(ctx context.Context, url string) (entity.P
 	}
 
 	project = entity.Project{
-		ID:       fmt.Sprintf("%x", md5.Sum([]byte(metadata.Fullname))),
-		URL:      url,
-		Metadata: metadata,
-		Status:   "in_process",
+		ID:        fmt.Sprintf("%x", md5.Sum([]byte(metadata.Fullname))),
+		URL:       url,
+		CreatedAt: time.Now(),
+		Metadata:  metadata,
+		Status:    "in_process",
 	}
 
 	// clone the source code
