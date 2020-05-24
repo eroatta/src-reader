@@ -65,6 +65,7 @@ func TestToDTO_OnProjectMapper_ShouldReturnProjectDTO(t *testing.T) {
 	assert.Equal(t, "4ba248c1cf1003995d356f11935287b3e99decca", dto.SourceCode.Hash)
 	assert.Equal(t, "/tmp/repositories/github.com/src-d/go-siva", dto.SourceCode.Location)
 	assert.ElementsMatch(t, []string{"common_test.go", "common.go"}, dto.SourceCode.Files)
+	assert.Equal(t, int32(2), dto.SourceCode.FilesCount)
 }
 
 func TestToEntity_OnProjectMapper_ShouldReturnProjectEntity(t *testing.T) {

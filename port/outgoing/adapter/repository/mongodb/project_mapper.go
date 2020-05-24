@@ -33,9 +33,10 @@ func (pm *projectMapper) toDTO(ent entity.Project) projectDTO {
 			Forks:         ent.Metadata.Forks,
 		},
 		SourceCode: sourceCodeDTO{
-			Hash:     ent.SourceCode.Hash,
-			Location: ent.SourceCode.Location,
-			Files:    ent.SourceCode.Files,
+			Hash:       ent.SourceCode.Hash,
+			Location:   ent.SourceCode.Location,
+			Files:      ent.SourceCode.Files,
+			FilesCount: int32(len(ent.SourceCode.Files)),
 		},
 	}
 }
@@ -101,7 +102,8 @@ type metadataDTO struct {
 
 // sourceCodeDTO is the database representation for a Project's Source Code.
 type sourceCodeDTO struct {
-	Hash     string   `bson:"hash"`
-	Location string   `bson:"location"`
-	Files    []string `bson:"files"`
+	Hash       string   `bson:"hash"`
+	Location   string   `bson:"location"`
+	Files      []string `bson:"files"`
+	FilesCount int32    `bson:"files_count`
 }
