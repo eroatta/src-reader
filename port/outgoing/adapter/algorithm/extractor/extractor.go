@@ -1,7 +1,6 @@
 package extractor
 
 import (
-	"fmt"
 	"go/ast"
 	"go/token"
 
@@ -15,7 +14,6 @@ import (
 //	* constant declaration
 //	* struct definition
 //	* interface definition
-//	* local variable declaration and initialization (with token ':=')
 type Extractor struct {
 	filename      string
 	packageName   string
@@ -70,29 +68,6 @@ func (e *Extractor) Visit(node ast.Node) ast.Visitor {
 		e.currentLoc = id
 		e.currentLocPos = elem.Pos()
 
-	case *ast.AssignStmt:
-		if elem.Tok != token.DEFINE {
-			return e
-		}
-
-		for _, name := range elem.Lhs {
-			ident, ok := name.(*ast.Ident)
-			if !ok {
-				continue
-			}
-
-			if ident.Name == "_" || ident.Name == "" {
-				continue
-			}
-
-			id := entity.NewIDBuilder().WithFilename(e.filename).
-				WithPackage(e.packageName).WithName(ident.Name).WithType(token.DEFINE).Build()
-			if ident.Obj != nil && ident.Obj.Pos() == ident.Pos() {
-				e.identifiers = append(e.identifiers,
-					newChildIdentifier(id, e.filename, ident.Pos(), ident.Name, token.DEFINE, e.currentLoc, e.currentLocPos))
-			}
-		}
-
 	case *ast.GenDecl:
 		for _, spec := range elem.Specs {
 			switch decl := spec.(type) {
@@ -117,14 +92,8 @@ func (e *Extractor) fromValueSpec(filename string, token token.Token, decl *ast.
 		id := entity.NewIDBuilder().WithFilename(e.filename).
 			WithPackage(e.packageName).WithName(name.String()).WithType(token).Build()
 
-		if obj, ok := e.scopes[name.Name]; ok && obj.Pos() == name.Pos() {
-			identifiers = append(identifiers,
-				newIdentifier(id, filename, name.Pos(), name.String(), token))
-			continue
-		}
-
 		identifiers = append(identifiers,
-			newChildIdentifier(id, filename, name.Pos(), name.String(), token, e.currentLoc, e.currentLocPos))
+			newIdentifier(id, filename, name.Pos(), name.String(), token))
 	}
 
 	return identifiers
@@ -144,13 +113,8 @@ func (e *Extractor) fromTypeSpec(filename string, decl *ast.TypeSpec) []entity.I
 	id := entity.NewIDBuilder().WithFilename(e.filename).
 		WithPackage(e.packageName).WithName(decl.Name.String()).WithType(identifierType).Build()
 
-	if obj, ok := e.scopes[decl.Name.String()]; ok && obj.Pos() == decl.Pos() {
-		return []entity.Identifier{
-			newIdentifier(id, filename, decl.Pos(), decl.Name.String(), identifierType)}
-	}
-
-	return []entity.Identifier{newChildIdentifier(id, filename, decl.Name.Pos(), decl.Name.String(),
-		identifierType, e.currentLoc, e.currentLocPos)}
+	return []entity.Identifier{
+		newIdentifier(id, filename, decl.Pos(), decl.Name.String(), identifierType)}
 }
 
 func newIdentifier(id string, filename string, pos token.Pos, name string, identifierType token.Token) entity.Identifier {
@@ -163,15 +127,6 @@ func newIdentifier(id string, filename string, pos token.Pos, name string, ident
 		Splits:     make(map[string][]entity.Split),
 		Expansions: make(map[string][]entity.Expansion),
 	}
-}
-
-func newChildIdentifier(id string, filename string, pos token.Pos, name string, identifierType token.Token, parent string, parentPos token.Pos) entity.Identifier {
-	id = fmt.Sprintf("%s+++local:%v", id, pos)
-	i := newIdentifier(id, filename, pos, name, identifierType)
-	i.Parent = parent
-	i.ParentPos = parentPos
-
-	return i
 }
 
 // Identifiers returns the list of found identifiers.

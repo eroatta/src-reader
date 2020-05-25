@@ -34,17 +34,10 @@ type Identifier struct {
 	Position   token.Pos
 	Name       string
 	Type       token.Token
-	Parent     string
-	ParentPos  token.Pos
 	Node       *ast.Node
 	Splits     map[string][]Split
 	Expansions map[string][]Expansion
 	Error      error
-}
-
-// IsLocal indicates if an identifier is part of a function.
-func (i Identifier) IsLocal() bool {
-	return i.Parent != ""
 }
 
 // Split represents a hardword or softword in which the identifier was divided.

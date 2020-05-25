@@ -124,45 +124,6 @@ func TestExpand_OnBasic_ShouldReturnExpandedResultsFromWords(t *testing.T) {
 		{From: "buff", Values: []string{"buffer"}}}, got)
 }
 
-func TestExpand_OnBasic_WhileUsingLocalVariables_ShouldReturnExpandedResultsFromWords(t *testing.T) {
-	miningResults := map[string]entity.Miner{
-		"declarations": &miner.Declaration{
-			Decls: map[string]miner.Decl{
-				"filename:main.go+++pkg:main+++declType:var+++name:strbuff": {
-					ID:       "filename:main.go+++pkg:main+++declType:var+++name:strbuff",
-					DeclType: token.FUNC,
-					Words: map[string]struct{}{
-						"string": {},
-						"buffer": {},
-					},
-					Phrases: map[string]struct{}{},
-				},
-			},
-		},
-	}
-
-	factory := expander.NewBasicFactory()
-	basic, _ := factory.Make(miningResults)
-
-	ident := entity.Identifier{
-		ID:   "filename:main.go+++pkg:main+++declType:var+++name:sb+++local:43",
-		Name: "sb",
-		Splits: map[string][]entity.Split{
-			"greedy": {
-				{Order: 1, Value: "s"},
-				{Order: 2, Value: "b"},
-			},
-		},
-		Parent: "filename:main.go+++pkg:main+++declType:var+++name:strbuff",
-	}
-
-	got := basic.Expand(ident)
-
-	assert.Equal(t, 2, len(got))
-	assert.EqualValues(t, []entity.Expansion{{From: "s", Values: []string{"string"}},
-		{From: "b", Values: []string{"buffer"}}}, got)
-}
-
 func TestExpand_OnBasic_ShouldReturnExpandedResultsFromPhrases(t *testing.T) {
 	miningResults := map[string]entity.Miner{
 		"declarations": &miner.Declaration{

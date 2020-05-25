@@ -31,8 +31,6 @@ type CSVIdentifierRepository struct {
 //	Position   token.Pos
 //	Name       string
 //	Type       token.Token
-//	Parent     string
-//	ParentPos  token.Pos
 //	Node       *ast.Node
 //	Splits     map[string][]Split
 //	Expansions map[string][]Expansion
@@ -71,9 +69,6 @@ func (r *CSVIdentifierRepository) Add(ctx context.Context, project entity.Projec
 		ident.File,
 		fmt.Sprintf("%v", ident.Position),
 		ident.Type.String(),
-		fmt.Sprintf("%v", ident.IsLocal()),
-		ident.Parent,
-		fmt.Sprintf("%v", ident.ParentPos),
 		splits,
 		expansions,
 		printableError(ident.Error),

@@ -131,37 +131,3 @@ func TestExpand_OnAMAP_ShouldReturnExpandedResults(t *testing.T) {
 	assert.Equal(t, 1, len(got))
 	assert.EqualValues(t, []entity.Expansion{{From: "sb", Values: []string{"string buffer"}}}, got)
 }
-
-func TestExpand_OnAMAP_WhileUsingLocalIdentifier_ShouldReturnExpandedResults(t *testing.T) {
-	miningResults := map[string]entity.Miner{
-		"scoped-declarations": &miner.Scope{
-			Scopes: map[string]miner.ScopedDecl{
-				"filename:main.go+++pkg:main+++declType:var+++name:sb": {
-					ID:       "sb",
-					DeclType: token.FUNC,
-					Comments: []string{"string buffer"},
-				},
-			},
-		},
-		"comments": miner.NewComments(),
-	}
-
-	factory := expander.NewAMAPFactory()
-	amap, _ := factory.Make(miningResults)
-
-	ident := entity.Identifier{
-		ID:   "filename:main.go+++pkg:main+++declType:var+++name:sb+++local:45",
-		Name: "sb",
-		Splits: map[string][]entity.Split{
-			"samurai": {
-				{Order: 1, Value: "sb"},
-			},
-		},
-		Parent: "filename:main.go+++pkg:main+++declType:var+++name:sb",
-	}
-
-	got := amap.Expand(ident)
-
-	assert.Equal(t, 1, len(got))
-	assert.EqualValues(t, []entity.Expansion{{From: "sb", Values: []string{"string buffer"}}}, got)
-}

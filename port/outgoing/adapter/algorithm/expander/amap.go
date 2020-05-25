@@ -53,11 +53,7 @@ func (a amapExpander) Expand(ident entity.Identifier) []entity.Expansion {
 		return []entity.Expansion{}
 	}
 
-	declarationID := ident.ID
-	if ident.IsLocal() {
-		declarationID = ident.Parent
-	}
-	scopedDecl, ok := a.scopedDeclarations[declarationID]
+	scopedDecl, ok := a.scopedDeclarations[ident.ID]
 	if !ok {
 		expansions := make([]entity.Expansion, len(splits))
 		for i, split := range splits {

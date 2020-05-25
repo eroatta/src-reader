@@ -49,11 +49,7 @@ func (b basicExpander) Expand(ident entity.Identifier) []entity.Expansion {
 		return []entity.Expansion{}
 	}
 
-	declarationID := ident.ID
-	if ident.IsLocal() {
-		declarationID = ident.Parent
-	}
-	decl, ok := b.declarations[declarationID]
+	decl, ok := b.declarations[ident.ID]
 	if !ok {
 		expansions := make([]entity.Expansion, len(splits))
 		for i, split := range splits {

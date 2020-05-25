@@ -26,8 +26,6 @@ func (im *identifierMapper) fromTokenToString(tok token.Token) string {
 		tokenString = "struct"
 	case token.INTERFACE:
 		tokenString = "interface"
-	case token.DEFINE:
-		tokenString = "define"
 	default:
 		tokenString = "unknown"
 	}
@@ -45,8 +43,6 @@ func (im *identifierMapper) toDTO(ent entity.Identifier, projectEnt entity.Proje
 		Position:   ent.Position,
 		Name:       ent.Name,
 		Type:       im.fromTokenToString(ent.Type),
-		Parent:     ent.Parent,
-		ParentPos:  ent.ParentPos,
 		AnalysisID: projectEnt.ID,
 		ProjectRef: projectEnt.Metadata.Fullname,
 		CreatedAt:  time.Now(),
@@ -104,8 +100,6 @@ type identifierDTO struct {
 	Position         token.Pos                 `bson:"position"`
 	Name             string                    `bson:"name"`
 	Type             string                    `bson:"type"`
-	Parent           string                    `bson:"parent_id"`
-	ParentPos        token.Pos                 `bson:"parent_position"`
 	Splits           map[string][]splitDTO     `bson:"splits"`
 	JoinedSplits     map[string]string         `bson:"joined_splits"`
 	Expansions       map[string][]expansionDTO `bson:"expansions"`

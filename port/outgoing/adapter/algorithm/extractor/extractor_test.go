@@ -42,18 +42,6 @@ func TestVisit_OnExtractorWithFuncDecl_ShouldReturnFoundIdentifiers(t *testing.T
 			Type:       token.FUNC,
 			Splits:     make(map[string][]entity.Split),
 			Expansions: make(map[string][]entity.Expansion),
-			Parent:     "",
-		},
-		{
-			ID:         "filename:testfile.go+++pkg:main+++declType::=+++name:handlerFunc+++local:154",
-			File:       "testfile.go",
-			Position:   154,
-			Name:       "handlerFunc",
-			Type:       token.DEFINE,
-			Parent:     "filename:testfile.go+++pkg:main+++declType:func+++name:iterate",
-			ParentPos:  20,
-			Splits:     make(map[string][]entity.Split),
-			Expansions: make(map[string][]entity.Expansion),
 		},
 	}
 
@@ -93,7 +81,6 @@ func TestVisit_OnExtractorWithFuncDeclUsingSameFuncName_ShouldReturnFoundIdentif
 			Type:       token.STRUCT,
 			Splits:     make(map[string][]entity.Split),
 			Expansions: make(map[string][]entity.Expansion),
-			Parent:     "",
 		},
 		{
 			ID:         "filename:testfile.go+++pkg:main+++declType:func+++name:car.name",
@@ -103,7 +90,6 @@ func TestVisit_OnExtractorWithFuncDeclUsingSameFuncName_ShouldReturnFoundIdentif
 			Type:       token.FUNC,
 			Splits:     make(map[string][]entity.Split),
 			Expansions: make(map[string][]entity.Expansion),
-			Parent:     "",
 		},
 		{
 			ID:         "filename:testfile.go+++pkg:main+++declType:struct+++name:boat",
@@ -113,7 +99,6 @@ func TestVisit_OnExtractorWithFuncDeclUsingSameFuncName_ShouldReturnFoundIdentif
 			Type:       token.STRUCT,
 			Splits:     make(map[string][]entity.Split),
 			Expansions: make(map[string][]entity.Expansion),
-			Parent:     "",
 		},
 		{
 			ID:         "filename:testfile.go+++pkg:main+++declType:func+++name:boat.name",
@@ -123,78 +108,6 @@ func TestVisit_OnExtractorWithFuncDeclUsingSameFuncName_ShouldReturnFoundIdentif
 			Type:       token.FUNC,
 			Splits:     make(map[string][]entity.Split),
 			Expansions: make(map[string][]entity.Expansion),
-			Parent:     "",
-		},
-	}
-
-	fs := token.NewFileSet()
-	node, _ := parser.ParseFile(fs, "testfile.go", []byte(src), parser.ParseComments)
-
-	e := extractor.New("testfile.go")
-	ast.Walk(e, node)
-
-	identifiers := e.Identifiers()
-	assert.Equal(t, expected, identifiers)
-}
-
-func TestVisit_OnExtractorWithFuncDecl_ShouldReturnFoundLocalIdentifiers(t *testing.T) {
-	src := `
-	package main
-
-	func main() {
-   		var firstString string
-   		secondString := "second"
-
-   		moreStrings := []string{}
-   		for _, s := range moreStrings {
-       		// do nothing
-   		}
-	}
-	`
-
-	expected := []entity.Identifier{
-		{
-			ID:         "filename:testfile.go+++pkg:main+++declType:func+++name:main",
-			File:       "testfile.go",
-			Position:   18,
-			Name:       "main",
-			Type:       token.FUNC,
-			Splits:     make(map[string][]entity.Split),
-			Expansions: make(map[string][]entity.Expansion),
-			Parent:     "",
-		},
-		{
-			ID:         "filename:testfile.go+++pkg:main+++declType:var+++name:firstString+++local:41",
-			File:       "testfile.go",
-			Position:   41,
-			Name:       "firstString",
-			Type:       token.VAR,
-			Splits:     make(map[string][]entity.Split),
-			Expansions: make(map[string][]entity.Expansion),
-			Parent:     "filename:testfile.go+++pkg:main+++declType:func+++name:main",
-			ParentPos:  18,
-		},
-		{
-			ID:         "filename:testfile.go+++pkg:main+++declType::=+++name:secondString+++local:65",
-			File:       "testfile.go",
-			Position:   65,
-			Name:       "secondString",
-			Type:       token.DEFINE,
-			Splits:     make(map[string][]entity.Split),
-			Expansions: make(map[string][]entity.Expansion),
-			Parent:     "filename:testfile.go+++pkg:main+++declType:func+++name:main",
-			ParentPos:  18,
-		},
-		{
-			ID:         "filename:testfile.go+++pkg:main+++declType::=+++name:moreStrings+++local:96",
-			File:       "testfile.go",
-			Position:   96,
-			Name:       "moreStrings",
-			Type:       token.DEFINE,
-			Splits:     make(map[string][]entity.Split),
-			Expansions: make(map[string][]entity.Expansion),
-			Parent:     "filename:testfile.go+++pkg:main+++declType:func+++name:main",
-			ParentPos:  18,
 		},
 	}
 
@@ -228,7 +141,6 @@ func TestVisit_OnExtractorWithVarDecl_ShouldReturnFoundIdentifiers(t *testing.T)
 			Type:       token.VAR,
 			Splits:     make(map[string][]entity.Split),
 			Expansions: make(map[string][]entity.Expansion),
-			Parent:     "",
 		},
 		{
 			ID:         "filename:testfile.go+++pkg:main+++declType:var+++name:regular",
@@ -238,7 +150,6 @@ func TestVisit_OnExtractorWithVarDecl_ShouldReturnFoundIdentifiers(t *testing.T)
 			Type:       token.VAR,
 			Splits:     make(map[string][]entity.Split),
 			Expansions: make(map[string][]entity.Expansion),
-			Parent:     "",
 		},
 		{
 			ID:         "filename:testfile.go+++pkg:main+++declType:var+++name:nrzXXZ",
@@ -248,7 +159,6 @@ func TestVisit_OnExtractorWithVarDecl_ShouldReturnFoundIdentifiers(t *testing.T)
 			Type:       token.VAR,
 			Splits:     make(map[string][]entity.Split),
 			Expansions: make(map[string][]entity.Expansion),
-			Parent:     "",
 		},
 	}
 
@@ -283,7 +193,6 @@ func TestVisit_OnExtractorWithConstDecl_ShouldReturnFoundIdentifiers(t *testing.
 			Type:       token.CONST,
 			Splits:     make(map[string][]entity.Split),
 			Expansions: make(map[string][]entity.Expansion),
-			Parent:     "",
 		},
 		{
 			ID:         "filename:testfile.go+++pkg:main+++declType:const+++name:regular",
@@ -293,7 +202,6 @@ func TestVisit_OnExtractorWithConstDecl_ShouldReturnFoundIdentifiers(t *testing.
 			Type:       token.CONST,
 			Splits:     make(map[string][]entity.Split),
 			Expansions: make(map[string][]entity.Expansion),
-			Parent:     "",
 		},
 		{
 			ID:         "filename:testfile.go+++pkg:main+++declType:const+++name:notRegular",
@@ -303,7 +211,6 @@ func TestVisit_OnExtractorWithConstDecl_ShouldReturnFoundIdentifiers(t *testing.
 			Type:       token.CONST,
 			Splits:     make(map[string][]entity.Split),
 			Expansions: make(map[string][]entity.Expansion),
-			Parent:     "",
 		},
 		{
 			ID:         "filename:testfile.go+++pkg:main+++declType:const+++name:nrzXXZ",
@@ -313,7 +220,6 @@ func TestVisit_OnExtractorWithConstDecl_ShouldReturnFoundIdentifiers(t *testing.
 			Type:       token.CONST,
 			Splits:     make(map[string][]entity.Split),
 			Expansions: make(map[string][]entity.Expansion),
-			Parent:     "",
 		},
 	}
 
@@ -353,7 +259,6 @@ func TestVisit_OnExtractorWithStructDecl_ShouldReturnFoundIdentifiers(t *testing
 			Type:       token.STRUCT,
 			Splits:     make(map[string][]entity.Split),
 			Expansions: make(map[string][]entity.Expansion),
-			Parent:     "",
 		},
 		{
 			ID:         "filename:testfile.go+++pkg:main+++declType:struct+++name:httpClient",
@@ -363,7 +268,6 @@ func TestVisit_OnExtractorWithStructDecl_ShouldReturnFoundIdentifiers(t *testing
 			Type:       token.STRUCT,
 			Splits:     make(map[string][]entity.Split),
 			Expansions: make(map[string][]entity.Expansion),
-			Parent:     "",
 		},
 	}
 
@@ -403,7 +307,6 @@ func TestVisit_OnExtractorWithInterfaceDecl_ShouldReturnFoundIdentifiers(t *test
 			Type:       token.INTERFACE,
 			Splits:     make(map[string][]entity.Split),
 			Expansions: make(map[string][]entity.Expansion),
-			Parent:     "",
 		},
 		{
 			ID:         "filename:testfile.go+++pkg:main+++declType:interface+++name:httpClient",
@@ -413,7 +316,6 @@ func TestVisit_OnExtractorWithInterfaceDecl_ShouldReturnFoundIdentifiers(t *test
 			Type:       token.INTERFACE,
 			Splits:     make(map[string][]entity.Split),
 			Expansions: make(map[string][]entity.Expansion),
-			Parent:     "",
 		},
 	}
 
