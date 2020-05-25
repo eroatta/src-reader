@@ -2,6 +2,7 @@ package mongodb
 
 import (
 	"go/token"
+	"strings"
 	"time"
 	"unicode"
 
@@ -56,30 +57,42 @@ func (im *identifierMapper) toDTO(ent entity.Identifier, projectEnt entity.Proje
 	}
 
 	splits := make(map[string][]splitDTO, len(ent.Splits))
+	joinedSplits := make(map[string]string, len(ent.Splits))
 	for k, v := range ent.Splits {
 		items := make([]splitDTO, len(v))
+		words := make([]string, len(v))
 		for i, splitEnt := range v {
 			items[i] = splitDTO{
 				Order: splitEnt.Order,
 				Value: splitEnt.Value,
 			}
+
+			words[i] = splitEnt.Value
 		}
 		splits[k] = items
+		joinedSplits[k] = strings.Join(words, "_")
 	}
 	dto.Splits = splits
+	dto.JoinedSplits = joinedSplits
 
 	expansions := make(map[string][]expansionDTO, len(ent.Expansions))
+	joinedExpansions := make(map[string]string, len(ent.Expansions))
 	for k, v := range ent.Expansions {
 		items := make([]expansionDTO, len(v))
+		words := make([]string, len(v))
 		for i, expansionEnt := range v {
 			items[i] = expansionDTO{
 				From:   expansionEnt.From,
 				Values: expansionEnt.Values,
 			}
+
+			words[i] = strings.Join(expansionEnt.Values, "|")
 		}
 		expansions[k] = items
+		joinedExpansions[k] = strings.Join(words, "_")
 	}
 	dto.Expansions = expansions
+	dto.JoinedExpansions = joinedExpansions
 
 	return dto
 }

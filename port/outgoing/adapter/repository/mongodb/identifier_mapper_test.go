@@ -79,11 +79,13 @@ func TestToDTO_OnIdentifierMapper_ShouldReturnIdentifierDTO(t *testing.T) {
 		{Order: 1, Value: "default"},
 		{Order: 2, Value: "output"},
 	}, dto.Splits["conserv"])
+	assert.Equal(t, "default_output", dto.JoinedSplits["conserv"])
 	assert.Equal(t, 1, len(dto.Expansions))
 	assert.EqualValues(t, []expansionDTO{
 		{From: "default", Values: []string{"default"}},
 		{From: "output", Values: []string{"output"}},
 	}, dto.Expansions["noexp"])
+	assert.Equal(t, "default_output", dto.JoinedExpansions["noexp"])
 	assert.Equal(t, "715f17550be5f7222a815ff80966adaf", dto.AnalysisID)
 	assert.Equal(t, "src-d/go-siva", dto.ProjectRef)
 	assert.Equal(t, time.Now().Format("2006-02-01"), dto.CreatedAt.Format("2006-02-01"))
