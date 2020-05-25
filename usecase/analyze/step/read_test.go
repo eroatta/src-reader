@@ -38,12 +38,12 @@ func TestClone_OnNonGolangRepository_ShouldReturnZeroFiles(t *testing.T) {
 func TestClone_OnGolangRepository_ShouldReturnAllGolangFiles(t *testing.T) {
 	scMock := sourceCodeFileReaderMock{
 		files: map[string][]byte{
-			"main.go": []byte("package main"),
-			"test.go": []byte("package test"),
+			"main.go":      []byte("package main"),
+			"main_test.go": []byte("package test"),
 		},
 	}
 
-	filesc := step.Read(context.TODO(), scMock, "/tmp", []string{"main.go", "test.go"})
+	filesc := step.Read(context.TODO(), scMock, "/tmp", []string{"main.go", "main_test.go"})
 
 	assert.NotNil(t, filesc)
 
@@ -52,9 +52,8 @@ func TestClone_OnGolangRepository_ShouldReturnAllGolangFiles(t *testing.T) {
 		files[file.Name] = file
 	}
 
-	assert.Equal(t, 2, len(files))
+	assert.Equal(t, 1, len(files))
 	assert.Equal(t, []byte("package main"), files["main.go"].Raw)
-	assert.Equal(t, []byte("package test"), files["test.go"].Raw)
 }
 
 type sourceCodeFileReaderMock struct {

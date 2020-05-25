@@ -13,7 +13,7 @@ func Read(ctx context.Context, sc repository.SourceCodeRepository, location stri
 	namesc := make(chan string)
 	go func() {
 		for _, f := range filenames {
-			if !strings.HasSuffix(f, ".go") {
+			if strings.HasSuffix(f, "_test.go") || !strings.HasSuffix(f, ".go") {
 				continue
 			}
 
