@@ -105,5 +105,5 @@ type sourceCodeDTO struct {
 	Hash       string   `bson:"hash"`
 	Location   string   `bson:"location"`
 	Files      []string `bson:"files"`
-	FilesCount int32    `bson:"files_count`
+	FilesCount int32    `bson:"files_count"`
 }
