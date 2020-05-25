@@ -310,8 +310,9 @@
       "yaxes": [
         {
           "$$hashKey": "object:1073",
+          "decimals": 0,
           "format": "short",
-          "label": null,
+          "label": "",
           "logBase": 1,
           "max": null,
           "min": null,
@@ -333,7 +334,6 @@
       }
     },
     {
-      "content": "\n# Avg Number of Files\n\nThis needs to add the number of files as an element on the indexed document.\n\n\n",
       "datasource": "Elasticsearch / Projects",
       "gridPos": {
         "h": 8,
@@ -342,28 +342,51 @@
         "y": 8
       },
       "id": 8,
-      "mode": "markdown",
+      "options": {
+        "colorMode": "value",
+        "fieldOptions": {
+          "calcs": [
+            "mean"
+          ],
+          "defaults": {
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "light-yellow",
+                  "value": null
+                }
+              ]
+            }
+          },
+          "overrides": [],
+          "values": false
+        },
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto"
+      },
       "pluginVersion": "6.7.3",
       "targets": [
         {
           "bucketAggs": [
             {
-              "$$hashKey": "object:1602",
-              "field": "source_code.files.keyword",
+              "$$hashKey": "object:7886",
+              "field": "metadata.created_at",
               "id": "2",
               "settings": {
-                "min_doc_count": 1,
-                "order": "desc",
-                "orderBy": "_term",
-                "size": "10"
+                "interval": "auto",
+                "min_doc_count": 0,
+                "trimEdges": 0
               },
-              "type": "terms"
+              "type": "date_histogram"
             }
           ],
           "metrics": [
             {
-              "$$hashKey": "object:1600",
-              "field": "metadata.size",
+              "$$hashKey": "object:7884",
+              "field": "source_code.files_count",
               "id": "1",
               "meta": {},
               "settings": {},
@@ -376,8 +399,8 @@
       ],
       "timeFrom": null,
       "timeShift": null,
-      "title": "Panel Title",
-      "type": "text"
+      "title": "Average Files per Repository",
+      "type": "stat"
     },
     {
       "datasource": "Elasticsearch / Projects",
@@ -574,8 +597,8 @@
       "pageSize": null,
       "showHeader": true,
       "sort": {
-        "col": 0,
-        "desc": true
+        "col": null,
+        "desc": false
       },
       "styles": [
         {
@@ -817,5 +840,5 @@
   "variables": {
     "list": []
   },
-  "version": 9
+  "version": 10
 }
