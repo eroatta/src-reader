@@ -35,17 +35,17 @@ func (im *identifierMapper) fromTokenToString(tok token.Token) string {
 
 // toDTO maps the entity for Identifier into a Data Transfer Object.
 func (im *identifierMapper) toDTO(ent entity.Identifier, projectEnt entity.Project) identifierDTO {
-	// setup direct mappings
-
 	dto := identifierDTO{
-		ID:         ent.ID,
-		File:       ent.File,
-		Position:   ent.Position,
-		Name:       ent.Name,
-		Type:       im.fromTokenToString(ent.Type),
-		AnalysisID: projectEnt.ID,
-		ProjectRef: projectEnt.Metadata.Fullname,
-		CreatedAt:  time.Now(),
+		ID:              ent.ID,
+		Package:         ent.Package,
+		AbsolutePackage: ent.FullPackageName(),
+		File:            ent.File,
+		Position:        ent.Position,
+		Name:            ent.Name,
+		Type:            im.fromTokenToString(ent.Type),
+		AnalysisID:      projectEnt.ID,
+		ProjectRef:      projectEnt.Metadata.Fullname,
+		CreatedAt:       time.Now(),
 	}
 
 	if unicode.IsUpper(rune(ent.Name[0])) && unicode.IsLetter(rune(ent.Name[0])) {
@@ -96,6 +96,8 @@ func (im *identifierMapper) toDTO(ent entity.Identifier, projectEnt entity.Proje
 // identifierDTO is the database representation for an Identifier.
 type identifierDTO struct {
 	ID               string                    `bson:"identifier_id"`
+	Package          string                    `bson:"package"`
+	AbsolutePackage  string                    `bson:"absolute_package"`
 	File             string                    `bson:"file"`
 	Position         token.Pos                 `bson:"position"`
 	Name             string                    `bson:"name"`

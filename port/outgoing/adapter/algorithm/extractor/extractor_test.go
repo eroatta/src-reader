@@ -36,6 +36,7 @@ func TestVisit_OnExtractorWithFuncDecl_ShouldReturnFoundIdentifiers(t *testing.T
 	expected := []entity.Identifier{
 		{
 			ID:         "filename:testfile.go+++pkg:main+++declType:func+++name:iterate",
+			Package:    "main",
 			File:       "testfile.go",
 			Position:   20,
 			Name:       "iterate",
@@ -75,6 +76,7 @@ func TestVisit_OnExtractorWithFuncDeclUsingSameFuncName_ShouldReturnFoundIdentif
 	expected := []entity.Identifier{
 		{
 			ID:         "filename:testfile.go+++pkg:main+++declType:struct+++name:car",
+			Package:    "main",
 			File:       "testfile.go",
 			Position:   25,
 			Name:       "car",
@@ -84,6 +86,7 @@ func TestVisit_OnExtractorWithFuncDeclUsingSameFuncName_ShouldReturnFoundIdentif
 		},
 		{
 			ID:         "filename:testfile.go+++pkg:main+++declType:func+++name:car.name",
+			Package:    "main",
 			File:       "testfile.go",
 			Position:   42,
 			Name:       "name",
@@ -93,6 +96,7 @@ func TestVisit_OnExtractorWithFuncDeclUsingSameFuncName_ShouldReturnFoundIdentif
 		},
 		{
 			ID:         "filename:testfile.go+++pkg:main+++declType:struct+++name:boat",
+			Package:    "main",
 			File:       "testfile.go",
 			Position:   93,
 			Name:       "boat",
@@ -102,6 +106,7 @@ func TestVisit_OnExtractorWithFuncDeclUsingSameFuncName_ShouldReturnFoundIdentif
 		},
 		{
 			ID:         "filename:testfile.go+++pkg:main+++declType:func+++name:boat.name",
+			Package:    "main",
 			File:       "testfile.go",
 			Position:   110,
 			Name:       "name",
@@ -135,6 +140,7 @@ func TestVisit_OnExtractorWithVarDecl_ShouldReturnFoundIdentifiers(t *testing.T)
 	expected := []entity.Identifier{
 		{
 			ID:         "filename:testfile.go+++pkg:main+++declType:var+++name:common",
+			Package:    "main",
 			File:       "testfile.go",
 			Position:   31,
 			Name:       "common",
@@ -144,6 +150,7 @@ func TestVisit_OnExtractorWithVarDecl_ShouldReturnFoundIdentifiers(t *testing.T)
 		},
 		{
 			ID:         "filename:testfile.go+++pkg:main+++declType:var+++name:regular",
+			Package:    "main",
 			File:       "testfile.go",
 			Position:   48,
 			Name:       "regular",
@@ -153,6 +160,7 @@ func TestVisit_OnExtractorWithVarDecl_ShouldReturnFoundIdentifiers(t *testing.T)
 		},
 		{
 			ID:         "filename:testfile.go+++pkg:main+++declType:var+++name:nrzXXZ",
+			Package:    "main",
 			File:       "testfile.go",
 			Position:   76,
 			Name:       "nrzXXZ",
@@ -187,6 +195,7 @@ func TestVisit_OnExtractorWithConstDecl_ShouldReturnFoundIdentifiers(t *testing.
 	expected := []entity.Identifier{
 		{
 			ID:         "filename:testfile.go+++pkg:main+++declType:const+++name:common",
+			Package:    "main",
 			File:       "testfile.go",
 			Position:   52,
 			Name:       "common",
@@ -196,6 +205,7 @@ func TestVisit_OnExtractorWithConstDecl_ShouldReturnFoundIdentifiers(t *testing.
 		},
 		{
 			ID:         "filename:testfile.go+++pkg:main+++declType:const+++name:regular",
+			Package:    "main",
 			File:       "testfile.go",
 			Position:   80,
 			Name:       "regular",
@@ -205,6 +215,7 @@ func TestVisit_OnExtractorWithConstDecl_ShouldReturnFoundIdentifiers(t *testing.
 		},
 		{
 			ID:         "filename:testfile.go+++pkg:main+++declType:const+++name:notRegular",
+			Package:    "main",
 			File:       "testfile.go",
 			Position:   89,
 			Name:       "notRegular",
@@ -214,6 +225,7 @@ func TestVisit_OnExtractorWithConstDecl_ShouldReturnFoundIdentifiers(t *testing.
 		},
 		{
 			ID:         "filename:testfile.go+++pkg:main+++declType:const+++name:nrzXXZ",
+			Package:    "main",
 			File:       "testfile.go",
 			Position:   131,
 			Name:       "nrzXXZ",
@@ -253,6 +265,7 @@ func TestVisit_OnExtractorWithStructDecl_ShouldReturnFoundIdentifiers(t *testing
 	expected := []entity.Identifier{
 		{
 			ID:         "filename:testfile.go+++pkg:main+++declType:struct+++name:selector",
+			Package:    "main",
 			File:       "testfile.go",
 			Position:   52,
 			Name:       "selector",
@@ -262,6 +275,7 @@ func TestVisit_OnExtractorWithStructDecl_ShouldReturnFoundIdentifiers(t *testing
 		},
 		{
 			ID:         "filename:testfile.go+++pkg:main+++declType:struct+++name:httpClient",
+			Package:    "main",
 			File:       "testfile.go",
 			Position:   97,
 			Name:       "httpClient",
@@ -301,6 +315,7 @@ func TestVisit_OnExtractorWithInterfaceDecl_ShouldReturnFoundIdentifiers(t *test
 	expected := []entity.Identifier{
 		{
 			ID:         "filename:testfile.go+++pkg:main+++declType:interface+++name:selector",
+			Package:    "main",
 			File:       "testfile.go",
 			Position:   52,
 			Name:       "selector",
@@ -310,6 +325,7 @@ func TestVisit_OnExtractorWithInterfaceDecl_ShouldReturnFoundIdentifiers(t *test
 		},
 		{
 			ID:         "filename:testfile.go+++pkg:main+++declType:interface+++name:httpClient",
+			Package:    "main",
 			File:       "testfile.go",
 			Position:   102,
 			Name:       "httpClient",

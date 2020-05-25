@@ -27,14 +27,14 @@ type CSVIdentifierRepository struct {
 
 // Add creates a new row for an identifier, using comma-separated values. The columns added are:
 // * id
-// * file       string
-//	Position   token.Pos
-//	Name       string
-//	Type       token.Token
-//	Node       *ast.Node
-//	Splits     map[string][]Split
-//	Expansions map[string][]Expansion
-//	Error      error
+// * package
+// * file
+// * position
+// * name
+// * type
+// * splits
+// * expansions
+// * error
 func (r *CSVIdentifierRepository) Add(ctx context.Context, project entity.Project, ident entity.Identifier) error {
 	var splitsColumnBuilder strings.Builder
 	for sptr, splits := range ident.Splits {
@@ -66,6 +66,7 @@ func (r *CSVIdentifierRepository) Add(ctx context.Context, project entity.Projec
 
 	row := []string{
 		ident.ID,
+		ident.Package,
 		ident.File,
 		fmt.Sprintf("%v", ident.Position),
 		ident.Type.String(),

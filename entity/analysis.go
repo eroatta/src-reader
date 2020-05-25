@@ -1,8 +1,10 @@
 package entity
 
 import (
+	"fmt"
 	"go/ast"
 	"go/token"
+	"strings"
 	"time"
 )
 
@@ -30,6 +32,7 @@ type File struct {
 // parent information, and splits/expansions.
 type Identifier struct {
 	ID         string
+	Package    string
 	File       string
 	Position   token.Pos
 	Name       string
@@ -50,6 +53,21 @@ type Split struct {
 type Expansion struct {
 	From   string
 	Values []string
+}
+
+// FullPackageName returns the package name, including its directory structure.
+func (i Identifier) FullPackageName() string {
+	idx := strings.LastIndex(i.File, "/")
+	if idx == -1 {
+		return i.Package
+	}
+
+	dir := i.File[:idx]
+	if strings.HasSuffix(dir, i.Package) {
+		return dir
+	}
+
+	return fmt.Sprintf("%s/%s", dir, i.Package)
 }
 
 // AnalysisResults represents the results for an analysis, indicating its creation date,

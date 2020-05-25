@@ -37,6 +37,7 @@ func TestFromTokenToString_OnIdentifierMapper_ShouldReturnTranslations(t *testin
 func TestToDTO_OnIdentifierMapper_ShouldReturnIdentifierDTO(t *testing.T) {
 	identifier := entity.Identifier{
 		ID:       "filename:cmd/siva/impl/list.go+++pkg:impl+++declType:var+++name:defaultOutput",
+		Package:  "impl",
 		File:     "cmd/siva/impl/list.go",
 		Position: token.Pos(194),
 		Name:     "defaultOutput",
@@ -65,6 +66,8 @@ func TestToDTO_OnIdentifierMapper_ShouldReturnIdentifierDTO(t *testing.T) {
 	dto := im.toDTO(identifier, project)
 
 	assert.Equal(t, "filename:cmd/siva/impl/list.go+++pkg:impl+++declType:var+++name:defaultOutput", dto.ID)
+	assert.Equal(t, "impl", dto.Package)
+	assert.Equal(t, "cmd/siva/impl", dto.AbsolutePackage)
 	assert.Equal(t, "cmd/siva/impl/list.go", dto.File)
 	assert.Equal(t, token.Pos(194), dto.Position)
 	assert.Equal(t, "defaultOutput", dto.Name)

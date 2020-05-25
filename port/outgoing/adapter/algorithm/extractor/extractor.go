@@ -62,7 +62,7 @@ func (e *Extractor) Visit(node ast.Node) ast.Visitor {
 
 		id := entity.NewIDBuilder().WithFilename(e.filename).
 			WithPackage(e.packageName).WithReceiver(recv).WithName(name).WithType(token.FUNC).Build()
-		e.identifiers = append(e.identifiers, newIdentifier(id, e.filename, elem.Pos(), name, token.FUNC))
+		e.identifiers = append(e.identifiers, newIdentifier(id, e.packageName, e.filename, elem.Pos(), name, token.FUNC))
 
 		// set current location at the beginning of each function
 		e.currentLoc = id
@@ -93,7 +93,7 @@ func (e *Extractor) fromValueSpec(filename string, token token.Token, decl *ast.
 			WithPackage(e.packageName).WithName(name.String()).WithType(token).Build()
 
 		identifiers = append(identifiers,
-			newIdentifier(id, filename, name.Pos(), name.String(), token))
+			newIdentifier(id, e.packageName, filename, name.Pos(), name.String(), token))
 	}
 
 	return identifiers
@@ -114,12 +114,13 @@ func (e *Extractor) fromTypeSpec(filename string, decl *ast.TypeSpec) []entity.I
 		WithPackage(e.packageName).WithName(decl.Name.String()).WithType(identifierType).Build()
 
 	return []entity.Identifier{
-		newIdentifier(id, filename, decl.Pos(), decl.Name.String(), identifierType)}
+		newIdentifier(id, e.packageName, filename, decl.Pos(), decl.Name.String(), identifierType)}
 }
 
-func newIdentifier(id string, filename string, pos token.Pos, name string, identifierType token.Token) entity.Identifier {
+func newIdentifier(id string, pkg string, filename string, pos token.Pos, name string, identifierType token.Token) entity.Identifier {
 	return entity.Identifier{
 		ID:         id,
+		Package:    pkg,
 		File:       filename,
 		Position:   pos,
 		Name:       name,
