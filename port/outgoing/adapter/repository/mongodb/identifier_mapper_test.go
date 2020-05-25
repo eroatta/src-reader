@@ -87,4 +87,5 @@ func TestToDTO_OnIdentifierMapper_ShouldReturnIdentifierDTO(t *testing.T) {
 	assert.Equal(t, "715f17550be5f7222a815ff80966adaf", dto.AnalysisID)
 	assert.Equal(t, "src-d/go-siva", dto.ProjectRef)
 	assert.Equal(t, time.Now().Format("2006-02-01"), dto.CreatedAt.Format("2006-02-01"))
+	assert.False(t, dto.Exported)
 }

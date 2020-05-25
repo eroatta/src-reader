@@ -3,6 +3,7 @@ package mongodb
 import (
 	"go/token"
 	"time"
+	"unicode"
 
 	"github.com/eroatta/src-reader/entity"
 )
@@ -36,6 +37,7 @@ func (im *identifierMapper) fromTokenToString(tok token.Token) string {
 // toDTO maps the entity for Identifier into a Data Transfer Object.
 func (im *identifierMapper) toDTO(ent entity.Identifier, projectEnt entity.Project) identifierDTO {
 	// setup direct mappings
+
 	dto := identifierDTO{
 		ID:         ent.ID,
 		File:       ent.File,
@@ -47,6 +49,10 @@ func (im *identifierMapper) toDTO(ent entity.Identifier, projectEnt entity.Proje
 		AnalysisID: projectEnt.ID,
 		ProjectRef: projectEnt.Metadata.Fullname,
 		CreatedAt:  time.Now(),
+	}
+
+	if unicode.IsUpper(rune(ent.Name[0])) && unicode.IsLetter(rune(ent.Name[0])) {
+		dto.Exported = true
 	}
 
 	splits := make(map[string][]splitDTO, len(ent.Splits))
@@ -80,19 +86,22 @@ func (im *identifierMapper) toDTO(ent entity.Identifier, projectEnt entity.Proje
 
 // identifierDTO is the database representation for an Identifier.
 type identifierDTO struct {
-	ID         string                    `bson:"identifier_id"`
-	File       string                    `bson:"file"`
-	Position   token.Pos                 `bson:"position"`
-	Name       string                    `bson:"name"`
-	Type       string                    `bson:"type"`
-	Parent     string                    `bson:"parent_id"`
-	ParentPos  token.Pos                 `bson:"parent_position"`
-	Splits     map[string][]splitDTO     `bson:"splits"`
-	Expansions map[string][]expansionDTO `bson:"expansions"`
-	Error      string                    `bson:"error_value,omitempty"`
-	AnalysisID string                    `bson:"analysis_id"`
-	ProjectRef string                    `bson:"project_ref"`
-	CreatedAt  time.Time                 `bson:"created_at"`
+	ID               string                    `bson:"identifier_id"`
+	File             string                    `bson:"file"`
+	Position         token.Pos                 `bson:"position"`
+	Name             string                    `bson:"name"`
+	Type             string                    `bson:"type"`
+	Parent           string                    `bson:"parent_id"`
+	ParentPos        token.Pos                 `bson:"parent_position"`
+	Splits           map[string][]splitDTO     `bson:"splits"`
+	JoinedSplits     map[string]string         `bson:"joined_splits"`
+	Expansions       map[string][]expansionDTO `bson:"expansions"`
+	JoinedExpansions map[string]string         `bson:"joined_expansions"`
+	Error            string                    `bson:"error_value,omitempty"`
+	AnalysisID       string                    `bson:"analysis_id"`
+	ProjectRef       string                    `bson:"project_ref"`
+	CreatedAt        time.Time                 `bson:"created_at"`
+	Exported         bool                      `bson:"is_exported"`
 }
 
 // splitDTO is the database representation for an Identifier's Split results.
