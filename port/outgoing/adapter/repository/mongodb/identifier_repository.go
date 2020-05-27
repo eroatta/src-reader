@@ -39,3 +39,7 @@ func (idb *IdentifierDB) Add(ctx context.Context, project entity.Project, ident 
 
 	return nil
 }
+
+func (idb *IdentifierDB) FindAllByProject(ctx context.Context, projectRef string) ([]entity.Identifier, error) {
+	return []entity.Identifier{}, repository.ErrIdentifierUnexpected
+}

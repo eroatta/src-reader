@@ -3,6 +3,7 @@ package csv
 import (
 	"context"
 	"encoding/csv"
+	"errors"
 	"fmt"
 	"os"
 	"strings"
@@ -90,4 +91,8 @@ func printableError(err error) string {
 	}
 
 	return ""
+}
+
+func (r *CSVIdentifierRepository) FindAllByProject(ctx context.Context, projectRef string) ([]entity.Identifier, error) {
+	return []entity.Identifier{}, errors.New("unimplemented method")
 }

@@ -426,6 +426,10 @@ func (i identifierRepositoryMock) Add(ctx context.Context, project entity.Projec
 	return i.err
 }
 
+func (i identifierRepositoryMock) FindAllByProject(ctx context.Context, projectRef string) ([]entity.Identifier, error) {
+	return []entity.Identifier{}, errors.New("shouldn't be called")
+}
+
 type analysisRepositoryMock struct {
 	err error
 }
