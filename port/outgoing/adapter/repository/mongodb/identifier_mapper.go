@@ -4,7 +4,6 @@ import (
 	"go/token"
 	"strings"
 	"time"
-	"unicode"
 
 	"github.com/eroatta/src-reader/entity"
 )
@@ -46,10 +45,7 @@ func (im *identifierMapper) toDTO(ent entity.Identifier, projectEnt entity.Proje
 		AnalysisID:      projectEnt.ID,
 		ProjectRef:      projectEnt.Metadata.Fullname,
 		CreatedAt:       time.Now(),
-	}
-
-	if unicode.IsUpper(rune(ent.Name[0])) && unicode.IsLetter(rune(ent.Name[0])) {
-		dto.Exported = true
+		Exported:        ent.Exported(),
 	}
 
 	splits := make(map[string][]splitDTO, len(ent.Splits))

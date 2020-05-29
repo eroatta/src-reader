@@ -6,6 +6,7 @@ import (
 	"go/token"
 	"strings"
 	"time"
+	"unicode"
 )
 
 // AnalysisConfig defines the configuration options for an analysis execution.
@@ -41,6 +42,11 @@ type Identifier struct {
 	Splits     map[string][]Split
 	Expansions map[string][]Expansion
 	Error      error
+}
+
+// Exported determines if the identifier is exported on its package.
+func (i Identifier) Exported() bool {
+	return unicode.IsUpper(rune(i.Name[0])) && unicode.IsLetter(rune(i.Name[0]))
 }
 
 // Split represents a hardword or softword in which the identifier was divided.

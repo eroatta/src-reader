@@ -8,6 +8,8 @@ import (
 )
 
 var (
+	// ErrIdentifierNoResults indicates that no identifiers were found matching the given criteria.
+	ErrIdentifierNoResults = errors.New("no identifiers found for the given criteria")
 	// ErrIdentifierUnexpected indicates that an error occurred while trying to perform an operation on IdentifierRepository.
 	ErrIdentifierUnexpected = errors.New("unexpected error performing the current operation on IdentifierRepository")
 )
