@@ -46,6 +46,11 @@ func (im *identifierMapper) toDTO(ent entity.Identifier, projectEnt entity.Proje
 		ProjectRef:      projectEnt.Metadata.Fullname,
 		CreatedAt:       time.Now(),
 		Exported:        ent.Exported(),
+		Normalization: normalizationDTO{
+			Word:      ent.Normalization.Word,
+			Algorithm: ent.Normalization.Algorithm,
+			Score:     ent.Normalization.Score,
+		},
 	}
 
 	splits := make(map[string][]splitDTO, len(ent.Splits))
@@ -107,6 +112,7 @@ type identifierDTO struct {
 	ProjectRef       string                    `bson:"project_ref"`
 	CreatedAt        time.Time                 `bson:"created_at"`
 	Exported         bool                      `bson:"is_exported"`
+	Normalization    normalizationDTO          `bson:"normalization"`
 }
 
 // splitDTO is the database representation for an Identifier's Split results.
@@ -119,4 +125,11 @@ type splitDTO struct {
 type expansionDTO struct {
 	From   string   `bson:"from"`
 	Values []string `bson:"values"`
+}
+
+// normalizationDTO is the database representation for an Identifer's Normalization results.
+type normalizationDTO struct {
+	Word      string  `bson:"word"`
+	Algorithm string  `bson:"algorithm"`
+	Score     float64 `bson:"score"`
 }

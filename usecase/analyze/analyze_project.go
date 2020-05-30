@@ -143,9 +143,10 @@ func (uc analyzeProjectUsecase) Analyze(ctx context.Context, url string) (entity
 	identc := step.Extract(valid, uc.defaultConfig.ExtractorFactory)
 	splittedc := step.Split(identc, splitters...)
 	expandedc := step.Expand(splittedc, expanders...)
+	normalizedc := step.Normalize(expandedc)
 
 	identErrorSamples := make([]string, 0)
-	for ident := range expandedc {
+	for ident := range normalizedc {
 		analysisResults.IdentifiersTotal++
 		if ident.Error != nil {
 			if len(identErrorSamples) < 10 {

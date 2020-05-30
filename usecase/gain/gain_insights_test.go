@@ -68,10 +68,86 @@ func TestProcess_OnGainInsightsUsecase_WhenFailingToSaveInsights_ShouldReturnErr
 func TestProcess_OnGainInsightsUsecase_ShouldReturnInsightsByPackage(t *testing.T) {
 	identifierRepositoryMock := identifierRepositoryMock{
 		idents: []entity.Identifier{
-			{Package: "main", File: "main.go", Name: "main"},
-			{Package: "main", File: "main.go", Name: "helperFunc"},
-			{Package: "main", File: "helper.go", Name: "HelperFunc"},
-			{Package: "main_test", File: "main_test.go", Name: "Mock"},
+			{
+				Package: "main",
+				File:    "main.go",
+				Name:    "main",
+				Splits: map[string][]entity.Split{
+					"conserv": {{Order: 1, Value: "main"}},
+				},
+				Expansions: map[string][]entity.Expansion{
+					"no_exp": {{From: "main", Values: []string{"main"}}},
+				},
+				Normalization: entity.Normalization{
+					Word:      "main",
+					Algorithm: "conserv+no_exp",
+					Score:     0.98,
+				},
+			},
+			{
+				Package: "main",
+				File:    "main.go",
+				Name:    "helperFunc",
+				Splits: map[string][]entity.Split{
+					"conserv": {
+						{Order: 1, Value: "helper"},
+						{Order: 2, Value: "func"},
+					},
+				},
+				Expansions: map[string][]entity.Expansion{
+					"no_exp": {
+						{From: "main", Values: []string{"main"}},
+						{From: "func", Values: []string{"function"}},
+					},
+				},
+				Normalization: entity.Normalization{
+					Word:      "helperFunction",
+					Algorithm: "conserv+no_exp",
+					Score:     0.93,
+				},
+			},
+			{
+				Package: "main",
+				File:    "helper.go",
+				Name:    "HelperFunc",
+				Splits: map[string][]entity.Split{
+					"conserv": {
+						{Order: 1, Value: "helper"},
+						{Order: 2, Value: "func"},
+					},
+				},
+				Expansions: map[string][]entity.Expansion{
+					"no_exp": {
+						{From: "main", Values: []string{"main"}},
+						{From: "func", Values: []string{"function"}},
+					},
+				},
+				Normalization: entity.Normalization{
+					Word:      "HelperFunction",
+					Algorithm: "conserv+no_exp",
+					Score:     0.93,
+				},
+			},
+			{
+				Package: "main_test",
+				File:    "main_test.go",
+				Name:    "Mock",
+				Splits: map[string][]entity.Split{
+					"conserv": {
+						{Order: 1, Value: "mock"},
+					},
+				},
+				Expansions: map[string][]entity.Expansion{
+					"no_exp": {
+						{From: "mock", Values: []string{"mock"}},
+					},
+				},
+				Normalization: entity.Normalization{
+					Word:      "Mock",
+					Algorithm: "conserv+no_exp",
+					Score:     1.0,
+				},
+			},
 		},
 		err: nil,
 	}
@@ -92,6 +168,13 @@ func TestProcess_OnGainInsightsUsecase_ShouldReturnInsightsByPackage(t *testing.
 			Package:          "main",
 			TotalIdentifiers: 3,
 			TotalExported:    1,
+			TotalSplits: map[string]int{
+				"conserv": 5,
+			},
+			TotalExpansions: map[string]int{
+				"no_exp": 5,
+			},
+			TotalWeight: 2.267,
 			Files: map[string]struct{}{
 				"main.go":   {},
 				"helper.go": {},
@@ -102,6 +185,13 @@ func TestProcess_OnGainInsightsUsecase_ShouldReturnInsightsByPackage(t *testing.
 			Package:          "main_test",
 			TotalIdentifiers: 1,
 			TotalExported:    1,
+			TotalSplits: map[string]int{
+				"conserv": 1,
+			},
+			TotalExpansions: map[string]int{
+				"no_exp": 1,
+			},
+			TotalWeight: 1.0,
 			Files: map[string]struct{}{
 				"main_test.go": {},
 			},

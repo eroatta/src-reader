@@ -54,6 +54,11 @@ func TestToDTO_OnIdentifierMapper_ShouldReturnIdentifierDTO(t *testing.T) {
 				{From: "output", Values: []string{"output"}},
 			},
 		},
+		Normalization: entity.Normalization{
+			Word:      "defaultOutput",
+			Algorithm: "conserv+no_exp",
+			Score:     0.99,
+		},
 	}
 	project := entity.Project{
 		ID: "715f17550be5f7222a815ff80966adaf",
@@ -88,4 +93,7 @@ func TestToDTO_OnIdentifierMapper_ShouldReturnIdentifierDTO(t *testing.T) {
 	assert.Equal(t, "src-d/go-siva", dto.ProjectRef)
 	assert.Equal(t, time.Now().Format("2006-02-01"), dto.CreatedAt.Format("2006-02-01"))
 	assert.False(t, dto.Exported)
+	assert.Equal(t, "defaultOutput", dto.Normalization.Word)
+	assert.Equal(t, "conserv+no_exp", dto.Normalization.Algorithm)
+	assert.Equal(t, 0.99, dto.Normalization.Score)
 }

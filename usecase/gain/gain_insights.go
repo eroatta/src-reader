@@ -52,9 +52,11 @@ func (uc gainInsightsUsecase) Process(ctx context.Context, projectRef string) ([
 		metrics, ok := byPackages[ident.FullPackageName()]
 		if !ok {
 			metrics = entity.Insight{
-				ProjectRef: projectRef,
-				Package:    ident.Package,
-				Files:      make(map[string]struct{}),
+				ProjectRef:      projectRef,
+				Package:         ident.Package,
+				TotalSplits:     make(map[string]int),
+				TotalExpansions: make(map[string]int),
+				Files:           make(map[string]struct{}),
 			}
 		}
 

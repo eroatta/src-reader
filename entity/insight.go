@@ -42,7 +42,11 @@ func (i *Insight) Include(ident Identifier) {
 		i.TotalExpansions[algorithm] += len(expansions)
 	}
 
-	//i.TotalWeight += ident.SimilarityRate() * 1 // TODO: adjust weight
+	weight := 0.7
+	if ident.Exported() {
+		weight = 1.0
+	}
+	i.TotalWeight += ident.Normalization.Score * weight
 
 	i.Files[ident.File] = struct{}{}
 }

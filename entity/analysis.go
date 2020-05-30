@@ -4,9 +4,12 @@ import (
 	"fmt"
 	"go/ast"
 	"go/token"
+	"sort"
 	"strings"
 	"time"
 	"unicode"
+
+	"github.com/agnivade/levenshtein"
 )
 
 // AnalysisConfig defines the configuration options for an analysis execution.
@@ -32,33 +35,17 @@ type File struct {
 // Identifier represents an identifier extracted from source code, indicating its origin, type,
 // parent information, and splits/expansions.
 type Identifier struct {
-	ID         string
-	Package    string
-	File       string
-	Position   token.Pos
-	Name       string
-	Type       token.Token
-	Node       *ast.Node
-	Splits     map[string][]Split
-	Expansions map[string][]Expansion
-	Error      error
-}
-
-// Exported determines if the identifier is exported on its package.
-func (i Identifier) Exported() bool {
-	return unicode.IsUpper(rune(i.Name[0])) && unicode.IsLetter(rune(i.Name[0]))
-}
-
-// Split represents a hardword or softword in which the identifier was divided.
-type Split struct {
-	Order int
-	Value string
-}
-
-// Expansion represents a set of expansions from a split.
-type Expansion struct {
-	From   string
-	Values []string
+	ID            string
+	Package       string
+	File          string
+	Position      token.Pos
+	Name          string
+	Type          token.Token
+	Node          *ast.Node
+	Splits        map[string][]Split
+	Expansions    map[string][]Expansion
+	Error         error
+	Normalization Normalization
 }
 
 // FullPackageName returns the package name, including its directory structure.
@@ -74,6 +61,77 @@ func (i Identifier) FullPackageName() string {
 	}
 
 	return fmt.Sprintf("%s/%s", dir, i.Package)
+}
+
+// Exported determines if the identifier is exported on its package.
+func (i Identifier) Exported() bool {
+	if len(i.Name) == 0 {
+		return false
+	}
+
+	return unicode.IsUpper(rune(i.Name[0])) && unicode.IsLetter(rune(i.Name[0]))
+}
+
+// Normalize applies a normalization function to select the best split/expansion approach.
+func (i *Identifier) Normalize() {
+	normalization := Normalization{
+		Word:      "undefined",
+		Algorithm: "undefined",
+		Score:     0.0,
+	}
+
+	for algorithm, expansions := range i.Expansions {
+		sort.Sort(bySoftwordOrder(expansions))
+
+		var wordBuilder strings.Builder
+		for i, expansion := range expansions {
+			expandedSoftword := expansion.Values[0] // TODO: for now, pick the first one
+			if i > 0 {
+				expandedSoftword = strings.Title(expandedSoftword)
+			}
+			wordBuilder.WriteString(expandedSoftword)
+		}
+		word := wordBuilder.String()
+
+		lengths := float64(len(i.Name) + len(word))
+		score := (lengths - float64(levenshtein.ComputeDistance(i.Name, word))) / lengths
+		if score >= normalization.Score {
+			normalization = Normalization{
+				Word:      word,
+				Algorithm: fmt.Sprintf("%s+%s", expansions[0].SpittingAlgorithm, algorithm),
+				Score:     score,
+			}
+		}
+	}
+
+	i.Normalization = normalization
+}
+
+// Split represents a hardword or softword in which the identifier was divided.
+type Split struct {
+	Order int
+	Value string
+}
+
+// Expansion represents a set of expansions from a split.
+type Expansion struct {
+	Order             int
+	From              string
+	Values            []string
+	SpittingAlgorithm string
+}
+
+type bySoftwordOrder []Expansion
+
+func (a bySoftwordOrder) Len() int           { return len(a) }
+func (a bySoftwordOrder) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a bySoftwordOrder) Less(i, j int) bool { return a[i].Order < a[j].Order }
+
+// Normalization represents a word composition with its given score.
+type Normalization struct {
+	Word      string
+	Algorithm string
+	Score     float64
 }
 
 // AnalysisResults represents the results for an analysis, indicating its creation date,
