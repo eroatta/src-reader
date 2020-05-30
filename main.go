@@ -15,6 +15,7 @@ import (
 	"github.com/eroatta/src-reader/port/outgoing/adapter/repository/mongodb"
 	"github.com/eroatta/src-reader/usecase/analyze"
 	"github.com/eroatta/src-reader/usecase/create"
+	"github.com/eroatta/src-reader/usecase/gain"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -35,6 +36,7 @@ func main() {
 	projectRepository := mongodb.NewMongoDBProjecRepository(clt, database)
 	analysisRepository := mongodb.NewMongoDBAnalysisRepository(clt, database)
 	identifierRepository := mongodb.NewMongoDBIdentifierRepository(clt, database)
+	insightRepository := mongodb.NewMongoDBInsightRepository(clt, database)
 
 	// create repositories based on Github
 	githubToken := os.Getenv("GITHUB_TOKEN")
@@ -46,11 +48,13 @@ func main() {
 	importProjectUsecase := create.NewImportProjectUsecase(projectRepository, remoteProjectRepository, sourceCodeRepository)
 	analyzeProjectUsecase := analyze.NewAnalyzeProjectUsecase(projectRepository, sourceCodeRepository,
 		identifierRepository, analysisRepository, defaultAnalysisConfig)
+	gainInsightsUsecase := gain.NewGainInsightsUsecase(identifierRepository, insightRepository)
 
 	// create REST API server and register use cases
 	router := rest.NewServer()
 	rest.RegisterCreateProjectUsecase(router, importProjectUsecase)
 	rest.RegisterAnalyzeProjectUsecase(router, analyzeProjectUsecase)
+	rest.RegisterGainInsightsUsecase(router, gainInsightsUsecase)
 
 	// start the server
 	router.Run()
