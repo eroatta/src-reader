@@ -1,6 +1,7 @@
 package mongodb
 
 import (
+	"errors"
 	"go/token"
 	"strings"
 	"time"
@@ -30,6 +31,26 @@ func (im *identifierMapper) fromTokenToString(tok token.Token) string {
 	}
 
 	return tokenString
+}
+
+func (im *identifierMapper) fromStringToToken(str string) token.Token {
+	var tok token.Token
+	switch str {
+	case "func":
+		tok = token.FUNC
+	case "var":
+		tok = token.VAR
+	case "const":
+		tok = token.CONST
+	case "struct":
+		tok = token.STRUCT
+	case "interface":
+		tok = token.INTERFACE
+	default:
+		tok = token.DEFAULT
+	}
+
+	return tok
 }
 
 // toDTO maps the entity for Identifier into a Data Transfer Object.
@@ -79,8 +100,10 @@ func (im *identifierMapper) toDTO(ent entity.Identifier, projectEnt entity.Proje
 		words := make([]string, len(v))
 		for i, expansionEnt := range v {
 			items[i] = expansionDTO{
-				From:   expansionEnt.From,
-				Values: expansionEnt.Values,
+				Order:              expansionEnt.Order,
+				SplittingAlgorithm: expansionEnt.SplittingAlgorithm,
+				From:               expansionEnt.From,
+				Values:             expansionEnt.Values,
 			}
 
 			words[i] = strings.Join(expansionEnt.Values, "|")
@@ -92,6 +115,58 @@ func (im *identifierMapper) toDTO(ent entity.Identifier, projectEnt entity.Proje
 	dto.JoinedExpansions = joinedExpansions
 
 	return dto
+}
+
+// toEntity maps the Data Transfer Object for Identifier into a domain entity.
+func (im *identifierMapper) toEntity(dto identifierDTO) entity.Identifier {
+	splits := make(map[string][]entity.Split, len(dto.Splits))
+	for alg, split := range dto.Splits {
+		items := make([]entity.Split, len(split))
+		for i, splitDto := range split {
+			items[i] = entity.Split{
+				Order: splitDto.Order,
+				Value: splitDto.Value,
+			}
+		}
+		splits[alg] = items
+	}
+
+	expansions := make(map[string][]entity.Expansion, len(dto.Expansions))
+	for alg, exp := range dto.Expansions {
+		items := make([]entity.Expansion, len(exp))
+		for i, expDto := range exp {
+			items[i] = entity.Expansion{
+				Order:              expDto.Order,
+				SplittingAlgorithm: expDto.SplittingAlgorithm,
+				From:               expDto.From,
+				Values:             expDto.Values,
+			}
+		}
+		expansions[alg] = items
+	}
+
+	var err error
+	if dto.Error != "" {
+		err = errors.New(dto.Error)
+	}
+
+	return entity.Identifier{
+		ID:         dto.ID,
+		Package:    dto.Package,
+		File:       dto.File,
+		Position:   dto.Position,
+		Name:       dto.Name,
+		Type:       im.fromStringToToken(dto.Type),
+		Node:       nil,
+		Splits:     splits,
+		Expansions: expansions,
+		Error:      err,
+		Normalization: entity.Normalization{
+			Word:      dto.Normalization.Word,
+			Algorithm: dto.Normalization.Algorithm,
+			Score:     dto.Normalization.Score,
+		},
+	}
 }
 
 // identifierDTO is the database representation for an Identifier.
@@ -123,8 +198,10 @@ type splitDTO struct {
 
 // expansionDTO is the database representation for an Identifier's Expansion results.
 type expansionDTO struct {
-	From   string   `bson:"from"`
-	Values []string `bson:"values"`
+	Order              int      `bson:"order"`
+	SplittingAlgorithm string   `bson:"splitting_algorithm"`
+	From               string   `bson:"from"`
+	Values             []string `bson:"values"`
 }
 
 // normalizationDTO is the database representation for an Identifer's Normalization results.

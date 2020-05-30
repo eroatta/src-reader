@@ -63,7 +63,7 @@ func TestNormalize_OnIdentifier(t *testing.T) {
 				Name: "delete",
 				Expansions: map[string][]entity.Expansion{
 					"custom_test": {
-						{Order: 1, SpittingAlgorithm: "split_test", From: "delete", Values: []string{"delete"}},
+						{Order: 1, SplittingAlgorithm: "split_test", From: "delete", Values: []string{"delete"}},
 					},
 				},
 			},
@@ -79,8 +79,8 @@ func TestNormalize_OnIdentifier(t *testing.T) {
 				Name: "ctrldel",
 				Expansions: map[string][]entity.Expansion{
 					"custom": {
-						{Order: 1, SpittingAlgorithm: "custom", From: "ctrl", Values: []string{"control"}},
-						{Order: 2, SpittingAlgorithm: "custom", From: "del", Values: []string{"delete"}},
+						{Order: 1, SplittingAlgorithm: "custom", From: "ctrl", Values: []string{"control"}},
+						{Order: 2, SplittingAlgorithm: "custom", From: "del", Values: []string{"delete"}},
 					},
 				},
 			},
@@ -96,12 +96,12 @@ func TestNormalize_OnIdentifier(t *testing.T) {
 				Name: "ctrldel",
 				Expansions: map[string][]entity.Expansion{
 					"custom": {
-						{Order: 1, SpittingAlgorithm: "custom", From: "ctrl", Values: []string{"control"}},
-						{Order: 2, SpittingAlgorithm: "custom", From: "del", Values: []string{"delete"}},
+						{Order: 1, SplittingAlgorithm: "custom", From: "ctrl", Values: []string{"control"}},
+						{Order: 2, SplittingAlgorithm: "custom", From: "del", Values: []string{"delete"}},
 					},
 					"another_custom": {
-						{Order: 1, SpittingAlgorithm: "custom", From: "ctrl", Values: []string{"control"}},
-						{Order: 2, SpittingAlgorithm: "custom", From: "del", Values: []string{"delay", "delete"}},
+						{Order: 1, SplittingAlgorithm: "custom", From: "ctrl", Values: []string{"control"}},
+						{Order: 2, SplittingAlgorithm: "custom", From: "del", Values: []string{"delay", "delete"}},
 					},
 				},
 			},

@@ -50,8 +50,8 @@ func TestToDTO_OnIdentifierMapper_ShouldReturnIdentifierDTO(t *testing.T) {
 		},
 		Expansions: map[string][]entity.Expansion{
 			"noexp": {
-				{From: "default", Values: []string{"default"}},
-				{From: "output", Values: []string{"output"}},
+				{Order: 1, SplittingAlgorithm: "conserv", From: "default", Values: []string{"default"}},
+				{Order: 2, SplittingAlgorithm: "conserv", From: "output", Values: []string{"output"}},
 			},
 		},
 		Normalization: entity.Normalization{
@@ -85,8 +85,8 @@ func TestToDTO_OnIdentifierMapper_ShouldReturnIdentifierDTO(t *testing.T) {
 	assert.Equal(t, "default_output", dto.JoinedSplits["conserv"])
 	assert.Equal(t, 1, len(dto.Expansions))
 	assert.EqualValues(t, []expansionDTO{
-		{From: "default", Values: []string{"default"}},
-		{From: "output", Values: []string{"output"}},
+		{Order: 1, SplittingAlgorithm: "conserv", From: "default", Values: []string{"default"}},
+		{Order: 2, SplittingAlgorithm: "conserv", From: "output", Values: []string{"output"}},
 	}, dto.Expansions["noexp"])
 	assert.Equal(t, "default_output", dto.JoinedExpansions["noexp"])
 	assert.Equal(t, "715f17550be5f7222a815ff80966adaf", dto.AnalysisID)
@@ -96,4 +96,70 @@ func TestToDTO_OnIdentifierMapper_ShouldReturnIdentifierDTO(t *testing.T) {
 	assert.Equal(t, "defaultOutput", dto.Normalization.Word)
 	assert.Equal(t, "conserv+no_exp", dto.Normalization.Algorithm)
 	assert.Equal(t, 0.99, dto.Normalization.Score)
+}
+
+func TestToEntity_OnIdentifierMapper_ShouldReturnIdentifierEntity(t *testing.T) {
+	identifier := identifierDTO{
+		ID:              "filename:cmd/siva/impl/list.go+++pkg:impl+++declType:var+++name:defaultOutput",
+		Package:         "impl",
+		AbsolutePackage: "cmd/siva/impl",
+		File:            "cmd/siva/impl/list.go",
+		Position:        194,
+		Name:            "defaultOutput",
+		Type:            "var",
+		Splits: map[string][]splitDTO{
+			"conserv": {
+				{Order: 1, Value: "default"},
+				{Order: 2, Value: "output"},
+			},
+		},
+		JoinedSplits: map[string]string{
+			"conserv": "default_output",
+		},
+		Expansions: map[string][]expansionDTO{
+			"noexp": {
+				{Order: 1, SplittingAlgorithm: "conserv", From: "default", Values: []string{"default"}},
+				{Order: 2, SplittingAlgorithm: "conserv", From: "output", Values: []string{"output"}},
+			},
+		},
+		JoinedExpansions: map[string]string{
+			"noexp": "default_output",
+		},
+		AnalysisID: "715f17550be5f7222a815ff80966adaf",
+		ProjectRef: "src-d/go-siva",
+		CreatedAt:  time.Now(),
+		Exported:   false,
+		Normalization: normalizationDTO{
+			Word:      "defaultOutput",
+			Algorithm: "conserv+no_exp",
+			Score:     0.99,
+		},
+	}
+
+	im := &identifierMapper{}
+	ent := im.toEntity(identifier)
+
+	assert.Equal(t, "filename:cmd/siva/impl/list.go+++pkg:impl+++declType:var+++name:defaultOutput", ent.ID)
+	assert.Equal(t, "impl", ent.Package)
+	assert.Equal(t, "cmd/siva/impl", ent.FullPackageName())
+	assert.Equal(t, "cmd/siva/impl/list.go", ent.File)
+	assert.Equal(t, token.Pos(194), ent.Position)
+	assert.Equal(t, "defaultOutput", ent.Name)
+	assert.Equal(t, token.VAR, ent.Type)
+	assert.Equal(t, 1, len(ent.Splits))
+	assert.EqualValues(t, []entity.Split{
+		{Order: 1, Value: "default"},
+		{Order: 2, Value: "output"},
+	}, ent.Splits["conserv"])
+	assert.Equal(t, 1, len(ent.Expansions))
+	assert.EqualValues(t, []entity.Expansion{
+		{Order: 1, SplittingAlgorithm: "conserv", From: "default", Values: []string{"default"}},
+		{Order: 2, SplittingAlgorithm: "conserv", From: "output", Values: []string{"output"}},
+	}, ent.Expansions["noexp"])
+	// assert.Equal(t, "715f17550be5f7222a815ff80966adaf", dto.AnalysisID)
+	// assert.Equal(t, "src-d/go-siva", dto.ProjectRef)
+	assert.False(t, ent.Exported())
+	assert.Equal(t, "defaultOutput", ent.Normalization.Word)
+	assert.Equal(t, "conserv+no_exp", ent.Normalization.Algorithm)
+	assert.Equal(t, 0.99, ent.Normalization.Score)
 }

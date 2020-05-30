@@ -98,7 +98,7 @@ func (i *Identifier) Normalize() {
 		if score >= normalization.Score {
 			normalization = Normalization{
 				Word:      word,
-				Algorithm: fmt.Sprintf("%s+%s", expansions[0].SpittingAlgorithm, algorithm),
+				Algorithm: fmt.Sprintf("%s+%s", expansions[0].SplittingAlgorithm, algorithm),
 				Score:     score,
 			}
 		}
@@ -115,10 +115,10 @@ type Split struct {
 
 // Expansion represents a set of expansions from a split.
 type Expansion struct {
-	Order             int
-	From              string
-	Values            []string
-	SpittingAlgorithm string
+	Order              int
+	From               string
+	Values             []string
+	SplittingAlgorithm string
 }
 
 type bySoftwordOrder []Expansion

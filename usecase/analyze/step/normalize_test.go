@@ -35,8 +35,8 @@ func TestNormalize_OnIdentifier_ShouldSendNormalizedElement(t *testing.T) {
 			},
 			Expansions: map[string][]entity.Expansion{
 				"custom": {
-					{Order: 1, SpittingAlgorithm: "custom", From: "ctrl", Values: []string{"control"}},
-					{Order: 2, SpittingAlgorithm: "custom", From: "del", Values: []string{"delete"}},
+					{Order: 1, SplittingAlgorithm: "custom", From: "ctrl", Values: []string{"control"}},
+					{Order: 2, SplittingAlgorithm: "custom", From: "del", Values: []string{"delete"}},
 				},
 			},
 		}
