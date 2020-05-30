@@ -71,5 +71,5 @@ func TestExpand_OnNoexp_ShouldReturnSameSplittedValues(t *testing.T) {
 	got := noexp.Expand(ident)
 
 	assert.Equal(t, 1, len(got))
-	assert.EqualValues(t, []entity.Expansion{{From: "str", Values: []string{"str"}}}, got)
+	assert.EqualValues(t, []entity.Expansion{{Order: 1, SplittingAlgorithm: "conserv", From: "str", Values: []string{"str"}}}, got)
 }

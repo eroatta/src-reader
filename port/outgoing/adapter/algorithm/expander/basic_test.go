@@ -83,7 +83,7 @@ func TestExpand_OnBasicWhenNoDeclFound_ShouldReturnUnexpandedResults(t *testing.
 	got := basic.Expand(ident)
 
 	assert.Equal(t, 1, len(got))
-	assert.EqualValues(t, []entity.Expansion{{From: "str", Values: []string{"str"}}}, got)
+	assert.EqualValues(t, []entity.Expansion{{Order: 1, SplittingAlgorithm: "greedy", From: "str", Values: []string{"str"}}}, got)
 }
 
 func TestExpand_OnBasic_ShouldReturnExpandedResultsFromWords(t *testing.T) {
@@ -120,8 +120,10 @@ func TestExpand_OnBasic_ShouldReturnExpandedResultsFromWords(t *testing.T) {
 	got := basic.Expand(ident)
 
 	assert.Equal(t, 2, len(got))
-	assert.EqualValues(t, []entity.Expansion{{From: "str", Values: []string{"string"}},
-		{From: "buff", Values: []string{"buffer"}}}, got)
+	assert.EqualValues(t, []entity.Expansion{
+		{Order: 1, SplittingAlgorithm: "greedy", From: "str", Values: []string{"string"}},
+		{Order: 2, SplittingAlgorithm: "greedy", From: "buff", Values: []string{"buffer"}},
+	}, got)
 }
 
 func TestExpand_OnBasic_ShouldReturnExpandedResultsFromPhrases(t *testing.T) {
@@ -156,7 +158,7 @@ func TestExpand_OnBasic_ShouldReturnExpandedResultsFromPhrases(t *testing.T) {
 	got := basic.Expand(ident)
 
 	assert.Equal(t, 1, len(got))
-	assert.EqualValues(t, []entity.Expansion{{From: "sb", Values: []string{"string buffer"}}}, got)
+	assert.EqualValues(t, []entity.Expansion{{Order: 1, SplittingAlgorithm: "greedy", From: "sb", Values: []string{"string buffer"}}}, got)
 }
 
 func TestExpand_OnBasicWhenMultipleResults_ShouldReturnClosestThreePerWord(t *testing.T) {
@@ -189,5 +191,5 @@ func TestExpand_OnBasicWhenMultipleResults_ShouldReturnClosestThreePerWord(t *te
 	got := basic.Expand(ident)
 
 	assert.Equal(t, 1, len(got))
-	assert.EqualValues(t, []entity.Expansion{{From: "contrl", Values: []string{"control", "control", "contrail"}}}, got)
+	assert.EqualValues(t, []entity.Expansion{{Order: 1, SplittingAlgorithm: "greedy", From: "contrl", Values: []string{"control", "control", "contrail"}}}, got)
 }

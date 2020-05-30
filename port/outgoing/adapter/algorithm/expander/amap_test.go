@@ -96,7 +96,7 @@ func TestExpand_OnAMAPWhenNoDeclFound_ShouldReturnUnexpandedResults(t *testing.T
 	got := amap.Expand(ident)
 
 	assert.Equal(t, 1, len(got))
-	assert.EqualValues(t, []entity.Expansion{{From: "str", Values: []string{"str"}}}, got)
+	assert.EqualValues(t, []entity.Expansion{{Order: 1, SplittingAlgorithm: "samurai", From: "str", Values: []string{"str"}}}, got)
 }
 
 func TestExpand_OnAMAP_ShouldReturnExpandedResults(t *testing.T) {
@@ -129,5 +129,5 @@ func TestExpand_OnAMAP_ShouldReturnExpandedResults(t *testing.T) {
 	got := amap.Expand(ident)
 
 	assert.Equal(t, 1, len(got))
-	assert.EqualValues(t, []entity.Expansion{{From: "sb", Values: []string{"string buffer"}}}, got)
+	assert.EqualValues(t, []entity.Expansion{{Order: 1, SplittingAlgorithm: "samurai", From: "sb", Values: []string{"string buffer"}}}, got)
 }

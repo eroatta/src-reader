@@ -29,7 +29,12 @@ func (e noexpExpander) Expand(ident entity.Identifier) []entity.Expansion {
 
 	expansions := make([]entity.Expansion, len(splits))
 	for i, split := range splits {
-		expansions[i] = entity.Expansion{From: split.Value, Values: []string{split.Value}}
+		expansions[i] = entity.Expansion{
+			Order:              split.Order,
+			SplittingAlgorithm: e.ApplicableOn(),
+			From:               split.Value,
+			Values:             []string{split.Value},
+		}
 	}
 	return expansions
 }

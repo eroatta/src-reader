@@ -53,7 +53,12 @@ func (b basicExpander) Expand(ident entity.Identifier) []entity.Expansion {
 	if !ok {
 		expansions := make([]entity.Expansion, len(splits))
 		for i, split := range splits {
-			expansions[i] = entity.Expansion{From: split.Value, Values: []string{split.Value}}
+			expansions[i] = entity.Expansion{
+				Order:              split.Order,
+				SplittingAlgorithm: b.ApplicableOn(),
+				From:               split.Value,
+				Values:             []string{split.Value},
+			}
 		}
 		return expansions
 	}
@@ -85,7 +90,12 @@ func (b basicExpander) Expand(ident entity.Identifier) []entity.Expansion {
 			expansions = handleMultipleExpansions(split.Value, expansions)
 		}
 
-		expanded[i] = entity.Expansion{From: split.Value, Values: expansions}
+		expanded[i] = entity.Expansion{
+			Order:              split.Order,
+			SplittingAlgorithm: b.ApplicableOn(),
+			From:               split.Value,
+			Values:             expansions,
+		}
 	}
 
 	return expanded

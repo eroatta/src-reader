@@ -57,7 +57,12 @@ func (a amapExpander) Expand(ident entity.Identifier) []entity.Expansion {
 	if !ok {
 		expansions := make([]entity.Expansion, len(splits))
 		for i, split := range splits {
-			expansions[i] = entity.Expansion{From: split.Value, Values: []string{split.Value}}
+			expansions[i] = entity.Expansion{
+				Order:              split.Order,
+				SplittingAlgorithm: a.ApplicableOn(),
+				From:               split.Value,
+				Values:             []string{split.Value},
+			}
 		}
 		return expansions
 	}
@@ -68,7 +73,12 @@ func (a amapExpander) Expand(ident entity.Identifier) []entity.Expansion {
 
 	expansions := make([]entity.Expansion, len(splits))
 	for i, split := range splits {
-		expansions[i] = entity.Expansion{From: split.Value, Values: amap.Expand(split.Value, scope, a.referenceText)}
+		expansions[i] = entity.Expansion{
+			Order:              split.Order,
+			SplittingAlgorithm: a.ApplicableOn(),
+			From:               split.Value,
+			Values:             amap.Expand(split.Value, scope, a.referenceText),
+		}
 	}
 
 	return expansions
