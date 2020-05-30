@@ -48,7 +48,7 @@ func TestProcess_OnGainInsightsUsecase_WhenErrorReadingIdentifiers_ShouldReturnE
 func TestProcess_OnGainInsightsUsecase_WhenFailingToSaveInsights_ShouldReturnError(t *testing.T) {
 	identifierRepositoryMock := identifierRepositoryMock{
 		idents: []entity.Identifier{
-			{Package: "main", File: "main.go"},
+			{Package: "main", File: "main.go", Name: "main"},
 		},
 		err: nil,
 	}
@@ -68,10 +68,10 @@ func TestProcess_OnGainInsightsUsecase_WhenFailingToSaveInsights_ShouldReturnErr
 func TestProcess_OnGainInsightsUsecase_ShouldReturnInsightsByPackage(t *testing.T) {
 	identifierRepositoryMock := identifierRepositoryMock{
 		idents: []entity.Identifier{
-			{Package: "main", File: "main.go"},
-			{Package: "main", File: "main.go"},
-			{Package: "main", File: "helper.go"},
-			{Package: "main_test", File: "main_test.go"},
+			{Package: "main", File: "main.go", Name: "main"},
+			{Package: "main", File: "main.go", Name: "helperFunc"},
+			{Package: "main", File: "helper.go", Name: "HelperFunc"},
+			{Package: "main_test", File: "main_test.go", Name: "Mock"},
 		},
 		err: nil,
 	}
@@ -88,12 +88,23 @@ func TestProcess_OnGainInsightsUsecase_ShouldReturnInsightsByPackage(t *testing.
 	assert.Equal(t, 2, len(insights))
 	assert.ElementsMatch(t, []entity.Insight{
 		{
-			ProjectRef: "eroatta/test",
-			Package:    "main",
+			ProjectRef:       "eroatta/test",
+			Package:          "main",
+			TotalIdentifiers: 3,
+			TotalExported:    1,
+			Files: map[string]struct{}{
+				"main.go":   {},
+				"helper.go": {},
+			},
 		},
 		{
-			ProjectRef: "eroatta/test",
-			Package:    "main_test",
+			ProjectRef:       "eroatta/test",
+			Package:          "main_test",
+			TotalIdentifiers: 1,
+			TotalExported:    1,
+			Files: map[string]struct{}{
+				"main_test.go": {},
+			},
 		},
 	}, insights)
 }

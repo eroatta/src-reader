@@ -54,10 +54,11 @@ func (uc gainInsightsUsecase) Process(ctx context.Context, projectRef string) ([
 			metrics = entity.Insight{
 				ProjectRef: projectRef,
 				Package:    ident.Package,
+				Files:      make(map[string]struct{}),
 			}
 		}
 
-		// TODO: metrics.Include(ident)
+		metrics.Include(ident)
 		byPackages[ident.FullPackageName()] = metrics
 	}
 
