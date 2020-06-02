@@ -2,6 +2,7 @@ package mongodb
 
 import (
 	"testing"
+	"time"
 
 	"github.com/eroatta/src-reader/entity"
 	"github.com/stretchr/testify/assert"
@@ -9,7 +10,6 @@ import (
 
 func TestToDTO_OnInsightMapper_ShouldReturnInsightDTO(t *testing.T) {
 	ent := entity.Insight{
-
 		ProjectRef:       "eroatta/test",
 		Package:          "main",
 		TotalIdentifiers: 3,
@@ -32,6 +32,7 @@ func TestToDTO_OnInsightMapper_ShouldReturnInsightDTO(t *testing.T) {
 
 	assert.Equal(t, "", dto.ID)
 	assert.Equal(t, "eroatta/test", dto.ProjectRef)
+	assert.Equal(t, time.Now().Format("2006-02-01"), dto.CreatedAt.Format("2006-02-01"))
 	assert.Equal(t, "main", dto.Package)
 	assert.Equal(t, ent.Rate(), dto.Accuracy)
 	assert.Equal(t, 3, dto.TotalIdentifiers)

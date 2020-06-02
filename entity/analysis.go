@@ -85,11 +85,14 @@ func (i *Identifier) Normalize() {
 
 		var wordBuilder strings.Builder
 		for i, expansion := range expansions {
-			expandedSoftword := expansion.Values[0] // TODO: for now, pick the first one
-			if i > 0 {
-				expandedSoftword = strings.Title(expandedSoftword)
+			// TODO: review
+			if len(expansion.Values) > 0 {
+				expandedSoftword := expansion.Values[0] // TODO: for now, pick the first one
+				if i > 0 {
+					expandedSoftword = strings.Title(expandedSoftword)
+				}
+				wordBuilder.WriteString(expandedSoftword)
 			}
-			wordBuilder.WriteString(expandedSoftword)
 		}
 		word := wordBuilder.String()
 

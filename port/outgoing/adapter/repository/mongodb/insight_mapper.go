@@ -2,6 +2,7 @@ package mongodb
 
 import (
 	"math"
+	"time"
 
 	"github.com/eroatta/src-reader/entity"
 )
@@ -28,6 +29,7 @@ func (is *insightMapper) toDTO(ent entity.Insight) insightDTO {
 
 	return insightDTO{
 		ProjectRef:       ent.ProjectRef,
+		CreatedAt:        time.Now(),
 		Package:          ent.Package,
 		Accuracy:         ent.Rate(),
 		TotalIdentifiers: ent.TotalIdentifiers,
@@ -42,7 +44,8 @@ func (is *insightMapper) toDTO(ent entity.Insight) insightDTO {
 }
 
 type insightDTO struct {
-	ID               string             `bson:"_id"`
+	ID               string             `bson:"_id,omitempty"`
+	CreatedAt        time.Time          `bson:"created_at"`
 	ProjectRef       string             `bson:"project_ref"`
 	Package          string             `bson:"package"`
 	Accuracy         float64            `bson:"accuracy"`

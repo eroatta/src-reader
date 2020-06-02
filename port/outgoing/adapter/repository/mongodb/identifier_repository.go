@@ -3,6 +3,7 @@ package mongodb
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/eroatta/src-reader/entity"
 	"github.com/eroatta/src-reader/repository"
@@ -43,14 +44,15 @@ func (idb *IdentifierDB) Add(ctx context.Context, project entity.Project, ident 
 
 // FindAllByProject retrieves all the identifiers related to a given project, from the underlying MongoDB collection.
 func (idb *IdentifierDB) FindAllByProject(ctx context.Context, projectRef string) ([]entity.Identifier, error) {
-	cursor, err := idb.collection.Find(ctx, bson.M{"project_ref": projectRef})
+	// TODO: review how to handle URL
+	cursor, err := idb.collection.Find(ctx, bson.M{"project_ref": strings.TrimPrefix(projectRef, "https://github.com/")})
 	if err != nil {
 		log.WithError(err).Error(fmt.Sprintf("error looking documents for %s", projectRef))
 		return []entity.Identifier{}, repository.ErrIdentifierUnexpected
 	}
 
 	var elements []identifierDTO
-	err = cursor.All(ctx, elements)
+	err = cursor.All(ctx, &elements)
 	if err != nil {
 		log.WithError(err).Error(fmt.Sprintf("error decoding found documents for %s", projectRef))
 		return []entity.Identifier{}, repository.ErrIdentifierUnexpected
