@@ -1,0 +1,475 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "$$hashKey": "object:75",
+        "builtIn": 1,
+        "datasource": "-- Grafana --",
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "gnetId": null,
+  "graphTooltip": 0,
+  "id": 8,
+  "iteration": 1591181132239,
+  "links": [],
+  "panels": [
+    {
+      "datasource": "Elasticsearch / Insights",
+      "gridPos": {
+        "h": 10,
+        "w": 6,
+        "x": 0,
+        "y": 0
+      },
+      "id": 4,
+      "options": {
+        "fieldOptions": {
+          "calcs": [
+            "mean"
+          ],
+          "defaults": {
+            "decimals": 3,
+            "mappings": [],
+            "max": 1,
+            "min": 0,
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "semi-dark-red",
+                  "value": null
+                },
+                {
+                  "color": "#EAB839",
+                  "value": 0.7
+                },
+                {
+                  "color": "semi-dark-green",
+                  "value": 0.9
+                }
+              ]
+            }
+          },
+          "overrides": [],
+          "values": false
+        },
+        "orientation": "auto",
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true
+      },
+      "pluginVersion": "6.7.3",
+      "targets": [
+        {
+          "bucketAggs": [
+            {
+              "$$hashKey": "object:179",
+              "field": "created_at",
+              "id": "2",
+              "settings": {
+                "interval": "auto",
+                "min_doc_count": 0,
+                "trimEdges": 0
+              },
+              "type": "date_histogram"
+            }
+          ],
+          "metrics": [
+            {
+              "$$hashKey": "object:177",
+              "field": "accuracy",
+              "id": "1",
+              "meta": {},
+              "settings": {},
+              "type": "avg"
+            }
+          ],
+          "refId": "A",
+          "timeField": "created_at"
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "Repository Accuracy",
+      "type": "gauge"
+    },
+    {
+      "colors": [
+        "#299c46",
+        "rgba(237, 129, 40, 0.89)",
+        "#d44a3a"
+      ],
+      "datasource": "Elasticsearch / Insights",
+      "gridPos": {
+        "h": 10,
+        "w": 18,
+        "x": 6,
+        "y": 0
+      },
+      "id": 8,
+      "polystat": {
+        "animationSpeed": 2500,
+        "columnAutoSize": true,
+        "columns": "",
+        "defaultClickThrough": "",
+        "defaultClickThroughNewTab": false,
+        "defaultClickThroughSanitize": false,
+        "displayLimit": 100,
+        "fontAutoScale": true,
+        "fontSize": 12,
+        "fontType": "Roboto",
+        "globalDecimals": 3,
+        "globalDisplayMode": "all",
+        "globalDisplayTextTriggeredEmpty": "OK",
+        "globalOperatorName": "avg",
+        "globalThresholds": [
+          {
+            "$$hashKey": "object:268",
+            "color": "#d44a3a",
+            "state": 2,
+            "value": 0
+          },
+          {
+            "$$hashKey": "object:271",
+            "color": "#FF9830",
+            "state": 1,
+            "value": 0.85
+          },
+          {
+            "$$hashKey": "object:261",
+            "color": "#299c46",
+            "state": 0,
+            "value": 0.86
+          }
+        ],
+        "globalUnitFormat": "short",
+        "gradientEnabled": true,
+        "hexagonSortByDirection": 1,
+        "hexagonSortByField": "name",
+        "maxMetrics": 0,
+        "polygonBorderColor": "black",
+        "polygonBorderSize": 2,
+        "polygonGlobalFillColor": "#0a50a1",
+        "radius": "",
+        "radiusAutoSize": true,
+        "rowAutoSize": true,
+        "rows": "",
+        "shape": "hexagon_pointed_top",
+        "tooltipDisplayMode": "all",
+        "tooltipDisplayTextTriggeredEmpty": "OK",
+        "tooltipFontSize": 12,
+        "tooltipFontType": "Roboto",
+        "tooltipPrimarySortDirection": 4,
+        "tooltipPrimarySortField": "name",
+        "tooltipSecondarySortDirection": 2,
+        "tooltipSecondarySortField": "thresholdLevel",
+        "tooltipTimestampEnabled": false
+      },
+      "savedComposites": [],
+      "savedOverrides": [],
+      "targets": [
+        {
+          "bucketAggs": [
+            {
+              "$$hashKey": "object:205",
+              "fake": true,
+              "field": "package.keyword",
+              "id": "3",
+              "settings": {
+                "min_doc_count": 1,
+                "order": "desc",
+                "orderBy": "_term",
+                "size": "10"
+              },
+              "type": "terms"
+            },
+            {
+              "$$hashKey": "object:193",
+              "field": "created_at",
+              "id": "2",
+              "settings": {
+                "interval": "auto",
+                "min_doc_count": 0,
+                "trimEdges": 0
+              },
+              "type": "date_histogram"
+            }
+          ],
+          "metrics": [
+            {
+              "$$hashKey": "object:191",
+              "field": "accuracy",
+              "id": "1",
+              "meta": {},
+              "settings": {},
+              "type": "max"
+            }
+          ],
+          "refId": "A",
+          "timeField": "created_at"
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "Repository Overview",
+      "type": "grafana-polystat-panel"
+    },
+    {
+      "columns": [
+        {
+          "$$hashKey": "object:284",
+          "text": "project_ref",
+          "value": "project_ref"
+        },
+        {
+          "$$hashKey": "object:293",
+          "text": "package",
+          "value": "package"
+        },
+        {
+          "$$hashKey": "object:305",
+          "text": "accuracy",
+          "value": "accuracy"
+        },
+        {
+          "$$hashKey": "object:320",
+          "text": "total_identifiers",
+          "value": "total_identifiers"
+        },
+        {
+          "$$hashKey": "object:338",
+          "text": "total_exported",
+          "value": "total_exported"
+        }
+      ],
+      "datasource": "Elasticsearch / Insights",
+      "fontSize": "100%",
+      "gridPos": {
+        "h": 10,
+        "w": 15,
+        "x": 0,
+        "y": 10
+      },
+      "id": 2,
+      "pageSize": null,
+      "showHeader": true,
+      "sort": {
+        "col": 0,
+        "desc": true
+      },
+      "styles": [
+        {
+          "$$hashKey": "object:171",
+          "alias": "Repository",
+          "align": "left",
+          "dateFormat": "YYYY-MM-DD HH:mm:ss",
+          "pattern": "project_ref",
+          "type": "string"
+        },
+        {
+          "$$hashKey": "object:172",
+          "alias": "Package",
+          "align": "left",
+          "colorMode": null,
+          "colors": [
+            "rgba(245, 54, 54, 0.9)",
+            "rgba(237, 129, 40, 0.89)",
+            "rgba(50, 172, 45, 0.97)"
+          ],
+          "decimals": 2,
+          "pattern": "package",
+          "thresholds": [],
+          "type": "string",
+          "unit": "short"
+        },
+        {
+          "$$hashKey": "object:568",
+          "alias": "Accuracy (rate)",
+          "align": "right",
+          "colorMode": "cell",
+          "colors": [
+            "rgba(245, 54, 54, 0.9)",
+            "rgba(237, 129, 40, 0.89)",
+            "rgba(50, 172, 45, 0.97)"
+          ],
+          "dateFormat": "YYYY-MM-DD HH:mm:ss",
+          "decimals": 4,
+          "mappingType": 1,
+          "pattern": "accuracy",
+          "thresholds": [
+            "0.5",
+            "0.85"
+          ],
+          "type": "number",
+          "unit": "short"
+        },
+        {
+          "$$hashKey": "object:691",
+          "alias": "",
+          "align": "right",
+          "colorMode": null,
+          "colors": [
+            "rgba(245, 54, 54, 0.9)",
+            "rgba(237, 129, 40, 0.89)",
+            "rgba(50, 172, 45, 0.97)"
+          ],
+          "dateFormat": "YYYY-MM-DD HH:mm:ss",
+          "decimals": 0,
+          "mappingType": 1,
+          "pattern": "/total_*/",
+          "thresholds": [],
+          "type": "number",
+          "unit": "short"
+        }
+      ],
+      "targets": [
+        {
+          "bucketAggs": [],
+          "metrics": [
+            {
+              "$$hashKey": "object:204",
+              "field": "select field",
+              "id": "1",
+              "meta": {},
+              "settings": {
+                "size": 500
+              },
+              "type": "raw_document"
+            }
+          ],
+          "refId": "A",
+          "timeField": "created_at"
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "Accuracy by Package",
+      "transform": "json",
+      "type": "table"
+    },
+    {
+      "datasource": "Elasticsearch / Insights",
+      "gridPos": {
+        "h": 10,
+        "w": 9,
+        "x": 15,
+        "y": 10
+      },
+      "header_js": "{}",
+      "id": 6,
+      "method": "GET",
+      "mode": "template",
+      "params_js": "{\n from:ctrl.range.from.format('x'),  // x is unix ms timestamp\n to:ctrl.range.to.format('x'), \n height:ctrl.height,\n now:Date.now(),\n interval: ctrl.template('$__interval'),\n sample: 'Not escaped: $__interval',\n since:ctrl.lastRequestTime\n}",
+      "request": "query",
+      "responseType": "text",
+      "showErrors": true,
+      "showTime": false,
+      "showTimeFormat": "LTS",
+      "showTimePrefix": null,
+      "showTimeValue": "request",
+      "skipSameURL": true,
+      "targets": [
+        {
+          "bucketAggs": [],
+          "metrics": [
+            {
+              "$$hashKey": "object:974",
+              "field": "select field",
+              "id": "1",
+              "meta": {},
+              "settings": {
+                "size": 500
+              },
+              "type": "raw_document"
+            }
+          ],
+          "refId": "A",
+          "timeField": "created_at"
+        }
+      ],
+      "template": "<pre>{{ response }}</pre>",
+      "templateResponse": true,
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "Panel Title",
+      "type": "ryantxu-ajax-panel",
+      "url": "https://raw.githubusercontent.com/ryantxu/ajax-panel/master/static/example.txt",
+      "withCredentials": false
+    }
+  ],
+  "schemaVersion": 22,
+  "style": "dark",
+  "tags": [],
+  "templating": {
+    "list": [
+      {
+        "allValue": null,
+        "current": {
+          "isNone": true,
+          "selected": false,
+          "text": "None",
+          "value": ""
+        },
+        "datasource": "Elasticsearch / Projects",
+        "definition": "{\n\t\"query\": {\n\t    \"match_all\": {}\n\t},\n\t\"_source\": {\n\t    \"includes\": [\"url\"]\n\t}\n}",
+        "hide": 0,
+        "includeAll": false,
+        "index": -1,
+        "label": "Repository",
+        "multi": false,
+        "name": "url",
+        "options": [],
+        "query": "{\n\t\"query\": {\n\t    \"match_all\": {}\n\t},\n\t\"_source\": {\n\t    \"includes\": [\"url\"]\n\t}\n}",
+        "refresh": 1,
+        "regex": "/.*\"url\": (.*).*/",
+        "skipUrlSync": false,
+        "sort": 0,
+        "tagValuesQuery": "",
+        "tags": [],
+        "tagsQuery": "",
+        "type": "query",
+        "useTags": false
+      },
+      {
+        "datasource": "Elasticsearch / Insights",
+        "filters": [],
+        "hide": 0,
+        "label": "",
+        "name": "Filters",
+        "skipUrlSync": false,
+        "type": "adhoc"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-2d",
+    "to": "now"
+  },
+  "timepicker": {
+    "refresh_intervals": [
+      "5s",
+      "10s",
+      "30s",
+      "1m",
+      "5m",
+      "15m",
+      "30m",
+      "1h",
+      "2h",
+      "1d"
+    ]
+  },
+  "timezone": "",
+  "title": "Insights",
+  "uid": "h95rVCzGz",
+  "variables": {
+    "list": []
+  },
+  "version": 6
+}
