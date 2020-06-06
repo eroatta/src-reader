@@ -212,6 +212,10 @@ func (i identifierRepositoryMock) FindAllByProject(ctx context.Context, projectR
 	return i.idents, i.err
 }
 
+func (i identifierRepositoryMock) FindAllByProjectAndFile(ctx context.Context, projectRef string, filename string) ([]entity.Identifier, error) {
+	return []entity.Identifier{}, errors.New("shouldn't be called")
+}
+
 type insightsRepositoryMock struct {
 	err error
 }

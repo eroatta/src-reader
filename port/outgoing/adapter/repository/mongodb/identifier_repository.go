@@ -65,3 +65,28 @@ func (idb *IdentifierDB) FindAllByProject(ctx context.Context, projectRef string
 
 	return identifiers, nil
 }
+
+// FindAllByProject retrieves all the identifiers related to a given project, from the underlying MongoDB collection.
+func (idb *IdentifierDB) FindAllByProjectAndFile(ctx context.Context, projectRef string, filename string) ([]entity.Identifier, error) {
+	// TODO: review how to handle URL
+	cursor, err := idb.collection.Find(ctx,
+		bson.M{"project_ref": strings.TrimPrefix(projectRef, "https://github.com/"), "file": filename})
+	if err != nil {
+		log.WithError(err).Error(fmt.Sprintf("error looking documents for %s on file %s", projectRef, filename))
+		return []entity.Identifier{}, repository.ErrIdentifierUnexpected
+	}
+
+	var elements []identifierDTO
+	err = cursor.All(ctx, &elements)
+	if err != nil {
+		log.WithError(err).Error(fmt.Sprintf("error decoding found documents for %s on file %s", projectRef, filename))
+		return []entity.Identifier{}, repository.ErrIdentifierUnexpected
+	}
+
+	identifiers := make([]entity.Identifier, len(elements))
+	for i, element := range elements {
+		identifiers[i] = idb.mapper.toEntity(element)
+	}
+
+	return identifiers, nil
+}

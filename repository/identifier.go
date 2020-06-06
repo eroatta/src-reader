@@ -20,4 +20,6 @@ type IdentifierRepository interface {
 	Add(ctx context.Context, project entity.Project, ident entity.Identifier) error
 	// FindAllByProject retrives a list of identifiers associated to the given project reference.
 	FindAllByProject(ctx context.Context, projectRef string) ([]entity.Identifier, error)
+	// FindAllByProjectAndFile retrieve a list of identifiers that match the given criteria.
+	FindAllByProjectAndFile(ctx context.Context, projectRef string, filename string) ([]entity.Identifier, error)
 }

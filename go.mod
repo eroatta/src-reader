@@ -12,6 +12,7 @@ require (
 	github.com/sirupsen/logrus v1.5.0
 	github.com/stretchr/testify v1.4.0
 	go.mongodb.org/mongo-driver v1.3.2
+	golang.org/x/tools v0.0.0-20190729092621-ff9f1409240a
 	gopkg.in/go-playground/assert.v1 v1.2.1 // indirect
 	gopkg.in/src-d/go-billy.v4 v4.3.2
 	gopkg.in/src-d/go-git.v4 v4.13.1

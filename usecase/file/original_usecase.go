@@ -10,9 +10,10 @@ import (
 )
 
 var (
-	ErrProjectNotFound = errors.New("TODO")
-	ErrFileNotFound    = errors.New("TODO")
-	ErrUnexpected      = errors.New("TODO")
+	ErrProjectNotFound     = errors.New("TODO")
+	ErrFileNotFound        = errors.New("TODO")
+	ErrIdentifiersNotFound = errors.New("TODO")
+	ErrUnexpected          = errors.New("TODO")
 )
 
 type OriginalFileUsecase interface {
