@@ -48,5 +48,6 @@ func getFile(ctx *gin.Context, uc fileUsecase) {
 		return
 	}
 
+	ctx.Writer.Header().Set("Access-Control-Allow-Origin", "*")
 	ctx.String(200, string(raw))
 }
