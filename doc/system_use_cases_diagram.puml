@@ -3,19 +3,19 @@
 actor User
 
 rectangle "src-reader" {
-    usecase (Import Project) as ImportProject
-    usecase (Split and Expand\n Identifiers) as SplitAndExpand
-    usecase (Collect Project\n Metrics) as CollectProjectMetrics
-    usecase (Collect Global\n Metrics) as CollectGlobalMetrics
-    usecase (Visualize Metrics) as VisualizeMetrics
+    usecase (Create Project) as CreateProject
+    usecase (Analyze Project) as AnalyzeProject
+    usecase (Extract Insights \nfrom analysis) as ExtractInsights
+    usecase (Retrieve original File) as RetrieveOriginalFile
+    usecase (Retrieve rewritten File) as RetrieveRewrittenFile
 }
 
 left to right direction
 
-User --> ImportProject
-User --> SplitAndExpand
-User --> CollectProjectMetrics
-User --> CollectGlobalMetrics
-User --> VisualizeMetrics
+User --> CreateProject
+User --> AnalyzeProject
+User --> ExtractInsights
+User --> RetrieveOriginalFile
+User --> RetrieveRewrittenFile
 
 @@enduml
