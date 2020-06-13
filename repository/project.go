@@ -5,6 +5,7 @@ import (
 	"errors"
 
 	"github.com/eroatta/src-reader/entity"
+	"github.com/google/uuid"
 )
 
 var (
@@ -18,6 +19,8 @@ var (
 type ProjectRepository interface {
 	// Add adds a new Project to the current repository.
 	Add(ctx context.Context, project entity.Project) error
+	// Get retrieves a Project by ID.
+	Get(ctx context.Context, ID uuid.UUID) (entity.Project, error)
 	// GetByReference retrieves a Project using its reference name.
 	GetByReference(ctx context.Context, projectRef string) (entity.Project, error)
 }

@@ -5,6 +5,7 @@ import (
 	"errors"
 
 	"github.com/eroatta/src-reader/entity"
+	"github.com/google/uuid"
 )
 
 // project repository mock
@@ -16,6 +17,10 @@ type projectRepositoryMock struct {
 
 func (m projectRepositoryMock) Add(ctx context.Context, p entity.Project) error {
 	return m.addErr
+}
+
+func (m projectRepositoryMock) Get(ctx context.Context, ID uuid.UUID) (entity.Project, error) {
+	return m.project, m.getErr
 }
 
 func (m projectRepositoryMock) GetByReference(ctx context.Context, projectRef string) (entity.Project, error) {
