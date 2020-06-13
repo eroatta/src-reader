@@ -12,6 +12,7 @@ import (
 	"github.com/eroatta/src-reader/entity"
 	"github.com/eroatta/src-reader/port/incoming/adapter/rest"
 	"github.com/eroatta/src-reader/usecase"
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -50,7 +51,7 @@ func TestPOST_OnAnalysisCreationHandler_WithEmptyBody_ShouldReturnHTTP400(t *tes
 			"name": "validation_error",
 			"message": "missing or invalid data",
 			"details": [
-				"invalid field 'repository' with value null or empty"
+				"invalid field 'project_id' with value null or empty"
 			]
 		}`,
 		w.Body.String())
@@ -62,7 +63,7 @@ func TestPOST_OnAnalysisCreationHandler_WithWrongDataType_ShouldReturnHTTP400(t 
 
 	w := httptest.NewRecorder()
 	body := `{
-		"repository": 1
+		"project_id": 1
 	}`
 	req, _ := http.NewRequest("POST", "/analysis", strings.NewReader(body))
 	router.ServeHTTP(w, req)
@@ -73,7 +74,7 @@ func TestPOST_OnAnalysisCreationHandler_WithWrongDataType_ShouldReturnHTTP400(t 
 			"name": "validation_error",
 			"message": "missing or invalid data",
 			"details": [
-				"json: cannot unmarshal number into Go struct field createAnalysisCommand.repository of type string"
+				"json: cannot unmarshal number into Go struct field createAnalysisCommand.project_id of type string"
 			]
 		}`,
 		w.Body.String())
@@ -85,7 +86,7 @@ func TestPOST_OnAnalysisCreationHandler_WithInvalidRepository_ShouldReturnHTTP40
 
 	w := httptest.NewRecorder()
 	body := `{
-		"repository": "./github.com/eroatta/src-reader"
+		"project_id": "adsgadffadas"
 	}`
 	req, _ := http.NewRequest("POST", "/analysis", strings.NewReader(body))
 	router.ServeHTTP(w, req)
@@ -96,7 +97,7 @@ func TestPOST_OnAnalysisCreationHandler_WithInvalidRepository_ShouldReturnHTTP40
 			"name": "validation_error",
 			"message": "missing or invalid data",
 			"details": [
-				"invalid field 'repository' with value ./github.com/eroatta/src-reader"
+				"invalid field 'project_id' with value adsgadffadas"
 			]
 		}`,
 		w.Body.String())
@@ -111,7 +112,7 @@ func TestPOST_OnAnalysisCreationHandler_WithNotFoundProject_ShouldReturnHTTP400(
 
 	w := httptest.NewRecorder()
 	body := `{
-		"repository": "https://github.com/eroatta/src-reader"
+		"project_id": "6ba7b810-9dad-11d1-80b4-00c04fd430c8"
 	}`
 	req, _ := http.NewRequest("POST", "/analysis", strings.NewReader(body))
 	router.ServeHTTP(w, req)
@@ -122,7 +123,7 @@ func TestPOST_OnAnalysisCreationHandler_WithNotFoundProject_ShouldReturnHTTP400(
 			"name": "validation_error",
 			"message": "missing or invalid data",
 			"details": [
-				"non-existing repository https://github.com/eroatta/src-reader"
+				"project with ID: 6ba7b810-9dad-11d1-80b4-00c04fd430c8 can't be found"
 			]
 		}`,
 		w.Body.String())
@@ -137,7 +138,7 @@ func TestPOST_OnAnalysisCreationHandler_WithInternalError_ShouldReturnHTTP500(t 
 
 	w := httptest.NewRecorder()
 	body := `{
-		"repository": "https://github.com/eroatta/src-reader"
+		"project_id": "6ba7b810-9dad-11d1-80b4-00c04fd430c8"
 	}`
 	req, _ := http.NewRequest("POST", "/analysis", strings.NewReader(body))
 	router.ServeHTTP(w, req)
@@ -159,7 +160,7 @@ func TestPOST_OnAnalysisCreationHandler_WithSuccess_ShouldReturnHTTP201(t *testi
 	router := rest.NewServer()
 	rest.RegisterAnalyzeProjectUsecase(router, mockAnalyzeUsecase{
 		a: entity.AnalysisResults{
-			ID:                      "715f17550be5f7222a815ff80966adaf",
+			ID:                      "f17e675d-7823-4510-a04b-86e8c1f239ea",
 			ProjectName:             "src-d/go-siva",
 			DateCreated:             now,
 			PipelineMiners:          []string{"miner_1", "miner_2"},
@@ -179,7 +180,7 @@ func TestPOST_OnAnalysisCreationHandler_WithSuccess_ShouldReturnHTTP201(t *testi
 
 	w := httptest.NewRecorder()
 	body := `{
-		"repository": "https://github.com/eroatta/src-reader"
+		"project_id": "6ba7b810-9dad-11d1-80b4-00c04fd430c8"
 	}`
 	req, _ := http.NewRequest("POST", "/analysis", strings.NewReader(body))
 	router.ServeHTTP(w, req)
@@ -187,7 +188,7 @@ func TestPOST_OnAnalysisCreationHandler_WithSuccess_ShouldReturnHTTP201(t *testi
 	assert.Equal(t, http.StatusCreated, w.Code)
 	assert.JSONEq(t, `
 		{
-			"id": "715f17550be5f7222a815ff80966adaf",
+			"id": "f17e675d-7823-4510-a04b-86e8c1f239ea",
 			"project_ref": "src-d/go-siva",
 			"created_at": "2020-05-05T22:00:00Z",
 			"miners": [
@@ -227,6 +228,6 @@ type mockAnalyzeUsecase struct {
 	err error
 }
 
-func (m mockAnalyzeUsecase) Process(ctx context.Context, url string) (entity.AnalysisResults, error) {
+func (m mockAnalyzeUsecase) Process(ctx context.Context, projectID uuid.UUID) (entity.AnalysisResults, error) {
 	return m.a, m.err
 }

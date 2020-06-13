@@ -9,6 +9,7 @@ import (
 	"github.com/eroatta/src-reader/entity"
 	"github.com/eroatta/src-reader/repository"
 	"github.com/eroatta/src-reader/usecase/step"
+	"github.com/google/uuid"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -35,7 +36,7 @@ var (
 // AnalyzeProjectUsecase defines the contract for the use case related to the analysis process of a project.
 type AnalyzeProjectUsecase interface {
 	// Process performs the splitting and expansion process on the source code belonging to the Project.
-	Process(ctx context.Context, projectRef string) (entity.AnalysisResults, error)
+	Process(ctx context.Context, projecID uuid.UUID) (entity.AnalysisResults, error)
 }
 
 // NewAnalyzeProjectUsecase initializes a new AnalyzeProjectUsecase handler.
@@ -61,15 +62,15 @@ type analyzeProjectUsecase struct {
 // Process processes the given Project, based on the configuration provided by the AnalysisConfig.
 // The process reads the source code, applies the given miners, splitters and expanders and then stores the results.
 // It's the default implementation for the use case.
-func (uc analyzeProjectUsecase) Process(ctx context.Context, projectRef string) (entity.AnalysisResults, error) {
-	project, err := uc.projectRepository.GetByReference(ctx, projectRef)
+func (uc analyzeProjectUsecase) Process(ctx context.Context, projectID uuid.UUID) (entity.AnalysisResults, error) {
+	project, err := uc.projectRepository.Get(ctx, projectID)
 	switch err {
 	case nil:
 		// do nothing
 	case repository.ErrProjectNoResults:
 		return entity.AnalysisResults{}, ErrProjectNotFound
 	default:
-		log.WithError(err).Errorf("unable to retrieve project %s", projectRef)
+		log.WithError(err).Errorf("unable to retrieve project %s", projectID.String())
 		return entity.AnalysisResults{}, ErrUnexpected
 	}
 
@@ -107,7 +108,7 @@ func (uc analyzeProjectUsecase) Process(ctx context.Context, projectRef string) 
 	// if every file can't be parsed, then fail
 	if len(valid) == 0 {
 		log.Errorf("unable to read or parse any file on %s for project %s",
-			project.SourceCode.Location, projectRef)
+			project.SourceCode.Location, project.Reference)
 		return entity.AnalysisResults{}, ErrUnableToBuildASTs
 	}
 
@@ -174,7 +175,7 @@ func (uc analyzeProjectUsecase) Process(ctx context.Context, projectRef string) 
 
 	err = uc.analysisRepository.Add(ctx, analysisResults)
 	if err != nil {
-		log.WithError(err).Errorf("unable to save analysis results for project %s", projectRef)
+		log.WithError(err).Errorf("unable to save analysis results for project %s", project.Reference)
 		return entity.AnalysisResults{}, ErrUnableToSaveAnalysis
 	}
 

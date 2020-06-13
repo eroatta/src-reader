@@ -7,11 +7,12 @@ import (
 
 	"github.com/eroatta/src-reader/usecase"
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	log "github.com/sirupsen/logrus"
 )
 
 type createAnalysisCommand struct {
-	Repository string `json:"repository" validate:"url"`
+	ProjectID string `json:"project_id" validate:"uuid"`
 }
 
 type analysisResponse struct {
@@ -58,12 +59,12 @@ func createAnalysis(ctx *gin.Context, uc usecase.AnalyzeProjectUsecase) {
 		return
 	}
 
-	analysis, err := uc.Process(ctx, cmd.Repository)
+	analysis, err := uc.Process(ctx, uuid.MustParse(cmd.ProjectID))
 	switch err {
 	case nil:
 		// do nothing
 	case usecase.ErrProjectNotFound:
-		setBadRequestResponse(ctx, fmt.Errorf("non-existing repository %s", cmd.Repository))
+		setBadRequestResponse(ctx, fmt.Errorf("project with ID: %s can't be found", cmd.ProjectID))
 		return
 	default:
 		setInternalErrorResponse(ctx, err)

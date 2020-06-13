@@ -11,6 +11,7 @@ import (
 	"github.com/eroatta/src-reader/port/outgoing/adapter/algorithm/splitter"
 	"github.com/eroatta/src-reader/repository"
 	"github.com/eroatta/src-reader/usecase"
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -28,7 +29,8 @@ func TestProcess_OnAnalyzeProjectUsecase_WhenNoProjectFound_ShouldReturnError(t 
 
 	uc := usecase.NewAnalyzeProjectUsecase(projectRepositoryMock, nil, nil, nil, &entity.AnalysisConfig{})
 
-	results, err := uc.Process(context.TODO(), "eroatta/test")
+	projectID, err := uuid.NewUUID()
+	results, err := uc.Process(context.TODO(), projectID)
 
 	assert.EqualError(t, err, usecase.ErrProjectNotFound.Error())
 	assert.Empty(t, results)
@@ -42,7 +44,8 @@ func TestProcess_OnAnalyzeProjectUsecase_WhenFailingToRetrieveProject_ShouldRetu
 
 	uc := usecase.NewAnalyzeProjectUsecase(projectRepositoryMock, nil, nil, nil, &entity.AnalysisConfig{})
 
-	results, err := uc.Process(context.TODO(), "eroatta/test")
+	projectID, err := uuid.NewUUID()
+	results, err := uc.Process(context.TODO(), projectID)
 
 	assert.EqualError(t, err, usecase.ErrUnexpected.Error())
 	assert.Empty(t, results)
@@ -68,7 +71,8 @@ func TestProcess_OnAnalyzeProjectUsecase_WhenFailingToReadFiles_ShouldReturnErro
 
 	uc := usecase.NewAnalyzeProjectUsecase(projectRepositoryMock, sourceCodeRepositoryMock, nil, nil, &entity.AnalysisConfig{})
 
-	results, err := uc.Process(context.TODO(), "eroatta/test")
+	projectID, err := uuid.NewUUID()
+	results, err := uc.Process(context.TODO(), projectID)
 
 	assert.EqualError(t, err, usecase.ErrUnableToBuildASTs.Error())
 	assert.Empty(t, results)
@@ -96,7 +100,8 @@ func TestProcess_OnAnalyzeProjectUsecase_WhenFailingToParseFiles_ShouldReturnErr
 
 	uc := usecase.NewAnalyzeProjectUsecase(projectRepositoryMock, sourceCodeRepositoryMock, nil, nil, &entity.AnalysisConfig{})
 
-	results, err := uc.Process(context.TODO(), "eroatta/test")
+	projectID, err := uuid.NewUUID()
+	results, err := uc.Process(context.TODO(), projectID)
 
 	assert.EqualError(t, err, usecase.ErrUnableToBuildASTs.Error())
 	assert.Empty(t, results)
@@ -128,7 +133,8 @@ func TestProcess_OnAnalyzeProjectUsecase_WhenFailingToCreateSplitters_ShouldRetu
 	}
 	uc := usecase.NewAnalyzeProjectUsecase(projectRepositoryMock, sourceCodeRepositoryMock, nil, nil, config)
 
-	results, err := uc.Process(context.TODO(), "eroatta/test")
+	projectID, err := uuid.NewUUID()
+	results, err := uc.Process(context.TODO(), projectID)
 
 	assert.EqualError(t, err, usecase.ErrUnableToCreateProcessors.Error())
 	assert.Empty(t, results)
@@ -162,7 +168,8 @@ func TestProcess_OnAnalyzeProjectUsecase_WhenFailingToCreateExpanders_ShouldRetu
 	}
 	uc := usecase.NewAnalyzeProjectUsecase(projectRepositoryMock, sourceCodeRepositoryMock, nil, nil, config)
 
-	results, err := uc.Process(context.TODO(), "eroatta/test")
+	projectID, err := uuid.NewUUID()
+	results, err := uc.Process(context.TODO(), projectID)
 
 	assert.EqualError(t, err, usecase.ErrUnableToCreateProcessors.Error())
 	assert.Empty(t, results)
@@ -202,7 +209,8 @@ func TestProcess_OnAnalyzeProjectUsecase_WhenFailingToSaveIdentifiers_ShouldRetu
 	}
 	uc := usecase.NewAnalyzeProjectUsecase(projectRepositoryMock, sourceCodeRepositoryMock, identifierRepositoryMock, nil, config)
 
-	results, err := uc.Process(context.TODO(), "eroatta/test")
+	projectID, err := uuid.NewUUID()
+	results, err := uc.Process(context.TODO(), projectID)
 
 	assert.EqualError(t, err, usecase.ErrUnableToSaveIdentifiers.Error())
 	assert.Empty(t, results)
@@ -246,7 +254,8 @@ func TestProcess_OnAnalyzeProjectUsecase_WhenFailingToSaveAnalysis_ShouldReturnE
 	}
 	uc := usecase.NewAnalyzeProjectUsecase(projectRepositoryMock, sourceCodeRepositoryMock, identifierRepositoryMock, analysisRepositoryMock, config)
 
-	results, err := uc.Process(context.TODO(), "eroatta/test")
+	projectID, err := uuid.NewUUID()
+	results, err := uc.Process(context.TODO(), projectID)
 
 	assert.EqualError(t, err, usecase.ErrUnableToSaveAnalysis.Error())
 	assert.Empty(t, results)
@@ -295,7 +304,8 @@ func TestProcess_OnAnalyzeProjectUsecase_WhenAnalyzingIdentifiers_ShouldReturnAn
 	uc := usecase.NewAnalyzeProjectUsecase(projectRepositoryMock, sourceCodeRepositoryMock,
 		identifierRepositoryMock, analysisRepositoryMock, config)
 
-	results, err := uc.Process(context.TODO(), "eroatta/test")
+	projectID, err := uuid.NewUUID()
+	results, err := uc.Process(context.TODO(), projectID)
 
 	assert.NoError(t, err)
 	assert.Equal(t, "asadfasa345asdfasdfa", results.ID)
