@@ -7,7 +7,7 @@ import "time"
 type Project struct {
 	ID         string
 	Status     string
-	URL        string
+	Reference  string
 	CreatedAt  time.Time
 	Metadata   Metadata
 	SourceCode SourceCode

@@ -18,6 +18,6 @@ var (
 type ProjectRepository interface {
 	// Add adds a new Project to the current repository.
 	Add(ctx context.Context, project entity.Project) error
-	// GetByURL retrieves a Project using the remote URL.
-	GetByURL(ctx context.Context, url string) (entity.Project, error)
+	// GetByReference retrieves a Project using its reference name.
+	GetByReference(ctx context.Context, projectRef string) (entity.Project, error)
 }

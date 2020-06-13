@@ -21,13 +21,13 @@ func NewInMemoryProjectRepository() *InMemoryProjectRepository {
 
 // Add stores a Project entity into the underlying in memory storage.
 func (r InMemoryProjectRepository) Add(ctx context.Context, project entity.Project) error {
-	r.repos[project.URL] = &project
+	r.repos[project.Reference] = &project
 	return nil
 }
 
-// GetByURL finds an existing Project on the in memory storage, using the given URL as filter.
-func (r InMemoryProjectRepository) GetByURL(ctx context.Context, url string) (entity.Project, error) {
-	project, ok := r.repos[url]
+// GetByReference finds an existing Project on the in memory storage, using the given reference as filter.
+func (r InMemoryProjectRepository) GetByReference(ctx context.Context, projectRef string) (entity.Project, error) {
+	project, ok := r.repos[projectRef]
 	if !ok {
 		return entity.Project{}, repository.ErrProjectNoResults
 	}

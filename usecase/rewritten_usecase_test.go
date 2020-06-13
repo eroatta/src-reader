@@ -18,8 +18,8 @@ func TestNewRewrittenFileUsecase_ShouldReturnNewInstance(t *testing.T) {
 
 func TestProcess_OnRewrittenFileUsecase_WhenProjectNotFound_ShouldReturnError(t *testing.T) {
 	projectRepositoryMock := projectRepositoryMock{
-		project:     entity.Project{},
-		getByURLErr: repository.ErrProjectNoResults,
+		project: entity.Project{},
+		getErr:  repository.ErrProjectNoResults,
 	}
 	uc := usecase.NewRewrittenFileUsecase(projectRepositoryMock, nil, nil)
 
@@ -31,8 +31,8 @@ func TestProcess_OnRewrittenFileUsecase_WhenProjectNotFound_ShouldReturnError(t 
 
 func TestProcess_OnRewrittenFileUsecase_WhenErrorAccessingProject_ShouldReturnError(t *testing.T) {
 	projectRepositoryMock := projectRepositoryMock{
-		project:     entity.Project{},
-		getByURLErr: repository.ErrProjectUnexpected,
+		project: entity.Project{},
+		getErr:  repository.ErrProjectUnexpected,
 	}
 	uc := usecase.NewRewrittenFileUsecase(projectRepositoryMock, nil, nil)
 

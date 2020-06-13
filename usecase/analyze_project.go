@@ -61,15 +61,15 @@ type analyzeProjectUsecase struct {
 // Process processes the given Project, based on the configuration provided by the AnalysisConfig.
 // The process reads the source code, applies the given miners, splitters and expanders and then stores the results.
 // It's the default implementation for the use case.
-func (uc analyzeProjectUsecase) Process(ctx context.Context, url string) (entity.AnalysisResults, error) {
-	project, err := uc.projectRepository.GetByURL(ctx, url)
+func (uc analyzeProjectUsecase) Process(ctx context.Context, projectRef string) (entity.AnalysisResults, error) {
+	project, err := uc.projectRepository.GetByReference(ctx, projectRef)
 	switch err {
 	case nil:
 		// do nothing
 	case repository.ErrProjectNoResults:
 		return entity.AnalysisResults{}, ErrProjectNotFound
 	default:
-		log.WithError(err).Error(fmt.Sprintf("unable to retrieve project %s", url))
+		log.WithError(err).Errorf("unable to retrieve project %s", projectRef)
 		return entity.AnalysisResults{}, ErrUnexpected
 	}
 
@@ -94,7 +94,7 @@ func (uc analyzeProjectUsecase) Process(ctx context.Context, url string) (entity
 				fileErrorSamples = append(fileErrorSamples, file.Error.Error())
 			}
 
-			log.WithError(file.Error).Warn(fmt.Sprintf("unable to read or parse file %s at %s", file.Name, project.SourceCode.Location))
+			log.WithError(file.Error).Warnf("unable to read or parse file %s at %s", file.Name, project.SourceCode.Location)
 			continue
 		}
 		valid = append(valid, file)
@@ -106,8 +106,8 @@ func (uc analyzeProjectUsecase) Process(ctx context.Context, url string) (entity
 
 	// if every file can't be parsed, then fail
 	if len(valid) == 0 {
-		log.Error(fmt.Sprintf("unable to read or parse any file on %s for project %s",
-			project.SourceCode.Location, analysisResults.ProjectName))
+		log.Errorf("unable to read or parse any file on %s for project %s",
+			project.SourceCode.Location, projectRef)
 		return entity.AnalysisResults{}, ErrUnableToBuildASTs
 	}
 
@@ -174,7 +174,7 @@ func (uc analyzeProjectUsecase) Process(ctx context.Context, url string) (entity
 
 	err = uc.analysisRepository.Add(ctx, analysisResults)
 	if err != nil {
-		log.WithError(err).Error(fmt.Sprintf("unable to save analysis results for project %s", analysisResults.ProjectName))
+		log.WithError(err).Errorf("unable to save analysis results for project %s", projectRef)
 		return entity.AnalysisResults{}, ErrUnableToSaveAnalysis
 	}
 

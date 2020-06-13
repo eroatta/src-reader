@@ -13,7 +13,7 @@ func TestToDTO_OnProjectMapper_ShouldReturnProjectDTO(t *testing.T) {
 	entity := entity.Project{
 		ID:        "715f17550be5f7222a815ff80966adaf",
 		Status:    "done",
-		URL:       "https://github.com/src-d/go-siva",
+		Reference: "src-d/go-siva",
 		CreatedAt: now,
 		Metadata: entity.Metadata{
 			RemoteID:      "69565817",
@@ -46,7 +46,7 @@ func TestToDTO_OnProjectMapper_ShouldReturnProjectDTO(t *testing.T) {
 
 	assert.Equal(t, "715f17550be5f7222a815ff80966adaf", dto.ID)
 	assert.Equal(t, "done", dto.Status)
-	assert.Equal(t, "https://github.com/src-d/go-siva", dto.Url)
+	assert.Equal(t, "src-d/go-siva", dto.ProjecRef)
 	assert.Equal(t, now, dto.CreatedAt)
 	assert.Equal(t, "69565817", dto.Metadata.RemoteID)
 	assert.Equal(t, "src-d", dto.Metadata.Owner)
@@ -73,7 +73,7 @@ func TestToEntity_OnProjectMapper_ShouldReturnProjectEntity(t *testing.T) {
 	dto := projectDTO{
 		ID:        "715f17550be5f7222a815ff80966adaf",
 		Status:    "done",
-		Url:       "https://github.com/src-d/go-siva",
+		ProjecRef: "src-d/go-siva",
 		CreatedAt: now,
 		Metadata: metadataDTO{
 			RemoteID:      "69565817",
@@ -106,7 +106,7 @@ func TestToEntity_OnProjectMapper_ShouldReturnProjectEntity(t *testing.T) {
 
 	assert.Equal(t, "715f17550be5f7222a815ff80966adaf", ent.ID)
 	assert.Equal(t, "done", ent.Status)
-	assert.Equal(t, "https://github.com/src-d/go-siva", ent.URL)
+	assert.Equal(t, "src-d/go-siva", ent.Reference)
 	assert.Equal(t, now, ent.CreatedAt)
 	assert.Equal(t, "69565817", ent.Metadata.RemoteID)
 	assert.Equal(t, "src-d", ent.Metadata.Owner)

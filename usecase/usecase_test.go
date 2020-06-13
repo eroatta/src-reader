@@ -9,17 +9,17 @@ import (
 
 // project repository mock
 type projectRepositoryMock struct {
-	project     entity.Project
-	getByURLErr error
-	addErr      error
+	project entity.Project
+	getErr  error
+	addErr  error
 }
 
 func (m projectRepositoryMock) Add(ctx context.Context, p entity.Project) error {
 	return m.addErr
 }
 
-func (m projectRepositoryMock) GetByURL(ctx context.Context, url string) (entity.Project, error) {
-	return m.project, m.getByURLErr
+func (m projectRepositoryMock) GetByReference(ctx context.Context, projectRef string) (entity.Project, error) {
+	return m.project, m.getErr
 }
 
 // end project repository mock

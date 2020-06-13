@@ -14,7 +14,7 @@ func (pm *projectMapper) toDTO(ent entity.Project) projectDTO {
 	return projectDTO{
 		ID:        ent.ID,
 		Status:    ent.Status,
-		Url:       ent.URL,
+		ProjecRef: ent.Reference,
 		CreatedAt: ent.CreatedAt,
 		Metadata: metadataDTO{
 			RemoteID:      ent.Metadata.RemoteID,
@@ -46,7 +46,7 @@ func (pm *projectMapper) toEntity(dto projectDTO) entity.Project {
 	return entity.Project{
 		ID:        dto.ID,
 		Status:    dto.Status,
-		URL:       dto.Url,
+		Reference: dto.ProjecRef,
 		CreatedAt: dto.CreatedAt,
 		Metadata: entity.Metadata{
 			RemoteID:      dto.Metadata.RemoteID,
@@ -76,7 +76,7 @@ func (pm *projectMapper) toEntity(dto projectDTO) entity.Project {
 type projectDTO struct {
 	ID         string        `bson:"_id"`
 	Status     string        `bson:"status"`
-	Url        string        `bson:"url"`
+	ProjecRef  string        `bson:"project_ref"`
 	CreatedAt  time.Time     `bson:"created_at"`
 	Metadata   metadataDTO   `bson:"metadata"`
 	SourceCode sourceCodeDTO `bson:"source_code"`

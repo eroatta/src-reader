@@ -40,22 +40,22 @@ func (pdb *ProjectDB) Add(ctx context.Context, project entity.Project) error {
 	return nil
 }
 
-// GetByURL finds an existing Project using the given URL as filter.
-func (pdb *ProjectDB) GetByURL(ctx context.Context, url string) (entity.Project, error) {
-	res := pdb.collection.FindOne(ctx, bson.M{"url": url})
+// GetByReference finds an existing Project using the given reference as filter.
+func (pdb *ProjectDB) GetByReference(ctx context.Context, projectRef string) (entity.Project, error) {
+	res := pdb.collection.FindOne(ctx, bson.M{"project_ref": projectRef})
 	switch res.Err() {
 	case nil:
 		// do nothing
 	case mongo.ErrNoDocuments:
 		return entity.Project{}, repository.ErrProjectNoResults
 	default:
-		log.WithError(res.Err()).Error(fmt.Sprintf("error searching record with url: %s", url))
+		log.WithError(res.Err()).Errorf("error searching record with reference: %s", projectRef)
 		return entity.Project{}, repository.ErrProjectUnexpected
 	}
 
 	var dto projectDTO
 	if err := res.Decode(&dto); err != nil {
-		log.WithError(err).Error(fmt.Sprintf("error decoding result for project with url: %s", url))
+		log.WithError(err).Errorf("error decoding result for project with reference: %s", projectRef)
 		return entity.Project{}, repository.ErrProjectUnexpected
 	}
 

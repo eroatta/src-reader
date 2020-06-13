@@ -49,7 +49,7 @@ func TestPOST_OnProjectCreationHandler_WithEmptyBody_ShouldReturnHTTP400(t *test
 			"name": "validation_error",
 			"message": "missing or invalid data",
 			"details": [
-				"invalid field 'repository' with value null or empty"
+				"invalid field 'reference' with value null or empty"
 			]
 		}`,
 		w.Body.String())
@@ -61,7 +61,7 @@ func TestPOST_OnProjectCreationHandler_WithWrongDataType_ShouldReturnHTTP400(t *
 
 	w := httptest.NewRecorder()
 	body := `{
-		"repository": 1
+		"reference": 1
 	}`
 	req, _ := http.NewRequest("POST", "/projects", strings.NewReader(body))
 	router.ServeHTTP(w, req)
@@ -72,7 +72,7 @@ func TestPOST_OnProjectCreationHandler_WithWrongDataType_ShouldReturnHTTP400(t *
 			"name": "validation_error",
 			"message": "missing or invalid data",
 			"details": [
-				"json: cannot unmarshal number into Go struct field postCreateProjectCommand.repository of type string"
+				"json: cannot unmarshal number into Go struct field postCreateProjectCommand.reference of type string"
 			]
 		}`,
 		w.Body.String())
@@ -84,7 +84,7 @@ func TestPOST_OnProjectCreationHandler_WithInvalidRepository_ShouldReturnHTTP400
 
 	w := httptest.NewRecorder()
 	body := `{
-		"repository": "./github.com/eroatta/src-reader"
+		"reference": "./github.com/eroatta/src-reader"
 	}`
 	req, _ := http.NewRequest("POST", "/projects", strings.NewReader(body))
 	router.ServeHTTP(w, req)
@@ -95,7 +95,7 @@ func TestPOST_OnProjectCreationHandler_WithInvalidRepository_ShouldReturnHTTP400
 			"name": "validation_error",
 			"message": "missing or invalid data",
 			"details": [
-				"invalid field 'repository' with value ./github.com/eroatta/src-reader"
+				"invalid field 'reference' with value ./github.com/eroatta/src-reader"
 			]
 		}`,
 		w.Body.String())
@@ -110,7 +110,7 @@ func TestPOST_OnProjectCreationHandler_WithInternalError_ShouldReturnHTTP500(t *
 
 	w := httptest.NewRecorder()
 	body := `{
-		"repository": "https://github.com/eroatta/src-reader"
+		"reference": "eroatta/src-reader"
 	}`
 	req, _ := http.NewRequest("POST", "/projects", strings.NewReader(body))
 	router.ServeHTTP(w, req)
@@ -132,9 +132,9 @@ func TestPOST_OnProjectCreationHandler_WithSuccess_ShouldReturnHTTP201(t *testin
 	router := rest.NewServer()
 	rest.RegisterCreateProjectUsecase(router, mockCreateUsecase{
 		p: entity.Project{
-			ID:     "715f17550be5f7222a815ff80966adaf",
-			Status: "done",
-			URL:    "https://github.com/src-d/go-siva",
+			ID:        "715f17550be5f7222a815ff80966adaf",
+			Status:    "done",
+			Reference: "src-d/go-siva",
 			Metadata: entity.Metadata{
 				RemoteID:      "69565817",
 				Owner:         "src-d",
@@ -165,7 +165,7 @@ func TestPOST_OnProjectCreationHandler_WithSuccess_ShouldReturnHTTP201(t *testin
 
 	w := httptest.NewRecorder()
 	body := `{
-		"repository": "https://github.com/src-d/go-siva"
+		"reference": "src-d/go-siva"
 	}`
 	req, _ := http.NewRequest("POST", "/projects", strings.NewReader(body))
 	router.ServeHTTP(w, req)
@@ -175,7 +175,7 @@ func TestPOST_OnProjectCreationHandler_WithSuccess_ShouldReturnHTTP201(t *testin
 		{
 			"id": "715f17550be5f7222a815ff80966adaf",
 			"status": "done",
-			"url": "https://github.com/src-d/go-siva",
+			"reference": "src-d/go-siva",
 			"metadata": {
 				"remote_id": "69565817",
 				"owner": "src-d",

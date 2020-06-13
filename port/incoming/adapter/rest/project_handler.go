@@ -2,21 +2,33 @@ package rest
 
 import (
 	"net/http"
+	"regexp"
 	"time"
 
 	"github.com/eroatta/src-reader/usecase"
 	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator"
 	log "github.com/sirupsen/logrus"
 )
 
+func init() {
+	regex := regexp.MustCompile(`^[a-zA-Z0-9-_]+/[a-zA-Z0-9-_]+$`)
+	err := requestValidator.RegisterValidation("reference", func(fl validator.FieldLevel) bool {
+		return regex.MatchString(fl.Field().String())
+	})
+	if err != nil {
+		log.WithError(err).Panic("unable to configure validators")
+	}
+}
+
 type postCreateProjectCommand struct {
-	Repository string `json:"repository" validate:"url"`
+	Reference string `json:"reference" validate:"reference"`
 }
 
 type projectResponse struct {
 	ID         string             `json:"id"`
 	Status     string             `json:"status"`
-	URL        string             `json:"url"`
+	Reference  string             `json:"reference"`
 	Metadata   metadataResponse   `json:"metadata"`
 	SourceCode sourcecodeResponse `json:"source_code"`
 }
@@ -69,7 +81,7 @@ func createProject(ctx *gin.Context, uc usecase.CreateProjectUsecase) {
 		return
 	}
 
-	p, err := uc.Process(ctx, cmd.Repository)
+	p, err := uc.Process(ctx, cmd.Reference)
 	if err != nil {
 		log.WithError(err).Error("unexpected error executing createProjectUsecase")
 		setInternalErrorResponse(ctx, err)
@@ -77,9 +89,9 @@ func createProject(ctx *gin.Context, uc usecase.CreateProjectUsecase) {
 	}
 
 	response := projectResponse{
-		ID:     p.ID,
-		Status: p.Status,
-		URL:    p.URL,
+		ID:        p.ID,
+		Status:    p.Status,
+		Reference: p.Reference,
 		Metadata: metadataResponse{
 			RemoteID:      p.Metadata.RemoteID,
 			Owner:         p.Metadata.Owner,

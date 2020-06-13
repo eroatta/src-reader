@@ -34,8 +34,7 @@ type rewrittenFileUsecase struct {
 }
 
 func (uc *rewrittenFileUsecase) Process(ctx context.Context, projectRef string, filename string) ([]byte, error) {
-	// TODO: review how to handle URLs
-	project, err := uc.pr.GetByURL(ctx, fmt.Sprintf("https://github.com/%s", projectRef))
+	project, err := uc.pr.GetByReference(ctx, projectRef)
 	switch err {
 	case nil:
 		// do nothing

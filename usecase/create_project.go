@@ -2,13 +2,12 @@ package usecase
 
 import (
 	"context"
-	"crypto/md5"
 	"errors"
-	"fmt"
 	"time"
 
 	"github.com/eroatta/src-reader/entity"
 	"github.com/eroatta/src-reader/repository"
+	"github.com/google/uuid"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -49,38 +48,39 @@ type createProjectUsecase struct {
 }
 
 // Process executes the pipeline to import a project from GitHub. It returns the project information.
-func (uc createProjectUsecase) Process(ctx context.Context, url string) (entity.Project, error) {
+func (uc createProjectUsecase) Process(ctx context.Context, projectRef string) (entity.Project, error) {
 	// check if not previously imported
-	project, err := uc.projectRepository.GetByURL(ctx, url)
+	project, err := uc.projectRepository.GetByReference(ctx, projectRef)
 	switch err {
 	case nil:
 		return project, nil
 	case repository.ErrProjectNoResults:
 		// continue
 	default:
-		log.WithError(err).Error(fmt.Sprintf("unable to retrieve project for %s", url))
+		log.WithError(err).Errorf("unable to retrieve project for %s", projectRef)
 		return entity.Project{}, ErrUnableToReadProject
 	}
 
 	// retrieve metadata
-	metadata, err := uc.metadataRepository.RetrieveMetadata(ctx, url)
+	metadata, err := uc.metadataRepository.RetrieveMetadata(ctx, projectRef)
 	if err != nil {
-		log.WithError(err).Error(fmt.Sprintf("unable to retrive metadata for %s", url))
+		log.WithError(err).Errorf("unable to retrive metadata for %s", projectRef)
 		return entity.Project{}, ErrUnableToRetrieveMetadata
 	}
 
+	id, _ := uuid.NewUUID()
 	project = entity.Project{
-		ID:        fmt.Sprintf("%x", md5.Sum([]byte(metadata.Fullname))),
-		URL:       url,
+		ID:        id.String(),
+		Reference: projectRef,
 		CreatedAt: time.Now(),
 		Metadata:  metadata,
 		Status:    "in_process",
 	}
 
 	// clone the source code
-	sourceCode, err := uc.sourceCodeRepository.Clone(ctx, project.Metadata.Fullname, project.Metadata.CloneURL)
+	sourceCode, err := uc.sourceCodeRepository.Clone(ctx, projectRef, project.Metadata.CloneURL)
 	if err != nil {
-		log.WithError(err).Error(fmt.Sprintf("unable to clone source code for %s", url))
+		log.WithError(err).Errorf("unable to clone source code for %s", projectRef)
 		return entity.Project{}, ErrUnableToCloneSourceCode
 	}
 	project.SourceCode = sourceCode
@@ -90,7 +90,7 @@ func (uc createProjectUsecase) Process(ctx context.Context, url string) (entity.
 	err = uc.projectRepository.Add(ctx, project)
 	if err != nil {
 		defer uc.sourceCodeRepository.Remove(ctx, sourceCode.Location)
-		log.WithError(err).Error(fmt.Sprintf("unable to save project for %s", url))
+		log.WithError(err).Errorf("unable to save project for %s", projectRef)
 		return entity.Project{}, ErrUnableToSaveProject
 	}
 

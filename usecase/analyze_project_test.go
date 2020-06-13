@@ -22,13 +22,13 @@ func TestNewAnalyzeProjectUsecase_ShouldReturnNewInstance(t *testing.T) {
 
 func TestProcess_OnAnalyzeProjectUsecase_WhenNoProjectFound_ShouldReturnError(t *testing.T) {
 	projectRepositoryMock := projectRepositoryMock{
-		project:     entity.Project{},
-		getByURLErr: repository.ErrProjectNoResults,
+		project: entity.Project{},
+		getErr:  repository.ErrProjectNoResults,
 	}
 
 	uc := usecase.NewAnalyzeProjectUsecase(projectRepositoryMock, nil, nil, nil, &entity.AnalysisConfig{})
 
-	results, err := uc.Process(context.TODO(), "httproject://github.com/eroatta/test")
+	results, err := uc.Process(context.TODO(), "eroatta/test")
 
 	assert.EqualError(t, err, usecase.ErrProjectNotFound.Error())
 	assert.Empty(t, results)
@@ -36,13 +36,13 @@ func TestProcess_OnAnalyzeProjectUsecase_WhenNoProjectFound_ShouldReturnError(t 
 
 func TestProcess_OnAnalyzeProjectUsecase_WhenFailingToRetrieveProject_ShouldReturnError(t *testing.T) {
 	projectRepositoryMock := projectRepositoryMock{
-		project:     entity.Project{},
-		getByURLErr: repository.ErrProjectUnexpected,
+		project: entity.Project{},
+		getErr:  repository.ErrProjectUnexpected,
 	}
 
 	uc := usecase.NewAnalyzeProjectUsecase(projectRepositoryMock, nil, nil, nil, &entity.AnalysisConfig{})
 
-	results, err := uc.Process(context.TODO(), "httproject://github.com/eroatta/test")
+	results, err := uc.Process(context.TODO(), "eroatta/test")
 
 	assert.EqualError(t, err, usecase.ErrUnexpected.Error())
 	assert.Empty(t, results)
@@ -50,7 +50,7 @@ func TestProcess_OnAnalyzeProjectUsecase_WhenFailingToRetrieveProject_ShouldRetu
 
 func TestProcess_OnAnalyzeProjectUsecase_WhenFailingToReadFiles_ShouldReturnError(t *testing.T) {
 	project := entity.Project{
-		URL: "https://github.com/eroatta/test",
+		Reference: "eroatta/test",
 		SourceCode: entity.SourceCode{
 			Hash:     "asdf1234asdf",
 			Location: "/tmp/repositories/eroatta/test",
@@ -68,7 +68,7 @@ func TestProcess_OnAnalyzeProjectUsecase_WhenFailingToReadFiles_ShouldReturnErro
 
 	uc := usecase.NewAnalyzeProjectUsecase(projectRepositoryMock, sourceCodeRepositoryMock, nil, nil, &entity.AnalysisConfig{})
 
-	results, err := uc.Process(context.TODO(), "httproject://github.com/eroatta/test")
+	results, err := uc.Process(context.TODO(), "eroatta/test")
 
 	assert.EqualError(t, err, usecase.ErrUnableToBuildASTs.Error())
 	assert.Empty(t, results)
@@ -76,7 +76,7 @@ func TestProcess_OnAnalyzeProjectUsecase_WhenFailingToReadFiles_ShouldReturnErro
 
 func TestProcess_OnAnalyzeProjectUsecase_WhenFailingToParseFiles_ShouldReturnError(t *testing.T) {
 	project := entity.Project{
-		URL: "https://github.com/eroatta/test",
+		Reference: "eroatta/test",
 		SourceCode: entity.SourceCode{
 			Hash:     "asdf1234asdf",
 			Location: "/tmp/repositories/eroatta/test",
@@ -96,7 +96,7 @@ func TestProcess_OnAnalyzeProjectUsecase_WhenFailingToParseFiles_ShouldReturnErr
 
 	uc := usecase.NewAnalyzeProjectUsecase(projectRepositoryMock, sourceCodeRepositoryMock, nil, nil, &entity.AnalysisConfig{})
 
-	results, err := uc.Process(context.TODO(), "https://github.com/eroatta/test")
+	results, err := uc.Process(context.TODO(), "eroatta/test")
 
 	assert.EqualError(t, err, usecase.ErrUnableToBuildASTs.Error())
 	assert.Empty(t, results)
@@ -104,7 +104,7 @@ func TestProcess_OnAnalyzeProjectUsecase_WhenFailingToParseFiles_ShouldReturnErr
 
 func TestProcess_OnAnalyzeProjectUsecase_WhenFailingToCreateSplitters_ShouldReturnError(t *testing.T) {
 	project := entity.Project{
-		URL: "https://github.com/eroatta/test",
+		Reference: "eroatta/test",
 		SourceCode: entity.SourceCode{
 			Hash:     "asdf1234asdf",
 			Location: "/tmp/repositories/eroatta/test",
@@ -128,7 +128,7 @@ func TestProcess_OnAnalyzeProjectUsecase_WhenFailingToCreateSplitters_ShouldRetu
 	}
 	uc := usecase.NewAnalyzeProjectUsecase(projectRepositoryMock, sourceCodeRepositoryMock, nil, nil, config)
 
-	results, err := uc.Process(context.TODO(), "https://github.com/eroatta/test")
+	results, err := uc.Process(context.TODO(), "eroatta/test")
 
 	assert.EqualError(t, err, usecase.ErrUnableToCreateProcessors.Error())
 	assert.Empty(t, results)
@@ -136,7 +136,7 @@ func TestProcess_OnAnalyzeProjectUsecase_WhenFailingToCreateSplitters_ShouldRetu
 
 func TestProcess_OnAnalyzeProjectUsecase_WhenFailingToCreateExpanders_ShouldReturnError(t *testing.T) {
 	project := entity.Project{
-		URL: "https://github.com/eroatta/test",
+		Reference: "eroatta/test",
 		SourceCode: entity.SourceCode{
 			Hash:     "asdf1234asdf",
 			Location: "/tmp/repositories/eroatta/test",
@@ -162,7 +162,7 @@ func TestProcess_OnAnalyzeProjectUsecase_WhenFailingToCreateExpanders_ShouldRetu
 	}
 	uc := usecase.NewAnalyzeProjectUsecase(projectRepositoryMock, sourceCodeRepositoryMock, nil, nil, config)
 
-	results, err := uc.Process(context.TODO(), "https://github.com/eroatta/test")
+	results, err := uc.Process(context.TODO(), "eroatta/test")
 
 	assert.EqualError(t, err, usecase.ErrUnableToCreateProcessors.Error())
 	assert.Empty(t, results)
@@ -170,7 +170,7 @@ func TestProcess_OnAnalyzeProjectUsecase_WhenFailingToCreateExpanders_ShouldRetu
 
 func TestProcess_OnAnalyzeProjectUsecase_WhenFailingToSaveIdentifiers_ShouldReturnError(t *testing.T) {
 	project := entity.Project{
-		URL: "https://github.com/eroatta/test",
+		Reference: "eroatta/test",
 		SourceCode: entity.SourceCode{
 			Hash:     "asdf1234asdf",
 			Location: "/tmp/repositories/eroatta/test",
@@ -202,7 +202,7 @@ func TestProcess_OnAnalyzeProjectUsecase_WhenFailingToSaveIdentifiers_ShouldRetu
 	}
 	uc := usecase.NewAnalyzeProjectUsecase(projectRepositoryMock, sourceCodeRepositoryMock, identifierRepositoryMock, nil, config)
 
-	results, err := uc.Process(context.TODO(), "https://github.com/eroatta/test")
+	results, err := uc.Process(context.TODO(), "eroatta/test")
 
 	assert.EqualError(t, err, usecase.ErrUnableToSaveIdentifiers.Error())
 	assert.Empty(t, results)
@@ -210,7 +210,7 @@ func TestProcess_OnAnalyzeProjectUsecase_WhenFailingToSaveIdentifiers_ShouldRetu
 
 func TestProcess_OnAnalyzeProjectUsecase_WhenFailingToSaveAnalysis_ShouldReturnError(t *testing.T) {
 	project := entity.Project{
-		URL: "https://github.com/eroatta/test",
+		Reference: "eroatta/test",
 		SourceCode: entity.SourceCode{
 			Hash:     "asdf1234asdf",
 			Location: "/tmp/repositories/eroatta/test",
@@ -246,7 +246,7 @@ func TestProcess_OnAnalyzeProjectUsecase_WhenFailingToSaveAnalysis_ShouldReturnE
 	}
 	uc := usecase.NewAnalyzeProjectUsecase(projectRepositoryMock, sourceCodeRepositoryMock, identifierRepositoryMock, analysisRepositoryMock, config)
 
-	results, err := uc.Process(context.TODO(), "https://github.com/eroatta/test")
+	results, err := uc.Process(context.TODO(), "eroatta/test")
 
 	assert.EqualError(t, err, usecase.ErrUnableToSaveAnalysis.Error())
 	assert.Empty(t, results)
@@ -254,8 +254,8 @@ func TestProcess_OnAnalyzeProjectUsecase_WhenFailingToSaveAnalysis_ShouldReturnE
 
 func TestProcess_OnAnalyzeProjectUsecase_WhenAnalyzingIdentifiers_ShouldReturnAnalysisResults(t *testing.T) {
 	project := entity.Project{
-		ID:  "asadfasa345asdfasdfa",
-		URL: "https://github.com/eroatta/test",
+		ID:        "asadfasa345asdfasdfa",
+		Reference: "eroatta/test",
 		Metadata: entity.Metadata{
 			Fullname: "eroatta/test",
 		},
@@ -295,7 +295,7 @@ func TestProcess_OnAnalyzeProjectUsecase_WhenAnalyzingIdentifiers_ShouldReturnAn
 	uc := usecase.NewAnalyzeProjectUsecase(projectRepositoryMock, sourceCodeRepositoryMock,
 		identifierRepositoryMock, analysisRepositoryMock, config)
 
-	results, err := uc.Process(context.TODO(), "https://github.com/eroatta/test")
+	results, err := uc.Process(context.TODO(), "eroatta/test")
 
 	assert.NoError(t, err)
 	assert.Equal(t, "asadfasa345asdfasdfa", results.ID)
