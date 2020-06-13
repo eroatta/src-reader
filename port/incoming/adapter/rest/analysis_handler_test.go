@@ -11,7 +11,7 @@ import (
 
 	"github.com/eroatta/src-reader/entity"
 	"github.com/eroatta/src-reader/port/incoming/adapter/rest"
-	"github.com/eroatta/src-reader/usecase/analyze"
+	"github.com/eroatta/src-reader/usecase"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -106,7 +106,7 @@ func TestPOST_OnAnalysisCreationHandler_WithNotFoundProject_ShouldReturnHTTP400(
 	router := rest.NewServer()
 	rest.RegisterAnalyzeProjectUsecase(router, mockAnalyzeUsecase{
 		a:   entity.AnalysisResults{},
-		err: analyze.ErrProjectNotFound,
+		err: usecase.ErrProjectNotFound,
 	})
 
 	w := httptest.NewRecorder()
@@ -227,6 +227,6 @@ type mockAnalyzeUsecase struct {
 	err error
 }
 
-func (m mockAnalyzeUsecase) Analyze(ctx context.Context, url string) (entity.AnalysisResults, error) {
+func (m mockAnalyzeUsecase) Process(ctx context.Context, url string) (entity.AnalysisResults, error) {
 	return m.a, m.err
 }

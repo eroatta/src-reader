@@ -1,4 +1,4 @@
-package analyze
+package usecase
 
 import (
 	"context"
@@ -8,7 +8,7 @@ import (
 
 	"github.com/eroatta/src-reader/entity"
 	"github.com/eroatta/src-reader/repository"
-	"github.com/eroatta/src-reader/usecase/analyze/step"
+	"github.com/eroatta/src-reader/usecase/step"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -34,8 +34,8 @@ var (
 
 // AnalyzeProjectUsecase defines the contract for the use case related to the analysis process of a project.
 type AnalyzeProjectUsecase interface {
-	// Analyze processes the given Project, based on the configuration provided by the AnalysisConfig.
-	Analyze(ctx context.Context, url string) (entity.AnalysisResults, error)
+	// Process performs the splitting and expansion process on the source code belonging to the Project.
+	Process(ctx context.Context, projectRef string) (entity.AnalysisResults, error)
 }
 
 // NewAnalyzeProjectUsecase initializes a new AnalyzeProjectUsecase handler.
@@ -58,10 +58,10 @@ type analyzeProjectUsecase struct {
 	defaultConfig        *entity.AnalysisConfig
 }
 
-// Analyze processes the given Project, based on the configuration provided by the AnalysisConfig.
+// Process processes the given Project, based on the configuration provided by the AnalysisConfig.
 // The process reads the source code, applies the given miners, splitters and expanders and then stores the results.
 // It's the default implementation for the use case.
-func (uc analyzeProjectUsecase) Analyze(ctx context.Context, url string) (entity.AnalysisResults, error) {
+func (uc analyzeProjectUsecase) Process(ctx context.Context, url string) (entity.AnalysisResults, error) {
 	project, err := uc.projectRepository.GetByURL(ctx, url)
 	switch err {
 	case nil:

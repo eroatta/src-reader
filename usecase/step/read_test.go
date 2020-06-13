@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/eroatta/src-reader/entity"
-	"github.com/eroatta/src-reader/usecase/analyze/step"
+	"github.com/eroatta/src-reader/usecase/step"
 	"github.com/stretchr/testify/assert"
 )
 

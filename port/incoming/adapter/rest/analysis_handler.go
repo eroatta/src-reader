@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/eroatta/src-reader/usecase/analyze"
+	"github.com/eroatta/src-reader/usecase"
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
 )
@@ -32,7 +32,7 @@ type summaryResponse struct {
 	ErrorSamples []string `json:"error_samples"`
 }
 
-func RegisterAnalyzeProjectUsecase(r *gin.Engine, uc analyze.AnalyzeProjectUsecase) *gin.Engine {
+func RegisterAnalyzeProjectUsecase(r *gin.Engine, uc usecase.AnalyzeProjectUsecase) *gin.Engine {
 	r.POST("/analysis", func(c *gin.Context) {
 		createAnalysis(c, uc)
 	})
@@ -43,7 +43,7 @@ func RegisterAnalyzeProjectUsecase(r *gin.Engine, uc analyze.AnalyzeProjectUseca
 	return r
 }
 
-func createAnalysis(ctx *gin.Context, uc analyze.AnalyzeProjectUsecase) {
+func createAnalysis(ctx *gin.Context, uc usecase.AnalyzeProjectUsecase) {
 	var cmd createAnalysisCommand
 
 	if err := ctx.ShouldBindJSON(&cmd); err != nil {
@@ -58,11 +58,11 @@ func createAnalysis(ctx *gin.Context, uc analyze.AnalyzeProjectUsecase) {
 		return
 	}
 
-	analysis, err := uc.Analyze(ctx, cmd.Repository)
+	analysis, err := uc.Process(ctx, cmd.Repository)
 	switch err {
 	case nil:
 		// do nothing
-	case analyze.ErrProjectNotFound:
+	case usecase.ErrProjectNotFound:
 		setBadRequestResponse(ctx, fmt.Errorf("non-existing repository %s", cmd.Repository))
 		return
 	default:

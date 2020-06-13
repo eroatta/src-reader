@@ -1,4 +1,4 @@
-package analyze_test
+package usecase_test
 
 import (
 	"context"
@@ -10,45 +10,45 @@ import (
 	"github.com/eroatta/src-reader/entity"
 	"github.com/eroatta/src-reader/port/outgoing/adapter/algorithm/splitter"
 	"github.com/eroatta/src-reader/repository"
-	"github.com/eroatta/src-reader/usecase/analyze"
+	"github.com/eroatta/src-reader/usecase"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestNewAnalyzeProjectUsecase_ShouldReturnNewInstance(t *testing.T) {
-	uc := analyze.NewAnalyzeProjectUsecase(nil, nil, nil, nil, nil)
+	uc := usecase.NewAnalyzeProjectUsecase(nil, nil, nil, nil, nil)
 
 	assert.Empty(t, uc)
 }
 
-func TestAnalyze_OnAnalyzeProjectUsecase_WhenNoProjectFound_ShouldReturnError(t *testing.T) {
+func TestProcess_OnAnalyzeProjectUsecase_WhenNoProjectFound_ShouldReturnError(t *testing.T) {
 	projectRepositoryMock := projectRepositoryMock{
-		p:   entity.Project{},
-		err: repository.ErrProjectNoResults,
+		project:     entity.Project{},
+		getByURLErr: repository.ErrProjectNoResults,
 	}
 
-	uc := analyze.NewAnalyzeProjectUsecase(projectRepositoryMock, nil, nil, nil, &entity.AnalysisConfig{})
+	uc := usecase.NewAnalyzeProjectUsecase(projectRepositoryMock, nil, nil, nil, &entity.AnalysisConfig{})
 
-	results, err := uc.Analyze(context.TODO(), "http://github.com/eroatta/test")
+	results, err := uc.Process(context.TODO(), "httproject://github.com/eroatta/test")
 
-	assert.EqualError(t, err, analyze.ErrProjectNotFound.Error())
+	assert.EqualError(t, err, usecase.ErrProjectNotFound.Error())
 	assert.Empty(t, results)
 }
 
-func TestAnalyze_OnAnalyzeProjectUsecase_WhenFailingToRetrieveProject_ShouldReturnError(t *testing.T) {
+func TestProcess_OnAnalyzeProjectUsecase_WhenFailingToRetrieveProject_ShouldReturnError(t *testing.T) {
 	projectRepositoryMock := projectRepositoryMock{
-		p:   entity.Project{},
-		err: repository.ErrProjectUnexpected,
+		project:     entity.Project{},
+		getByURLErr: repository.ErrProjectUnexpected,
 	}
 
-	uc := analyze.NewAnalyzeProjectUsecase(projectRepositoryMock, nil, nil, nil, &entity.AnalysisConfig{})
+	uc := usecase.NewAnalyzeProjectUsecase(projectRepositoryMock, nil, nil, nil, &entity.AnalysisConfig{})
 
-	results, err := uc.Analyze(context.TODO(), "http://github.com/eroatta/test")
+	results, err := uc.Process(context.TODO(), "httproject://github.com/eroatta/test")
 
-	assert.EqualError(t, err, analyze.ErrUnexpected.Error())
+	assert.EqualError(t, err, usecase.ErrUnexpected.Error())
 	assert.Empty(t, results)
 }
 
-func TestAnalyze_OnAnalyzeProjectUsecase_WhenFailingToReadFiles_ShouldReturnError(t *testing.T) {
+func TestProcess_OnAnalyzeProjectUsecase_WhenFailingToReadFiles_ShouldReturnError(t *testing.T) {
 	project := entity.Project{
 		URL: "https://github.com/eroatta/test",
 		SourceCode: entity.SourceCode{
@@ -58,8 +58,7 @@ func TestAnalyze_OnAnalyzeProjectUsecase_WhenFailingToReadFiles_ShouldReturnErro
 		},
 	}
 	projectRepositoryMock := projectRepositoryMock{
-		p:   project,
-		err: nil,
+		project: project,
 	}
 
 	sourceCodeRepositoryMock := sourceCodeFileReaderMock{
@@ -67,15 +66,15 @@ func TestAnalyze_OnAnalyzeProjectUsecase_WhenFailingToReadFiles_ShouldReturnErro
 		err:   repository.ErrSourceCodeUnableReadFile,
 	}
 
-	uc := analyze.NewAnalyzeProjectUsecase(projectRepositoryMock, sourceCodeRepositoryMock, nil, nil, &entity.AnalysisConfig{})
+	uc := usecase.NewAnalyzeProjectUsecase(projectRepositoryMock, sourceCodeRepositoryMock, nil, nil, &entity.AnalysisConfig{})
 
-	results, err := uc.Analyze(context.TODO(), "http://github.com/eroatta/test")
+	results, err := uc.Process(context.TODO(), "httproject://github.com/eroatta/test")
 
-	assert.EqualError(t, err, analyze.ErrUnableToBuildASTs.Error())
+	assert.EqualError(t, err, usecase.ErrUnableToBuildASTs.Error())
 	assert.Empty(t, results)
 }
 
-func TestAnalyze_OnAnalyzeProjectUsecase_WhenFailingToParseFiles_ShouldReturnError(t *testing.T) {
+func TestProcess_OnAnalyzeProjectUsecase_WhenFailingToParseFiles_ShouldReturnError(t *testing.T) {
 	project := entity.Project{
 		URL: "https://github.com/eroatta/test",
 		SourceCode: entity.SourceCode{
@@ -85,8 +84,7 @@ func TestAnalyze_OnAnalyzeProjectUsecase_WhenFailingToParseFiles_ShouldReturnErr
 		},
 	}
 	projectRepositoryMock := projectRepositoryMock{
-		p:   project,
-		err: nil,
+		project: project,
 	}
 
 	sourceCodeRepositoryMock := sourceCodeFileReaderMock{
@@ -96,15 +94,15 @@ func TestAnalyze_OnAnalyzeProjectUsecase_WhenFailingToParseFiles_ShouldReturnErr
 		err: nil,
 	}
 
-	uc := analyze.NewAnalyzeProjectUsecase(projectRepositoryMock, sourceCodeRepositoryMock, nil, nil, &entity.AnalysisConfig{})
+	uc := usecase.NewAnalyzeProjectUsecase(projectRepositoryMock, sourceCodeRepositoryMock, nil, nil, &entity.AnalysisConfig{})
 
-	results, err := uc.Analyze(context.TODO(), "https://github.com/eroatta/test")
+	results, err := uc.Process(context.TODO(), "https://github.com/eroatta/test")
 
-	assert.EqualError(t, err, analyze.ErrUnableToBuildASTs.Error())
+	assert.EqualError(t, err, usecase.ErrUnableToBuildASTs.Error())
 	assert.Empty(t, results)
 }
 
-func TestAnalyze_OnAnalyzeProjectUsecase_WhenFailingToCreateSplitters_ShouldReturnError(t *testing.T) {
+func TestProcess_OnAnalyzeProjectUsecase_WhenFailingToCreateSplitters_ShouldReturnError(t *testing.T) {
 	project := entity.Project{
 		URL: "https://github.com/eroatta/test",
 		SourceCode: entity.SourceCode{
@@ -114,8 +112,7 @@ func TestAnalyze_OnAnalyzeProjectUsecase_WhenFailingToCreateSplitters_ShouldRetu
 		},
 	}
 	projectRepositoryMock := projectRepositoryMock{
-		p:   project,
-		err: nil,
+		project: project,
 	}
 
 	sourceCodeRepositoryMock := sourceCodeFileReaderMock{
@@ -129,15 +126,15 @@ func TestAnalyze_OnAnalyzeProjectUsecase_WhenFailingToCreateSplitters_ShouldRetu
 		Miners:    []string{},
 		Splitters: []string{},
 	}
-	uc := analyze.NewAnalyzeProjectUsecase(projectRepositoryMock, sourceCodeRepositoryMock, nil, nil, config)
+	uc := usecase.NewAnalyzeProjectUsecase(projectRepositoryMock, sourceCodeRepositoryMock, nil, nil, config)
 
-	results, err := uc.Analyze(context.TODO(), "https://github.com/eroatta/test")
+	results, err := uc.Process(context.TODO(), "https://github.com/eroatta/test")
 
-	assert.EqualError(t, err, analyze.ErrUnableToCreateProcessors.Error())
+	assert.EqualError(t, err, usecase.ErrUnableToCreateProcessors.Error())
 	assert.Empty(t, results)
 }
 
-func TestAnalyze_OnAnalyzeProjectUsecase_WhenFailingToCreateExpanders_ShouldReturnError(t *testing.T) {
+func TestProcess_OnAnalyzeProjectUsecase_WhenFailingToCreateExpanders_ShouldReturnError(t *testing.T) {
 	project := entity.Project{
 		URL: "https://github.com/eroatta/test",
 		SourceCode: entity.SourceCode{
@@ -147,8 +144,7 @@ func TestAnalyze_OnAnalyzeProjectUsecase_WhenFailingToCreateExpanders_ShouldRetu
 		},
 	}
 	projectRepositoryMock := projectRepositoryMock{
-		p:   project,
-		err: nil,
+		project: project,
 	}
 
 	sourceCodeRepositoryMock := sourceCodeFileReaderMock{
@@ -164,15 +160,15 @@ func TestAnalyze_OnAnalyzeProjectUsecase_WhenFailingToCreateExpanders_ShouldRetu
 		SplittingAlgorithmFactory: splitter.NewSplitterFactory(),
 		Expanders:                 []string{},
 	}
-	uc := analyze.NewAnalyzeProjectUsecase(projectRepositoryMock, sourceCodeRepositoryMock, nil, nil, config)
+	uc := usecase.NewAnalyzeProjectUsecase(projectRepositoryMock, sourceCodeRepositoryMock, nil, nil, config)
 
-	results, err := uc.Analyze(context.TODO(), "https://github.com/eroatta/test")
+	results, err := uc.Process(context.TODO(), "https://github.com/eroatta/test")
 
-	assert.EqualError(t, err, analyze.ErrUnableToCreateProcessors.Error())
+	assert.EqualError(t, err, usecase.ErrUnableToCreateProcessors.Error())
 	assert.Empty(t, results)
 }
 
-func TestAnalyze_OnAnalyzeProjectUsecase_WhenFailingToSaveIdentifiers_ShouldReturnError(t *testing.T) {
+func TestProcess_OnAnalyzeProjectUsecase_WhenFailingToSaveIdentifiers_ShouldReturnError(t *testing.T) {
 	project := entity.Project{
 		URL: "https://github.com/eroatta/test",
 		SourceCode: entity.SourceCode{
@@ -182,8 +178,7 @@ func TestAnalyze_OnAnalyzeProjectUsecase_WhenFailingToSaveIdentifiers_ShouldRetu
 		},
 	}
 	projectRepositoryMock := projectRepositoryMock{
-		p:   project,
-		err: nil,
+		project: project,
 	}
 
 	sourceCodeRepositoryMock := sourceCodeFileReaderMock{
@@ -205,15 +200,15 @@ func TestAnalyze_OnAnalyzeProjectUsecase_WhenFailingToSaveIdentifiers_ShouldRetu
 		Expanders:                 []string{"mock"},
 		ExpansionAlgorithmFactory: expanderAbstractFactoryMock{},
 	}
-	uc := analyze.NewAnalyzeProjectUsecase(projectRepositoryMock, sourceCodeRepositoryMock, identifierRepositoryMock, nil, config)
+	uc := usecase.NewAnalyzeProjectUsecase(projectRepositoryMock, sourceCodeRepositoryMock, identifierRepositoryMock, nil, config)
 
-	results, err := uc.Analyze(context.TODO(), "https://github.com/eroatta/test")
+	results, err := uc.Process(context.TODO(), "https://github.com/eroatta/test")
 
-	assert.EqualError(t, err, analyze.ErrUnableToSaveIdentifiers.Error())
+	assert.EqualError(t, err, usecase.ErrUnableToSaveIdentifiers.Error())
 	assert.Empty(t, results)
 }
 
-func TestAnalyze_OnAnalyzeProjectUsecase_WhenFailingToSaveAnalysis_ShouldReturnError(t *testing.T) {
+func TestProcess_OnAnalyzeProjectUsecase_WhenFailingToSaveAnalysis_ShouldReturnError(t *testing.T) {
 	project := entity.Project{
 		URL: "https://github.com/eroatta/test",
 		SourceCode: entity.SourceCode{
@@ -223,8 +218,7 @@ func TestAnalyze_OnAnalyzeProjectUsecase_WhenFailingToSaveAnalysis_ShouldReturnE
 		},
 	}
 	projectRepositoryMock := projectRepositoryMock{
-		p:   project,
-		err: nil,
+		project: project,
 	}
 
 	sourceCodeRepositoryMock := sourceCodeFileReaderMock{
@@ -250,15 +244,15 @@ func TestAnalyze_OnAnalyzeProjectUsecase_WhenFailingToSaveAnalysis_ShouldReturnE
 		Expanders:                 []string{"mock"},
 		ExpansionAlgorithmFactory: expanderAbstractFactoryMock{},
 	}
-	uc := analyze.NewAnalyzeProjectUsecase(projectRepositoryMock, sourceCodeRepositoryMock, identifierRepositoryMock, analysisRepositoryMock, config)
+	uc := usecase.NewAnalyzeProjectUsecase(projectRepositoryMock, sourceCodeRepositoryMock, identifierRepositoryMock, analysisRepositoryMock, config)
 
-	results, err := uc.Analyze(context.TODO(), "https://github.com/eroatta/test")
+	results, err := uc.Process(context.TODO(), "https://github.com/eroatta/test")
 
-	assert.EqualError(t, err, analyze.ErrUnableToSaveAnalysis.Error())
+	assert.EqualError(t, err, usecase.ErrUnableToSaveAnalysis.Error())
 	assert.Empty(t, results)
 }
 
-func TestAnalyze_OnAnalyzeProjectUsecase_WhenAnalyzingIdentifiers_ShouldReturnAnalysisResults(t *testing.T) {
+func TestProcess_OnAnalyzeProjectUsecase_WhenAnalyzingIdentifiers_ShouldReturnAnalysisResults(t *testing.T) {
 	project := entity.Project{
 		ID:  "asadfasa345asdfasdfa",
 		URL: "https://github.com/eroatta/test",
@@ -272,8 +266,7 @@ func TestAnalyze_OnAnalyzeProjectUsecase_WhenAnalyzingIdentifiers_ShouldReturnAn
 		},
 	}
 	projectRepositoryMock := projectRepositoryMock{
-		p:   project,
-		err: nil,
+		project: project,
 	}
 
 	sourceCodeRepositoryMock := sourceCodeFileReaderMock{
@@ -299,10 +292,10 @@ func TestAnalyze_OnAnalyzeProjectUsecase_WhenAnalyzingIdentifiers_ShouldReturnAn
 		Expanders:                 []string{"mock"},
 		ExpansionAlgorithmFactory: expanderAbstractFactoryMock{},
 	}
-	uc := analyze.NewAnalyzeProjectUsecase(projectRepositoryMock, sourceCodeRepositoryMock,
+	uc := usecase.NewAnalyzeProjectUsecase(projectRepositoryMock, sourceCodeRepositoryMock,
 		identifierRepositoryMock, analysisRepositoryMock, config)
 
-	results, err := uc.Analyze(context.TODO(), "https://github.com/eroatta/test")
+	results, err := uc.Process(context.TODO(), "https://github.com/eroatta/test")
 
 	assert.NoError(t, err)
 	assert.Equal(t, "asadfasa345asdfasdfa", results.ID)
@@ -318,19 +311,6 @@ func TestAnalyze_OnAnalyzeProjectUsecase_WhenAnalyzingIdentifiers_ShouldReturnAn
 	assert.Equal(t, 1, results.IdentifiersValid)
 	assert.Equal(t, 0, results.IdentifiersError)
 	assert.Empty(t, results.IdentifiersErrorSamples)
-}
-
-type projectRepositoryMock struct {
-	p   entity.Project
-	err error
-}
-
-func (m projectRepositoryMock) Add(ctx context.Context, project entity.Project) error {
-	return errors.New("shouldn't be called")
-}
-
-func (m projectRepositoryMock) GetByURL(ctx context.Context, url string) (entity.Project, error) {
-	return m.p, m.err
 }
 
 type sourceCodeFileReaderMock struct {
@@ -416,28 +396,4 @@ func (t *extractorMock) Visit(node ast.Node) ast.Visitor {
 
 func (t *extractorMock) Identifiers() []entity.Identifier {
 	return t.idents
-}
-
-type identifierRepositoryMock struct {
-	err error
-}
-
-func (i identifierRepositoryMock) Add(ctx context.Context, project entity.Project, ident entity.Identifier) error {
-	return i.err
-}
-
-func (i identifierRepositoryMock) FindAllByProject(ctx context.Context, projectRef string) ([]entity.Identifier, error) {
-	return []entity.Identifier{}, errors.New("shouldn't be called")
-}
-
-func (i identifierRepositoryMock) FindAllByProjectAndFile(ctx context.Context, projectRef string, filename string) ([]entity.Identifier, error) {
-	return []entity.Identifier{}, errors.New("shouldn't be called")
-}
-
-type analysisRepositoryMock struct {
-	err error
-}
-
-func (a analysisRepositoryMock) Add(ctx context.Context, analysis entity.AnalysisResults) error {
-	return a.err
 }
