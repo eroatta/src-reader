@@ -7,6 +7,7 @@ import (
 	"github.com/eroatta/src-reader/entity"
 )
 
+// project repository mock
 type projectRepositoryMock struct {
 	project     entity.Project
 	getByURLErr error
@@ -21,6 +22,9 @@ func (m projectRepositoryMock) GetByURL(ctx context.Context, url string) (entity
 	return m.project, m.getByURLErr
 }
 
+// end project repository mock
+
+// metadata repository mock
 type metadataRepositoryMock struct {
 	metadata entity.Metadata
 	err      error
@@ -30,6 +34,9 @@ func (m metadataRepositoryMock) RetrieveMetadata(ctx context.Context, url string
 	return m.metadata, m.err
 }
 
+// end metadata repository mock
+
+// source code repository mock
 type sourceCodeRepositoryMock struct {
 	sourceCode entity.SourceCode
 	err        error
@@ -47,8 +54,12 @@ func (m sourceCodeRepositoryMock) Read(ctx context.Context, location string, fil
 	return []byte{}, errors.New("shouldn't be called")
 }
 
+// end source code repository mock
+
+// identifier repository mock
 type identifierRepositoryMock struct {
-	err error
+	idents []entity.Identifier
+	err    error
 }
 
 func (i identifierRepositoryMock) Add(ctx context.Context, project entity.Project, ident entity.Identifier) error {
@@ -56,13 +67,16 @@ func (i identifierRepositoryMock) Add(ctx context.Context, project entity.Projec
 }
 
 func (i identifierRepositoryMock) FindAllByProject(ctx context.Context, projectRef string) ([]entity.Identifier, error) {
-	return []entity.Identifier{}, errors.New("shouldn't be called")
+	return i.idents, i.err
 }
 
 func (i identifierRepositoryMock) FindAllByProjectAndFile(ctx context.Context, projectRef string, filename string) ([]entity.Identifier, error) {
 	return []entity.Identifier{}, errors.New("shouldn't be called")
 }
 
+// end identifier repository mock
+
+// analysis repository mock
 type analysisRepositoryMock struct {
 	err error
 }
@@ -70,3 +84,16 @@ type analysisRepositoryMock struct {
 func (a analysisRepositoryMock) Add(ctx context.Context, analysis entity.AnalysisResults) error {
 	return a.err
 }
+
+// end analysis repository mock
+
+// insights repository mock
+type insightsRepositoryMock struct {
+	err error
+}
+
+func (i insightsRepositoryMock) AddAll(ctx context.Context, insights []entity.Insight) error {
+	return i.err
+}
+
+// end insights repository mock

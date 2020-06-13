@@ -1,4 +1,4 @@
-package gain
+package usecase
 
 import (
 	"context"

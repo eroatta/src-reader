@@ -10,7 +10,7 @@ import (
 
 	"github.com/eroatta/src-reader/entity"
 	"github.com/eroatta/src-reader/port/incoming/adapter/rest"
-	"github.com/eroatta/src-reader/usecase/gain"
+	"github.com/eroatta/src-reader/usecase"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -105,7 +105,7 @@ func TestPOST_OnInsightsCreationHandler_WithNotFoundIdentifiers_ShouldReturnHTTP
 	router := rest.NewServer()
 	rest.RegisterGainInsightsUsecase(router, mockGainInsightsUsecase{
 		ins: []entity.Insight{},
-		err: gain.ErrIdentifiersNotFound,
+		err: usecase.ErrIdentifiersNotFound,
 	})
 
 	w := httptest.NewRecorder()

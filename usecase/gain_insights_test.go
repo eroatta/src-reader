@@ -1,18 +1,17 @@
-package gain_test
+package usecase_test
 
 import (
 	"context"
-	"errors"
 	"testing"
 
 	"github.com/eroatta/src-reader/entity"
 	"github.com/eroatta/src-reader/repository"
-	"github.com/eroatta/src-reader/usecase/gain"
+	"github.com/eroatta/src-reader/usecase"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestNewGainInsightsUsecase_ShouldReturnNewInstance(t *testing.T) {
-	uc := gain.NewGainInsightsUsecase(nil, nil)
+	uc := usecase.NewGainInsightsUsecase(nil, nil)
 
 	assert.NotNil(t, uc)
 }
@@ -23,11 +22,11 @@ func TestProcess_OnGainInsightsUsecase_WhenNoIdentifiers_ShouldReturnError(t *te
 		err:    repository.ErrIdentifierNoResults,
 	}
 
-	uc := gain.NewGainInsightsUsecase(identifierRepositoryMock, nil)
+	uc := usecase.NewGainInsightsUsecase(identifierRepositoryMock, nil)
 
 	insights, err := uc.Process(context.TODO(), "eroatta/test")
 
-	assert.EqualError(t, err, gain.ErrIdentifiersNotFound.Error())
+	assert.EqualError(t, err, usecase.ErrIdentifiersNotFound.Error())
 	assert.Empty(t, insights)
 }
 
@@ -37,11 +36,11 @@ func TestProcess_OnGainInsightsUsecase_WhenErrorReadingIdentifiers_ShouldReturnE
 		err:    repository.ErrIdentifierUnexpected,
 	}
 
-	uc := gain.NewGainInsightsUsecase(identifierRepositoryMock, nil)
+	uc := usecase.NewGainInsightsUsecase(identifierRepositoryMock, nil)
 
 	insights, err := uc.Process(context.TODO(), "eroatta/test")
 
-	assert.EqualError(t, err, gain.ErrUnableToReadIdentifiers.Error())
+	assert.EqualError(t, err, usecase.ErrUnableToReadIdentifiers.Error())
 	assert.Empty(t, insights)
 }
 
@@ -57,11 +56,11 @@ func TestProcess_OnGainInsightsUsecase_WhenFailingToSaveInsights_ShouldReturnErr
 		err: repository.ErrInsightUnexpected,
 	}
 
-	uc := gain.NewGainInsightsUsecase(identifierRepositoryMock, insightsRepositoryMock)
+	uc := usecase.NewGainInsightsUsecase(identifierRepositoryMock, insightsRepositoryMock)
 
 	insights, err := uc.Process(context.TODO(), "eroatta/test")
 
-	assert.EqualError(t, err, gain.ErrUnableToGainInsights.Error())
+	assert.EqualError(t, err, usecase.ErrUnableToGainInsights.Error())
 	assert.Empty(t, insights)
 }
 
@@ -156,7 +155,7 @@ func TestProcess_OnGainInsightsUsecase_ShouldReturnInsightsByPackage(t *testing.
 		err: nil,
 	}
 
-	uc := gain.NewGainInsightsUsecase(identifierRepositoryMock, insightsRepositoryMock)
+	uc := usecase.NewGainInsightsUsecase(identifierRepositoryMock, insightsRepositoryMock)
 
 	insights, err := uc.Process(context.TODO(), "eroatta/test")
 
@@ -197,29 +196,4 @@ func TestProcess_OnGainInsightsUsecase_ShouldReturnInsightsByPackage(t *testing.
 			},
 		},
 	}, insights)
-}
-
-type identifierRepositoryMock struct {
-	idents []entity.Identifier
-	err    error
-}
-
-func (i identifierRepositoryMock) Add(ctx context.Context, project entity.Project, ident entity.Identifier) error {
-	return errors.New("shouldn't be called")
-}
-
-func (i identifierRepositoryMock) FindAllByProject(ctx context.Context, projectRef string) ([]entity.Identifier, error) {
-	return i.idents, i.err
-}
-
-func (i identifierRepositoryMock) FindAllByProjectAndFile(ctx context.Context, projectRef string, filename string) ([]entity.Identifier, error) {
-	return []entity.Identifier{}, errors.New("shouldn't be called")
-}
-
-type insightsRepositoryMock struct {
-	err error
-}
-
-func (i insightsRepositoryMock) AddAll(ctx context.Context, insights []entity.Insight) error {
-	return i.err
 }

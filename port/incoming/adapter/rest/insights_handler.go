@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"sort"
 
-	"github.com/eroatta/src-reader/usecase/gain"
+	"github.com/eroatta/src-reader/usecase"
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
 )
@@ -35,7 +35,7 @@ type packageResponse struct {
 
 // RegisterGainInsightsUsecase sets the endpoint and the handler on the REST service to
 // handle the insights creation.
-func RegisterGainInsightsUsecase(r *gin.Engine, uc gain.GainInsightsUsecase) *gin.Engine {
+func RegisterGainInsightsUsecase(r *gin.Engine, uc usecase.GainInsightsUsecase) *gin.Engine {
 	r.POST("/insights", func(c *gin.Context) {
 		createInsights(c, uc)
 	})
@@ -45,7 +45,7 @@ func RegisterGainInsightsUsecase(r *gin.Engine, uc gain.GainInsightsUsecase) *gi
 	return r
 }
 
-func createInsights(ctx *gin.Context, uc gain.GainInsightsUsecase) {
+func createInsights(ctx *gin.Context, uc usecase.GainInsightsUsecase) {
 	var cmd createInsightsCommand
 
 	if err := ctx.ShouldBindJSON(&cmd); err != nil {
@@ -64,7 +64,7 @@ func createInsights(ctx *gin.Context, uc gain.GainInsightsUsecase) {
 	switch err {
 	case nil:
 		// do nothing
-	case gain.ErrIdentifiersNotFound:
+	case usecase.ErrIdentifiersNotFound:
 		setBadRequestResponse(ctx, fmt.Errorf("non-existing identifiers for %s", cmd.Repository))
 		return
 	default:

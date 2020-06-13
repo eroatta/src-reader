@@ -15,7 +15,6 @@ import (
 	"github.com/eroatta/src-reader/port/outgoing/adapter/repository/mongodb"
 	"github.com/eroatta/src-reader/usecase"
 	"github.com/eroatta/src-reader/usecase/file"
-	"github.com/eroatta/src-reader/usecase/gain"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -48,7 +47,7 @@ func main() {
 	importProjectUsecase := usecase.NewCreateProjectUsecase(projectRepository, remoteProjectRepository, sourceCodeRepository)
 	analyzeProjectUsecase := usecase.NewAnalyzeProjectUsecase(projectRepository, sourceCodeRepository,
 		identifierRepository, analysisRepository, defaultAnalysisConfig)
-	gainInsightsUsecase := gain.NewGainInsightsUsecase(identifierRepository, insightRepository)
+	gainInsightsUsecase := usecase.NewGainInsightsUsecase(identifierRepository, insightRepository)
 	originalFileUsecase := file.NewOriginalFileUsecase(projectRepository, sourceCodeRepository)
 	rewrittenFileUsecase := file.NewRewrittenFileUsecase(projectRepository, sourceCodeRepository, identifierRepository)
 
