@@ -29,7 +29,7 @@ func TestProcess_OnAnalyzeProjectUsecase_WhenNoProjectFound_ShouldReturnError(t 
 
 	uc := usecase.NewAnalyzeProjectUsecase(projectRepositoryMock, nil, nil, nil, &entity.AnalysisConfig{})
 
-	projectID, err := uuid.NewUUID()
+	projectID, _ := uuid.NewUUID()
 	results, err := uc.Process(context.TODO(), projectID)
 
 	assert.EqualError(t, err, usecase.ErrProjectNotFound.Error())
@@ -44,7 +44,7 @@ func TestProcess_OnAnalyzeProjectUsecase_WhenFailingToRetrieveProject_ShouldRetu
 
 	uc := usecase.NewAnalyzeProjectUsecase(projectRepositoryMock, nil, nil, nil, &entity.AnalysisConfig{})
 
-	projectID, err := uuid.NewUUID()
+	projectID, _ := uuid.NewUUID()
 	results, err := uc.Process(context.TODO(), projectID)
 
 	assert.EqualError(t, err, usecase.ErrUnexpected.Error())
@@ -71,7 +71,7 @@ func TestProcess_OnAnalyzeProjectUsecase_WhenFailingToReadFiles_ShouldReturnErro
 
 	uc := usecase.NewAnalyzeProjectUsecase(projectRepositoryMock, sourceCodeRepositoryMock, nil, nil, &entity.AnalysisConfig{})
 
-	projectID, err := uuid.NewUUID()
+	projectID, _ := uuid.NewUUID()
 	results, err := uc.Process(context.TODO(), projectID)
 
 	assert.EqualError(t, err, usecase.ErrUnableToBuildASTs.Error())
@@ -100,7 +100,7 @@ func TestProcess_OnAnalyzeProjectUsecase_WhenFailingToParseFiles_ShouldReturnErr
 
 	uc := usecase.NewAnalyzeProjectUsecase(projectRepositoryMock, sourceCodeRepositoryMock, nil, nil, &entity.AnalysisConfig{})
 
-	projectID, err := uuid.NewUUID()
+	projectID, _ := uuid.NewUUID()
 	results, err := uc.Process(context.TODO(), projectID)
 
 	assert.EqualError(t, err, usecase.ErrUnableToBuildASTs.Error())
@@ -133,7 +133,7 @@ func TestProcess_OnAnalyzeProjectUsecase_WhenFailingToCreateSplitters_ShouldRetu
 	}
 	uc := usecase.NewAnalyzeProjectUsecase(projectRepositoryMock, sourceCodeRepositoryMock, nil, nil, config)
 
-	projectID, err := uuid.NewUUID()
+	projectID, _ := uuid.NewUUID()
 	results, err := uc.Process(context.TODO(), projectID)
 
 	assert.EqualError(t, err, usecase.ErrUnableToCreateProcessors.Error())
@@ -168,7 +168,7 @@ func TestProcess_OnAnalyzeProjectUsecase_WhenFailingToCreateExpanders_ShouldRetu
 	}
 	uc := usecase.NewAnalyzeProjectUsecase(projectRepositoryMock, sourceCodeRepositoryMock, nil, nil, config)
 
-	projectID, err := uuid.NewUUID()
+	projectID, _ := uuid.NewUUID()
 	results, err := uc.Process(context.TODO(), projectID)
 
 	assert.EqualError(t, err, usecase.ErrUnableToCreateProcessors.Error())
@@ -209,7 +209,7 @@ func TestProcess_OnAnalyzeProjectUsecase_WhenFailingToSaveIdentifiers_ShouldRetu
 	}
 	uc := usecase.NewAnalyzeProjectUsecase(projectRepositoryMock, sourceCodeRepositoryMock, identifierRepositoryMock, nil, config)
 
-	projectID, err := uuid.NewUUID()
+	projectID, _ := uuid.NewUUID()
 	results, err := uc.Process(context.TODO(), projectID)
 
 	assert.EqualError(t, err, usecase.ErrUnableToSaveIdentifiers.Error())
@@ -254,7 +254,7 @@ func TestProcess_OnAnalyzeProjectUsecase_WhenFailingToSaveAnalysis_ShouldReturnE
 	}
 	uc := usecase.NewAnalyzeProjectUsecase(projectRepositoryMock, sourceCodeRepositoryMock, identifierRepositoryMock, analysisRepositoryMock, config)
 
-	projectID, err := uuid.NewUUID()
+	projectID, _ := uuid.NewUUID()
 	results, err := uc.Process(context.TODO(), projectID)
 
 	assert.EqualError(t, err, usecase.ErrUnableToSaveAnalysis.Error())
@@ -304,7 +304,7 @@ func TestProcess_OnAnalyzeProjectUsecase_WhenAnalyzingIdentifiers_ShouldReturnAn
 	uc := usecase.NewAnalyzeProjectUsecase(projectRepositoryMock, sourceCodeRepositoryMock,
 		identifierRepositoryMock, analysisRepositoryMock, config)
 
-	projectID, err := uuid.NewUUID()
+	projectID, _ := uuid.NewUUID()
 	results, err := uc.Process(context.TODO(), projectID)
 
 	assert.NoError(t, err)
