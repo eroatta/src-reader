@@ -1,4 +1,4 @@
-package file
+package usecase
 
 import (
 	"context"
@@ -10,10 +10,7 @@ import (
 )
 
 var (
-	ErrProjectNotFound     = errors.New("TODO")
-	ErrFileNotFound        = errors.New("TODO")
-	ErrIdentifiersNotFound = errors.New("TODO")
-	ErrUnexpected          = errors.New("TODO")
+	ErrFileNotFound = errors.New("TODO")
 )
 
 type OriginalFileUsecase interface {

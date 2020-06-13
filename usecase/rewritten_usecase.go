@@ -1,4 +1,4 @@
-package file
+package usecase
 
 import (
 	"bytes"

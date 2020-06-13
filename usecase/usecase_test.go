@@ -39,6 +39,7 @@ func (m metadataRepositoryMock) RetrieveMetadata(ctx context.Context, url string
 // source code repository mock
 type sourceCodeRepositoryMock struct {
 	sourceCode entity.SourceCode
+	files      map[string][]byte
 	err        error
 }
 
@@ -51,7 +52,16 @@ func (m sourceCodeRepositoryMock) Remove(ctx context.Context, location string) e
 }
 
 func (m sourceCodeRepositoryMock) Read(ctx context.Context, location string, filename string) ([]byte, error) {
-	return []byte{}, errors.New("shouldn't be called")
+	if m.err != nil {
+		return []byte{}, m.err
+	}
+
+	b, ok := m.files[filename]
+	if !ok {
+		return []byte{}, errors.New("not found")
+	}
+
+	return b, nil
 }
 
 // end source code repository mock
@@ -71,7 +81,7 @@ func (i identifierRepositoryMock) FindAllByProject(ctx context.Context, projectR
 }
 
 func (i identifierRepositoryMock) FindAllByProjectAndFile(ctx context.Context, projectRef string, filename string) ([]entity.Identifier, error) {
-	return []entity.Identifier{}, errors.New("shouldn't be called")
+	return i.idents, i.err
 }
 
 // end identifier repository mock

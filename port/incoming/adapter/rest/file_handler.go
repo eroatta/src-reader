@@ -6,11 +6,11 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/eroatta/src-reader/usecase/file"
+	"github.com/eroatta/src-reader/usecase"
 	"github.com/gin-gonic/gin"
 )
 
-func RegisterOriginalFileUsecase(r *gin.Engine, uc file.OriginalFileUsecase) *gin.Engine {
+func RegisterOriginalFileUsecase(r *gin.Engine, uc usecase.OriginalFileUsecase) *gin.Engine {
 	r.GET("/files/originals/:owner/:project/*file", func(c *gin.Context) {
 		getFile(c, uc)
 	})
@@ -18,7 +18,7 @@ func RegisterOriginalFileUsecase(r *gin.Engine, uc file.OriginalFileUsecase) *gi
 	return r
 }
 
-func RegisterRewrittenFileUsecase(r *gin.Engine, uc file.RewrittenFileUsecase) *gin.Engine {
+func RegisterRewrittenFileUsecase(r *gin.Engine, uc usecase.RewrittenFileUsecase) *gin.Engine {
 	r.GET("/files/rewritten/:owner/:project/*file", func(c *gin.Context) {
 		getFile(c, uc)
 	})
@@ -36,11 +36,11 @@ func getFile(ctx *gin.Context, uc fileUsecase) {
 	switch err {
 	case nil:
 		// do nothing
-	case file.ErrProjectNotFound:
+	case usecase.ErrProjectNotFound:
 		ctx.AbortWithStatus(http.StatusNotFound)
-	case file.ErrFileNotFound:
+	case usecase.ErrFileNotFound:
 		ctx.AbortWithStatus(http.StatusNotFound)
-	case file.ErrIdentifiersNotFound:
+	case usecase.ErrIdentifiersNotFound:
 		ctx.String(http.StatusConflict, "Ooops! Did you already analyze this project?")
 		return
 	default:

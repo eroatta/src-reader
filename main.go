@@ -14,7 +14,6 @@ import (
 	"github.com/eroatta/src-reader/port/outgoing/adapter/repository/github"
 	"github.com/eroatta/src-reader/port/outgoing/adapter/repository/mongodb"
 	"github.com/eroatta/src-reader/usecase"
-	"github.com/eroatta/src-reader/usecase/file"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -48,8 +47,8 @@ func main() {
 	analyzeProjectUsecase := usecase.NewAnalyzeProjectUsecase(projectRepository, sourceCodeRepository,
 		identifierRepository, analysisRepository, defaultAnalysisConfig)
 	gainInsightsUsecase := usecase.NewGainInsightsUsecase(identifierRepository, insightRepository)
-	originalFileUsecase := file.NewOriginalFileUsecase(projectRepository, sourceCodeRepository)
-	rewrittenFileUsecase := file.NewRewrittenFileUsecase(projectRepository, sourceCodeRepository, identifierRepository)
+	originalFileUsecase := usecase.NewOriginalFileUsecase(projectRepository, sourceCodeRepository)
+	rewrittenFileUsecase := usecase.NewRewrittenFileUsecase(projectRepository, sourceCodeRepository, identifierRepository)
 
 	// create REST API server and register use cases
 	router := rest.NewServer()

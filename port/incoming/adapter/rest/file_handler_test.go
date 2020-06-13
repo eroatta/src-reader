@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/eroatta/src-reader/port/incoming/adapter/rest"
-	"github.com/eroatta/src-reader/usecase/file"
+	"github.com/eroatta/src-reader/usecase"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -17,7 +17,7 @@ func TestGET_OnOriginalFileHandler_WithNoExistingProject_ShouldReturn404(t *test
 		expectedProjectRef: "eroatta/test",
 		expectedFileRef:    "amap/amap.go",
 		raw:                nil,
-		err:                file.ErrProjectNotFound,
+		err:                usecase.ErrProjectNotFound,
 	}
 	router := rest.NewServer()
 	rest.RegisterOriginalFileUsecase(router, originalFileUsecaseMock)
@@ -35,7 +35,7 @@ func TestGET_OnOriginalFileHandler_WithNoExistingFile_ShouldReturn404(t *testing
 		expectedProjectRef: "eroatta/test",
 		expectedFileRef:    "amap/amap.go",
 		raw:                nil,
-		err:                file.ErrFileNotFound,
+		err:                usecase.ErrFileNotFound,
 	}
 	router := rest.NewServer()
 	rest.RegisterOriginalFileUsecase(router, originalFileUsecaseMock)
@@ -53,7 +53,7 @@ func TestGET_OnOriginalFileHandler_WithErrorsWhileProcessing_ShouldReturn500(t *
 		expectedProjectRef: "eroatta/test",
 		expectedFileRef:    "amap/amap.go",
 		raw:                nil,
-		err:                file.ErrUnexpected,
+		err:                usecase.ErrUnexpected,
 	}
 	router := rest.NewServer()
 	rest.RegisterOriginalFileUsecase(router, originalFileUsecaseMock)
@@ -97,7 +97,7 @@ func TestGET_OnRewrittenFileHandler_WithNoExistingProject_ShouldReturn404(t *tes
 		expectedProjectRef: "eroatta/test",
 		expectedFileRef:    "amap/amap.go",
 		raw:                nil,
-		err:                file.ErrProjectNotFound,
+		err:                usecase.ErrProjectNotFound,
 	}
 	router := rest.NewServer()
 	rest.RegisterRewrittenFileUsecase(router, rewrittenFileUsecaseMock)
@@ -115,7 +115,7 @@ func TestGET_OnRewrittenFileHandler_WithNoExistingFile_ShouldReturn404(t *testin
 		expectedProjectRef: "eroatta/test",
 		expectedFileRef:    "amap/amap.go",
 		raw:                nil,
-		err:                file.ErrFileNotFound,
+		err:                usecase.ErrFileNotFound,
 	}
 	router := rest.NewServer()
 	rest.RegisterRewrittenFileUsecase(router, rewrittenFileUsecaseMock)
@@ -133,7 +133,7 @@ func TestGET_OnRewrittenFileHandler_WithNoExistingIdentifiers_ShouldReturn409(t 
 		expectedProjectRef: "eroatta/test",
 		expectedFileRef:    "amap/amap.go",
 		raw:                nil,
-		err:                file.ErrIdentifiersNotFound,
+		err:                usecase.ErrIdentifiersNotFound,
 	}
 	router := rest.NewServer()
 	rest.RegisterRewrittenFileUsecase(router, rewrittenFileUsecaseMock)
@@ -152,7 +152,7 @@ func TestGET_OnRewrittenFileHandler_WithErrorsWhileProcessing_ShouldReturn500(t 
 		expectedProjectRef: "eroatta/test",
 		expectedFileRef:    "amap/amap.go",
 		raw:                nil,
-		err:                file.ErrUnexpected,
+		err:                usecase.ErrUnexpected,
 	}
 	router := rest.NewServer()
 	rest.RegisterRewrittenFileUsecase(router, rewrittenFileUsecaseMock)
