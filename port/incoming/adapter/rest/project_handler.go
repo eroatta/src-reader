@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/eroatta/src-reader/usecase/create"
+	"github.com/eroatta/src-reader/usecase"
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
 )
@@ -44,7 +44,7 @@ type sourcecodeResponse struct {
 	Files    []string `json:"files"`
 }
 
-func RegisterCreateProjectUsecase(r *gin.Engine, uc create.ImportProjectUsecase) *gin.Engine {
+func RegisterCreateProjectUsecase(r *gin.Engine, uc usecase.CreateProjectUsecase) *gin.Engine {
 	r.POST("/projects", func(c *gin.Context) {
 		createProject(c, uc)
 	})
@@ -54,7 +54,7 @@ func RegisterCreateProjectUsecase(r *gin.Engine, uc create.ImportProjectUsecase)
 	return r
 }
 
-func createProject(ctx *gin.Context, uc create.ImportProjectUsecase) {
+func createProject(ctx *gin.Context, uc usecase.CreateProjectUsecase) {
 	var cmd postCreateProjectCommand
 
 	if err := ctx.ShouldBindJSON(&cmd); err != nil {
@@ -69,7 +69,7 @@ func createProject(ctx *gin.Context, uc create.ImportProjectUsecase) {
 		return
 	}
 
-	p, err := uc.Import(ctx, cmd.Repository)
+	p, err := uc.Process(ctx, cmd.Repository)
 	if err != nil {
 		log.WithError(err).Error("unexpected error executing createProjectUsecase")
 		setInternalErrorResponse(ctx, err)

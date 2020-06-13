@@ -1,4 +1,4 @@
-package create
+package usecase
 
 import (
 	"context"
@@ -26,33 +26,30 @@ var (
 	ErrUnableToSaveProject = errors.New("Unable to store project changes")
 )
 
-// ImportProjectUsecase defines the contract for the use case related to the import process
-// for a project.
-type ImportProjectUsecase interface {
-	// Import executes the pipeline to import a project from GitHub and
-	// extract the identifiers. It returns the project information.
-	Import(ctx context.Context, url string) (entity.Project, error)
+// CreateProjectUsecase handles the creation and import or a Project.
+type CreateProjectUsecase interface {
+	// Process retrieves a project from GitHub and imports it.
+	Process(ctx context.Context, projectRef string) (entity.Project, error)
 }
 
-// NewImportProjectUsecase initializes a new ImportProjectUsecase handler.
-func NewImportProjectUsecase(pr repository.ProjectRepository, mr repository.MetadataRepository,
-	scr repository.SourceCodeRepository) ImportProjectUsecase {
-	return importProjectUsecase{
+// NewCreateProjectUsecase initializes a new CreateProjectUsecase instance.
+func NewCreateProjectUsecase(pr repository.ProjectRepository, mr repository.MetadataRepository,
+	scr repository.SourceCodeRepository) CreateProjectUsecase {
+	return createProjectUsecase{
 		projectRepository:    pr,
 		metadataRepository:   mr,
 		sourceCodeRepository: scr,
 	}
 }
 
-type importProjectUsecase struct {
+type createProjectUsecase struct {
 	projectRepository    repository.ProjectRepository
 	metadataRepository   repository.MetadataRepository
 	sourceCodeRepository repository.SourceCodeRepository
 }
 
-// Import executes the pipeline to import a project from GitHub and extract the identifiers.
-// It returns the project information. It's the current default implementation for the use case.
-func (uc importProjectUsecase) Import(ctx context.Context, url string) (entity.Project, error) {
+// Process executes the pipeline to import a project from GitHub. It returns the project information.
+func (uc createProjectUsecase) Process(ctx context.Context, url string) (entity.Project, error) {
 	// check if not previously imported
 	project, err := uc.projectRepository.GetByURL(ctx, url)
 	switch err {

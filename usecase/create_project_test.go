@@ -1,4 +1,4 @@
-package create_test
+package usecase_test
 
 import (
 	"context"
@@ -7,17 +7,17 @@ import (
 
 	"github.com/eroatta/src-reader/entity"
 	"github.com/eroatta/src-reader/repository"
-	"github.com/eroatta/src-reader/usecase/create"
+	"github.com/eroatta/src-reader/usecase"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestNewImportProjectUsecase_ShouldReturnNewInstance(t *testing.T) {
-	uc := create.NewImportProjectUsecase(nil, nil, nil)
+func TestNewCreateProjectUsecase_ShouldReturnNewInstance(t *testing.T) {
+	uc := usecase.NewCreateProjectUsecase(nil, nil, nil)
 
 	assert.NotNil(t, uc)
 }
 
-func TestImport_OnImportProjectUsecase_ShouldReturnImportResults(t *testing.T) {
+func TestProcess_OnCreateProjectUsecase_ShouldReturnImportResults(t *testing.T) {
 	prMock := projectRepositoryMock{
 		getByURLErr: repository.ErrProjectNoResults,
 	}
@@ -35,9 +35,9 @@ func TestImport_OnImportProjectUsecase_ShouldReturnImportResults(t *testing.T) {
 		},
 		err: nil,
 	}
-	uc := create.NewImportProjectUsecase(prMock, rprMock, scrMock)
+	uc := usecase.NewCreateProjectUsecase(prMock, rprMock, scrMock)
 
-	project, err := uc.Import(context.TODO(), "https://github.com/test/mytest")
+	project, err := uc.Process(context.TODO(), "https://github.com/test/mytest")
 
 	assert.NoError(t, err)
 	assert.Equal(t, "done", project.Status)
@@ -47,7 +47,7 @@ func TestImport_OnImportProjectUsecase_ShouldReturnImportResults(t *testing.T) {
 	assert.Equal(t, 1, len(project.SourceCode.Files))
 }
 
-func TestImport_OnImportProjectUsecase_WhenAlreadyImportedProject_ShouldImportResults(t *testing.T) {
+func TestProcess_OnCreateProjectUsecase_WhenAlreadyImportedProject_ShouldImportResults(t *testing.T) {
 	prMock := projectRepositoryMock{
 		project: entity.Project{
 			Status: "finished",
@@ -55,9 +55,9 @@ func TestImport_OnImportProjectUsecase_WhenAlreadyImportedProject_ShouldImportRe
 		},
 		getByURLErr: nil,
 	}
-	uc := create.NewImportProjectUsecase(prMock, nil, nil)
+	uc := usecase.NewCreateProjectUsecase(prMock, nil, nil)
 
-	project, err := uc.Import(context.TODO(), "https://github.com/test/mytest")
+	project, err := uc.Process(context.TODO(), "https://github.com/test/mytest")
 
 	assert.NoError(t, err)
 	assert.NotEmpty(t, project)
@@ -65,35 +65,35 @@ func TestImport_OnImportProjectUsecase_WhenAlreadyImportedProject_ShouldImportRe
 	assert.Equal(t, "https://github.com/test/mytest", project.URL)
 }
 
-func TestImport_OnImportProjectUsecase_WhenUnableToCheckExistingProject_ShouldReturnError(t *testing.T) {
+func TestProcess_OnCreateProjectUsecase_WhenUnableToCheckExistingProject_ShouldReturnError(t *testing.T) {
 	prMock := projectRepositoryMock{
 		project:     entity.Project{},
 		getByURLErr: repository.ErrProjectUnexpected,
 	}
-	uc := create.NewImportProjectUsecase(prMock, nil, nil)
+	uc := usecase.NewCreateProjectUsecase(prMock, nil, nil)
 
-	project, err := uc.Import(context.TODO(), "https://github.com/test/mytest")
+	project, err := uc.Process(context.TODO(), "https://github.com/test/mytest")
 
-	assert.EqualError(t, err, create.ErrUnableToReadProject.Error())
+	assert.EqualError(t, err, usecase.ErrUnableToReadProject.Error())
 	assert.Empty(t, project)
 }
 
-func TestImport_OnImportProjectUsecase_WhenUnableToRetrieveMetadataFromRemoteRepository_ShouldReturnError(t *testing.T) {
+func TestProcess_OnCreateProjectUsecase_WhenUnableToRetrieveMetadataFromRemoteRepository_ShouldReturnError(t *testing.T) {
 	prMock := projectRepositoryMock{
 		getByURLErr: repository.ErrProjectNoResults,
 	}
 	rprMock := metadataRepositoryMock{
 		err: repository.ErrProjectUnexpected,
 	}
-	uc := create.NewImportProjectUsecase(prMock, rprMock, nil)
+	uc := usecase.NewCreateProjectUsecase(prMock, rprMock, nil)
 
-	project, err := uc.Import(context.TODO(), "https://github.com/test/mytest")
+	project, err := uc.Process(context.TODO(), "https://github.com/test/mytest")
 
-	assert.EqualError(t, err, create.ErrUnableToRetrieveMetadata.Error())
+	assert.EqualError(t, err, usecase.ErrUnableToRetrieveMetadata.Error())
 	assert.Empty(t, project)
 }
 
-func TestImport_OnImportProjectUsecase_WhenUnableToCloneSourceCode_ShouldReturnError(t *testing.T) {
+func TestProcess_OnCreateProjectUsecase_WhenUnableToCloneSourceCode_ShouldReturnError(t *testing.T) {
 	prMock := projectRepositoryMock{
 		getByURLErr: repository.ErrProjectNoResults,
 	}
@@ -106,15 +106,15 @@ func TestImport_OnImportProjectUsecase_WhenUnableToCloneSourceCode_ShouldReturnE
 	scrMock := sourceCodeRepositoryMock{
 		err: repository.ErrProjectUnexpected,
 	}
-	uc := create.NewImportProjectUsecase(prMock, rprMock, scrMock)
+	uc := usecase.NewCreateProjectUsecase(prMock, rprMock, scrMock)
 
-	project, err := uc.Import(context.TODO(), "https://github.com/test/mytest")
+	project, err := uc.Process(context.TODO(), "https://github.com/test/mytest")
 
-	assert.EqualError(t, err, create.ErrUnableToCloneSourceCode.Error())
+	assert.EqualError(t, err, usecase.ErrUnableToCloneSourceCode.Error())
 	assert.Empty(t, project)
 }
 
-func TestImport_OnImportProjectUsecase_WhenUnableToSaveImportedProject_ShouldReturnError(t *testing.T) {
+func TestProcess_OnCreateProjectUsecase_WhenUnableToSaveImportedProject_ShouldReturnError(t *testing.T) {
 	prMock := projectRepositoryMock{
 		getByURLErr: repository.ErrProjectNoResults,
 		addErr:      repository.ErrProjectUnexpected,
@@ -128,11 +128,11 @@ func TestImport_OnImportProjectUsecase_WhenUnableToSaveImportedProject_ShouldRet
 	scrMock := sourceCodeRepositoryMock{
 		err: nil,
 	}
-	uc := create.NewImportProjectUsecase(prMock, rprMock, scrMock)
+	uc := usecase.NewCreateProjectUsecase(prMock, rprMock, scrMock)
 
-	project, err := uc.Import(context.TODO(), "https://github.com/test/mytest")
+	project, err := uc.Process(context.TODO(), "https://github.com/test/mytest")
 
-	assert.EqualError(t, err, create.ErrUnableToSaveProject.Error())
+	assert.EqualError(t, err, usecase.ErrUnableToSaveProject.Error())
 	assert.Empty(t, project)
 }
 

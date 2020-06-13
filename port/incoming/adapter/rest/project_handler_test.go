@@ -209,6 +209,6 @@ type mockCreateUsecase struct {
 	err error
 }
 
-func (m mockCreateUsecase) Import(ctx context.Context, url string) (entity.Project, error) {
+func (m mockCreateUsecase) Process(ctx context.Context, url string) (entity.Project, error) {
 	return m.p, m.err
 }

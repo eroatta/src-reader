@@ -13,8 +13,8 @@ import (
 	"github.com/eroatta/src-reader/port/outgoing/adapter/algorithm/splitter"
 	"github.com/eroatta/src-reader/port/outgoing/adapter/repository/github"
 	"github.com/eroatta/src-reader/port/outgoing/adapter/repository/mongodb"
+	"github.com/eroatta/src-reader/usecase"
 	"github.com/eroatta/src-reader/usecase/analyze"
-	"github.com/eroatta/src-reader/usecase/create"
 	"github.com/eroatta/src-reader/usecase/file"
 	"github.com/eroatta/src-reader/usecase/gain"
 	log "github.com/sirupsen/logrus"
@@ -46,7 +46,7 @@ func main() {
 	sourceCodeRepository := github.NewGogitSourceCodeRepository(sourceCodeFolder, github.PlainClonerFunc)
 
 	// create supported use cases
-	importProjectUsecase := create.NewImportProjectUsecase(projectRepository, remoteProjectRepository, sourceCodeRepository)
+	importProjectUsecase := usecase.NewCreateProjectUsecase(projectRepository, remoteProjectRepository, sourceCodeRepository)
 	analyzeProjectUsecase := analyze.NewAnalyzeProjectUsecase(projectRepository, sourceCodeRepository,
 		identifierRepository, analysisRepository, defaultAnalysisConfig)
 	gainInsightsUsecase := gain.NewGainInsightsUsecase(identifierRepository, insightRepository)
