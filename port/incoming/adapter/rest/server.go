@@ -70,6 +70,17 @@ func setBadRequestOnValidationResponse(ctx *gin.Context, err error) {
 	ctx.JSON(http.StatusBadRequest, errResponse)
 }
 
+func setNotFoundResponse(ctx *gin.Context, err error) {
+	errResponse := errorResponse{
+		Name:    "not_found",
+		Message: "resource not found",
+		Details: make([]string, 0),
+	}
+	errResponse.Details = append(errResponse.Details, err.Error())
+
+	ctx.JSON(http.StatusNotFound, errResponse)
+}
+
 func setInternalErrorResponse(ctx *gin.Context, err error) {
 	errResponse := errorResponse{
 		Name:    "internal_error",

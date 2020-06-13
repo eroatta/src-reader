@@ -1,13 +1,16 @@
 package rest
 
 import (
+	"fmt"
 	"net/http"
 	"regexp"
 	"time"
 
+	"github.com/eroatta/src-reader/entity"
 	"github.com/eroatta/src-reader/usecase"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator"
+	"github.com/google/uuid"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -60,7 +63,7 @@ func RegisterCreateProjectUsecase(r *gin.Engine, uc usecase.CreateProjectUsecase
 	r.POST("/projects", func(c *gin.Context) {
 		createProject(c, uc)
 	})
-	// r.GET("/projects/$id", internal.getProject)
+
 	// r.DELETE("/projects/$id", internal.deleteProject)
 
 	return r
@@ -81,38 +84,72 @@ func createProject(ctx *gin.Context, uc usecase.CreateProjectUsecase) {
 		return
 	}
 
-	p, err := uc.Process(ctx, cmd.Reference)
+	project, err := uc.Process(ctx, cmd.Reference)
 	if err != nil {
 		log.WithError(err).Error("unexpected error executing createProjectUsecase")
 		setInternalErrorResponse(ctx, err)
 		return
 	}
 
-	response := projectResponse{
-		ID:        p.ID,
-		Status:    p.Status,
-		Reference: p.Reference,
+	ctx.JSON(http.StatusCreated, toProjectResponse(project))
+}
+
+func RegisterGetProjectUsecase(r *gin.Engine, uc usecase.GetProjectUsecase) *gin.Engine {
+	r.GET("/projects/:id", func(c *gin.Context) {
+		getProject(c, uc)
+	})
+
+	return r
+}
+
+func getProject(ctx *gin.Context, uc usecase.GetProjectUsecase) {
+	ID, err := uuid.Parse(ctx.Param("id"))
+	if err != nil {
+		setNotFoundResponse(ctx, fmt.Errorf("project with ID: %s can't be found", ctx.Param("id")))
+		return
+	}
+
+	project, err := uc.Process(ctx, ID)
+	switch err {
+	case nil:
+		// do nothing
+	case usecase.ErrProjectNotFound:
+		setNotFoundResponse(ctx, fmt.Errorf("project with ID: %s can't be found", ID.String()))
+		return
+	default:
+		log.WithError(err).Error("unexpected error executing getProjectUsecase")
+		setInternalErrorResponse(ctx, fmt.Errorf("error accessing project with ID: %s", ID.String()))
+		return
+	}
+
+	ctx.JSON(http.StatusOK, toProjectResponse(project))
+}
+
+func toProjectResponse(project entity.Project) projectResponse {
+	return projectResponse{
+		ID:        project.ID,
+		Status:    project.Status,
+		Reference: project.Reference,
 		Metadata: metadataResponse{
-			RemoteID:      p.Metadata.RemoteID,
-			Owner:         p.Metadata.Owner,
-			Fullname:      p.Metadata.Fullname,
-			Description:   p.Metadata.Description,
-			CloneURL:      p.Metadata.CloneURL,
-			DefaultBranch: p.Metadata.DefaultBranch,
-			License:       p.Metadata.License,
-			CreatedAt:     p.Metadata.CreatedAt,
-			UpdatedAt:     p.Metadata.UpdatedAt,
-			IsFork:        p.Metadata.IsFork,
-			Size:          p.Metadata.Size,
-			Stargazers:    p.Metadata.Stargazers,
-			Watchers:      p.Metadata.Watchers,
-			Forks:         p.Metadata.Forks,
+			RemoteID:      project.Metadata.RemoteID,
+			Owner:         project.Metadata.Owner,
+			Fullname:      project.Metadata.Fullname,
+			Description:   project.Metadata.Description,
+			CloneURL:      project.Metadata.CloneURL,
+			DefaultBranch: project.Metadata.DefaultBranch,
+			License:       project.Metadata.License,
+			CreatedAt:     project.Metadata.CreatedAt,
+			UpdatedAt:     project.Metadata.UpdatedAt,
+			IsFork:        project.Metadata.IsFork,
+			Size:          project.Metadata.Size,
+			Stargazers:    project.Metadata.Stargazers,
+			Watchers:      project.Metadata.Watchers,
+			Forks:         project.Metadata.Forks,
 		},
 		SourceCode: sourcecodeResponse{
-			Hash:     p.SourceCode.Hash,
-			Location: p.SourceCode.Location,
-			Files:    p.SourceCode.Files,
+			Hash:     project.SourceCode.Hash,
+			Location: project.SourceCode.Location,
+			Files:    project.SourceCode.Files,
 		},
 	}
-	ctx.JSON(http.StatusCreated, response)
 }
