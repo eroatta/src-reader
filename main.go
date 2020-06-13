@@ -63,11 +63,24 @@ func main() {
 }
 
 var defaultAnalysisConfig = &entity.AnalysisConfig{
-	Miners:                    []string{"wordcount", "scoped-declarations", "comments", "declarations", "global-frequency-table"},
-	MinerAlgorithmFactory:     miner.NewMinerFactory(),
-	ExtractorFactory:          extractor.New,
-	Splitters:                 []string{"conserv", "greedy", "samurai"},
+	Miners: []string{
+		"wordcount",
+		"scoped-declarations",
+		"comments",
+		"declarations",
+		"global-frequency-table",
+	},
+	MinerAlgorithmFactory: miner.NewMinerFactory(),
+	ExtractorFactory:      extractor.New,
+	Splitters: []string{
+		"conserv",
+		"greedy",
+		"samurai",
+	},
 	SplittingAlgorithmFactory: splitter.NewSplitterFactory(),
-	Expanders:                 []string{"noexp", "basic", "amap"},
+	Expanders: []string{
+		"noexp",
+		"basic",
+		"amap"},
 	ExpansionAlgorithmFactory: expander.NewExpanderFactory(),
 }
