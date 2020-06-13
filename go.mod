@@ -8,7 +8,6 @@ require (
 	github.com/eroatta/token v0.0.0-20200414231506-a6cba19b8140
 	github.com/gin-gonic/gin v1.6.3
 	github.com/go-playground/validator v9.31.0+incompatible
-	github.com/go-playground/validator/v10 v10.2.0
 	github.com/google/uuid v1.1.1
 	github.com/prometheus/client_golang v1.6.0
 	github.com/sirupsen/logrus v1.5.0
