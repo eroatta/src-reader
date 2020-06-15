@@ -16,6 +16,8 @@ import (
 var (
 	// ErrProjectNotFound indicates that the requested project is not accessible.
 	ErrProjectNotFound = errors.New("unable to retrieve requested Project")
+	// ErrPreviousAnalysisFound indicates there is an existing previous analysis.
+	ErrPreviousAnalysisFound = errors.New("existing previous analysis for project")
 	// ErrUnableToBuildASTs indicates that an error occurred while trying to read or parse the source code files to
 	// build the required Abstract Syntax Trees.
 	ErrUnableToBuildASTs = errors.New("unable to create ASTs from input")
@@ -74,9 +76,22 @@ func (uc analyzeProjectUsecase) Process(ctx context.Context, projectID uuid.UUID
 		return entity.AnalysisResults{}, ErrUnexpected
 	}
 
+	previousAnalysis, err := uc.analysisRepository.GetByProjectID(ctx, projectID)
+	switch err {
+	case repository.ErrAnalysisNoResults:
+		// do nothing
+	case nil:
+		return previousAnalysis, ErrPreviousAnalysisFound
+	default:
+		log.WithError(err).Errorf("unable to check for previous analysis on project %s", projectID.String())
+		return entity.AnalysisResults{}, ErrUnexpected
+	}
+
+	analysisID, _ := uuid.NewUUID()
 	analysisResults := entity.AnalysisResults{
-		ID:                project.ID,
+		ID:                analysisID,
 		DateCreated:       time.Now(),
+		ProjectID:         project.ID,
 		ProjectName:       project.Metadata.Fullname,
 		PipelineMiners:    make([]string, 0),
 		PipelineSplitters: make([]string, 0),

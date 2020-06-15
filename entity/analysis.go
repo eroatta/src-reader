@@ -10,6 +10,7 @@ import (
 	"unicode"
 
 	"github.com/agnivade/levenshtein"
+	"github.com/google/uuid"
 )
 
 // AnalysisConfig defines the configuration options for an analysis execution.
@@ -141,8 +142,9 @@ type Normalization struct {
 // the configuration provided (URL, miners, splitters, expanders), and information about
 // the processed files and identifiers.
 type AnalysisResults struct {
-	ID                      string
+	ID                      uuid.UUID
 	DateCreated             time.Time
+	ProjectID               uuid.UUID
 	ProjectName             string
 	PipelineMiners          []string
 	PipelineSplitters       []string

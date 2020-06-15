@@ -1,11 +1,15 @@
 package entity
 
-import "time"
+import (
+	"time"
+
+	"github.com/google/uuid"
+)
 
 // Project represents a GitHub repository, which contains metadata about it
 // and references to locally stored source code.
 type Project struct {
-	ID         string
+	ID         uuid.UUID
 	Status     string
 	Reference  string
 	CreatedAt  time.Time

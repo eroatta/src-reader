@@ -129,6 +129,49 @@ func TestPOST_OnAnalysisCreationHandler_WithNotFoundProject_ShouldReturnHTTP400(
 		w.Body.String())
 }
 
+func TestPOST_OnAnalysisCreationHandler_WithAlreadyExistingAnalysis_ShouldReturnHTTP400(t *testing.T) {
+	now := time.Date(2020, time.May, 5, 22, 0, 0, 0, time.UTC)
+	router := rest.NewServer()
+	rest.RegisterAnalyzeProjectUsecase(router, mockAnalyzeUsecase{
+		a: entity.AnalysisResults{
+			ID:                      uuid.MustParse("f17e675d-7823-4510-a04b-86e8c1f239ea"),
+			ProjectName:             "src-d/go-siva",
+			ProjectID:               uuid.MustParse("6ba7b810-9dad-11d1-80b4-00c04fd430c8"),
+			DateCreated:             now,
+			PipelineMiners:          []string{"miner_1", "miner_2"},
+			PipelineSplitters:       []string{"splitter_1", "splitter_2"},
+			PipelineExpanders:       []string{"expander_1", "expander_2"},
+			FilesTotal:              10,
+			FilesValid:              8,
+			FilesError:              2,
+			FilesErrorSamples:       []string{"file_error"},
+			IdentifiersTotal:        120,
+			IdentifiersValid:        105,
+			IdentifiersError:        15,
+			IdentifiersErrorSamples: []string{"identifier_error"},
+		},
+		err: usecase.ErrPreviousAnalysisFound,
+	})
+
+	w := httptest.NewRecorder()
+	body := `{
+		"project_id": "6ba7b810-9dad-11d1-80b4-00c04fd430c8"
+	}`
+	req, _ := http.NewRequest("POST", "/analysis", strings.NewReader(body))
+	router.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusBadRequest, w.Code)
+	assert.JSONEq(t, `
+		{
+			"name": "validation_error",
+			"message": "missing or invalid data",
+			"details": [
+				"a previous analysis exists for project with ID: 6ba7b810-9dad-11d1-80b4-00c04fd430c8"
+			]
+		}`,
+		w.Body.String())
+}
+
 func TestPOST_OnAnalysisCreationHandler_WithInternalError_ShouldReturnHTTP500(t *testing.T) {
 	router := rest.NewServer()
 	rest.RegisterAnalyzeProjectUsecase(router, mockAnalyzeUsecase{
@@ -160,7 +203,7 @@ func TestPOST_OnAnalysisCreationHandler_WithSuccess_ShouldReturnHTTP201(t *testi
 	router := rest.NewServer()
 	rest.RegisterAnalyzeProjectUsecase(router, mockAnalyzeUsecase{
 		a: entity.AnalysisResults{
-			ID:                      "f17e675d-7823-4510-a04b-86e8c1f239ea",
+			ID:                      uuid.MustParse("f17e675d-7823-4510-a04b-86e8c1f239ea"),
 			ProjectName:             "src-d/go-siva",
 			DateCreated:             now,
 			PipelineMiners:          []string{"miner_1", "miner_2"},

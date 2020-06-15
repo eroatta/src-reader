@@ -63,7 +63,7 @@ func (im *identifierMapper) toDTO(ent entity.Identifier, projectEnt entity.Proje
 		Position:        ent.Position,
 		Name:            ent.Name,
 		Type:            im.fromTokenToString(ent.Type),
-		AnalysisID:      projectEnt.ID,
+		AnalysisID:      projectEnt.ID.String(),
 		ProjectRef:      projectEnt.Metadata.Fullname,
 		CreatedAt:       time.Now(),
 		Exported:        ent.Exported(),

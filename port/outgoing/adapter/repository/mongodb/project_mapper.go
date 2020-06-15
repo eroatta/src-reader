@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/eroatta/src-reader/entity"
+	"github.com/google/uuid"
 )
 
 // projectMapper maps a Project between its model and database representations.
@@ -12,7 +13,7 @@ type projectMapper struct{}
 // toDTO maps the entity for Project into a Data Transfer Object.
 func (pm *projectMapper) toDTO(ent entity.Project) projectDTO {
 	return projectDTO{
-		ID:        ent.ID,
+		ID:        ent.ID.String(),
 		Status:    ent.Status,
 		ProjecRef: ent.Reference,
 		CreatedAt: ent.CreatedAt,
@@ -44,7 +45,7 @@ func (pm *projectMapper) toDTO(ent entity.Project) projectDTO {
 // toEntity maps the Data Transfer Object for Project into a domain entity.
 func (pm *projectMapper) toEntity(dto projectDTO) entity.Project {
 	return entity.Project{
-		ID:        dto.ID,
+		ID:        uuid.MustParse(dto.ID),
 		Status:    dto.Status,
 		Reference: dto.ProjecRef,
 		CreatedAt: dto.CreatedAt,

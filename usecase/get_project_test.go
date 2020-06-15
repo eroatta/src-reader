@@ -49,7 +49,7 @@ func TestProcess_OnGetProjectUsecase_WhenExistingProject_ShouldReturnProject(t *
 	id, _ := uuid.NewUUID()
 	projectRepositoryMock := projectRepositoryMock{
 		project: entity.Project{
-			ID:        id.String(),
+			ID:        id,
 			Reference: "test/mytest",
 			Status:    "done",
 			Metadata: entity.Metadata{

@@ -66,13 +66,16 @@ func createAnalysis(ctx *gin.Context, uc usecase.AnalyzeProjectUsecase) {
 	case usecase.ErrProjectNotFound:
 		setBadRequestResponse(ctx, fmt.Errorf("project with ID: %s can't be found", cmd.ProjectID))
 		return
+	case usecase.ErrPreviousAnalysisFound:
+		setBadRequestResponse(ctx, fmt.Errorf("a previous analysis exists for project with ID: %s", cmd.ProjectID))
+		return
 	default:
 		setInternalErrorResponse(ctx, err)
 		return
 	}
 
 	response := analysisResponse{
-		ID:         analysis.ID,
+		ID:         analysis.ID.String(),
 		ProjectRef: analysis.ProjectName,
 		CreatedAt:  analysis.DateCreated,
 		Miners:     analysis.PipelineMiners,

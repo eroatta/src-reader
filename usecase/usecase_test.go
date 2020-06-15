@@ -93,11 +93,17 @@ func (i identifierRepositoryMock) FindAllByProjectAndFile(ctx context.Context, p
 
 // analysis repository mock
 type analysisRepositoryMock struct {
-	err error
+	analysisResults entity.AnalysisResults
+	addErr          error
+	getErr          error
 }
 
 func (a analysisRepositoryMock) Add(ctx context.Context, analysis entity.AnalysisResults) error {
-	return a.err
+	return a.addErr
+}
+
+func (a analysisRepositoryMock) GetByProjectID(ctx context.Context, projectID uuid.UUID) (entity.AnalysisResults, error) {
+	return a.analysisResults, a.getErr
 }
 
 // end analysis repository mock

@@ -127,7 +127,7 @@ func getProject(ctx *gin.Context, uc usecase.GetProjectUsecase) {
 
 func toProjectResponse(project entity.Project) projectResponse {
 	return projectResponse{
-		ID:        project.ID,
+		ID:        project.ID.String(),
 		Status:    project.Status,
 		Reference: project.Reference,
 		Metadata: metadataResponse{

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"go/ast"
 	"testing"
+	"time"
 
 	"github.com/eroatta/src-reader/entity"
 	"github.com/eroatta/src-reader/port/outgoing/adapter/algorithm/splitter"
@@ -51,6 +52,47 @@ func TestProcess_OnAnalyzeProjectUsecase_WhenFailingToRetrieveProject_ShouldRetu
 	assert.Empty(t, results)
 }
 
+func TestProcess_OnAnalyzeProjectUsecase_WhenExistingAnalysisForProject_ShouldReturnError(t *testing.T) {
+	project := entity.Project{
+		Reference: "eroatta/test",
+		SourceCode: entity.SourceCode{
+			Hash:     "asdf1234asdf",
+			Location: "/tmp/repositories/eroatta/test",
+			Files:    []string{"main.go"},
+		},
+	}
+	projectRepositoryMock := projectRepositoryMock{
+		project: project,
+	}
+	analysisRepositoryMock := analysisRepositoryMock{
+		analysisResults: entity.AnalysisResults{
+			ID:                      uuid.MustParse("f17e675d-7823-4510-a04b-86e8c1f239ea"),
+			ProjectID:               uuid.MustParse("f9b76fde-c342-4328-8650-85da8f21e2be"),
+			ProjectName:             "eroatta/test",
+			DateCreated:             time.Now(),
+			PipelineMiners:          []string{"miner_1", "miner_2"},
+			PipelineSplitters:       []string{"splitter_1", "splitter_2"},
+			PipelineExpanders:       []string{"expander_1", "expander_2"},
+			FilesTotal:              10,
+			FilesValid:              8,
+			FilesError:              2,
+			FilesErrorSamples:       []string{"file_error"},
+			IdentifiersTotal:        120,
+			IdentifiersValid:        105,
+			IdentifiersError:        15,
+			IdentifiersErrorSamples: []string{"identifier_error"},
+		},
+	}
+	uc := usecase.NewAnalyzeProjectUsecase(projectRepositoryMock, nil, nil,
+		analysisRepositoryMock, &entity.AnalysisConfig{})
+
+	projectID, _ := uuid.NewUUID()
+	results, err := uc.Process(context.TODO(), projectID)
+
+	assert.EqualError(t, err, usecase.ErrPreviousAnalysisFound.Error())
+	assert.Equal(t, uuid.MustParse("f17e675d-7823-4510-a04b-86e8c1f239ea"), results.ID)
+}
+
 func TestProcess_OnAnalyzeProjectUsecase_WhenFailingToReadFiles_ShouldReturnError(t *testing.T) {
 	project := entity.Project{
 		Reference: "eroatta/test",
@@ -69,7 +111,13 @@ func TestProcess_OnAnalyzeProjectUsecase_WhenFailingToReadFiles_ShouldReturnErro
 		err:   repository.ErrSourceCodeUnableReadFile,
 	}
 
-	uc := usecase.NewAnalyzeProjectUsecase(projectRepositoryMock, sourceCodeRepositoryMock, nil, nil, &entity.AnalysisConfig{})
+	analysisRepositoryMock := analysisRepositoryMock{
+		analysisResults: entity.AnalysisResults{},
+		getErr:          repository.ErrAnalysisNoResults,
+	}
+
+	uc := usecase.NewAnalyzeProjectUsecase(projectRepositoryMock, sourceCodeRepositoryMock,
+		nil, analysisRepositoryMock, &entity.AnalysisConfig{})
 
 	projectID, _ := uuid.NewUUID()
 	results, err := uc.Process(context.TODO(), projectID)
@@ -98,7 +146,13 @@ func TestProcess_OnAnalyzeProjectUsecase_WhenFailingToParseFiles_ShouldReturnErr
 		err: nil,
 	}
 
-	uc := usecase.NewAnalyzeProjectUsecase(projectRepositoryMock, sourceCodeRepositoryMock, nil, nil, &entity.AnalysisConfig{})
+	analysisRepositoryMock := analysisRepositoryMock{
+		analysisResults: entity.AnalysisResults{},
+		getErr:          repository.ErrAnalysisNoResults,
+	}
+
+	uc := usecase.NewAnalyzeProjectUsecase(projectRepositoryMock, sourceCodeRepositoryMock,
+		nil, analysisRepositoryMock, &entity.AnalysisConfig{})
 
 	projectID, _ := uuid.NewUUID()
 	results, err := uc.Process(context.TODO(), projectID)
@@ -127,11 +181,17 @@ func TestProcess_OnAnalyzeProjectUsecase_WhenFailingToCreateSplitters_ShouldRetu
 		err: nil,
 	}
 
+	analysisRepositoryMock := analysisRepositoryMock{
+		analysisResults: entity.AnalysisResults{},
+		getErr:          repository.ErrAnalysisNoResults,
+	}
+
 	config := &entity.AnalysisConfig{
 		Miners:    []string{},
 		Splitters: []string{},
 	}
-	uc := usecase.NewAnalyzeProjectUsecase(projectRepositoryMock, sourceCodeRepositoryMock, nil, nil, config)
+	uc := usecase.NewAnalyzeProjectUsecase(projectRepositoryMock, sourceCodeRepositoryMock,
+		nil, analysisRepositoryMock, config)
 
 	projectID, _ := uuid.NewUUID()
 	results, err := uc.Process(context.TODO(), projectID)
@@ -160,13 +220,19 @@ func TestProcess_OnAnalyzeProjectUsecase_WhenFailingToCreateExpanders_ShouldRetu
 		err: nil,
 	}
 
+	analysisRepositoryMock := analysisRepositoryMock{
+		analysisResults: entity.AnalysisResults{},
+		getErr:          repository.ErrAnalysisNoResults,
+	}
+
 	config := &entity.AnalysisConfig{
 		Miners:                    []string{},
 		Splitters:                 []string{"conserv"},
 		SplittingAlgorithmFactory: splitter.NewSplitterFactory(),
 		Expanders:                 []string{},
 	}
-	uc := usecase.NewAnalyzeProjectUsecase(projectRepositoryMock, sourceCodeRepositoryMock, nil, nil, config)
+	uc := usecase.NewAnalyzeProjectUsecase(projectRepositoryMock, sourceCodeRepositoryMock,
+		nil, analysisRepositoryMock, config)
 
 	projectID, _ := uuid.NewUUID()
 	results, err := uc.Process(context.TODO(), projectID)
@@ -199,6 +265,11 @@ func TestProcess_OnAnalyzeProjectUsecase_WhenFailingToSaveIdentifiers_ShouldRetu
 		err: repository.ErrIdentifierUnexpected,
 	}
 
+	analysisRepositoryMock := analysisRepositoryMock{
+		analysisResults: entity.AnalysisResults{},
+		getErr:          repository.ErrAnalysisNoResults,
+	}
+
 	config := &entity.AnalysisConfig{
 		Miners:                    []string{},
 		ExtractorFactory:          newExtractorMock,
@@ -207,7 +278,8 @@ func TestProcess_OnAnalyzeProjectUsecase_WhenFailingToSaveIdentifiers_ShouldRetu
 		Expanders:                 []string{"mock"},
 		ExpansionAlgorithmFactory: expanderAbstractFactoryMock{},
 	}
-	uc := usecase.NewAnalyzeProjectUsecase(projectRepositoryMock, sourceCodeRepositoryMock, identifierRepositoryMock, nil, config)
+	uc := usecase.NewAnalyzeProjectUsecase(projectRepositoryMock, sourceCodeRepositoryMock,
+		identifierRepositoryMock, analysisRepositoryMock, config)
 
 	projectID, _ := uuid.NewUUID()
 	results, err := uc.Process(context.TODO(), projectID)
@@ -241,7 +313,9 @@ func TestProcess_OnAnalyzeProjectUsecase_WhenFailingToSaveAnalysis_ShouldReturnE
 	}
 
 	analysisRepositoryMock := analysisRepositoryMock{
-		err: repository.ErrAnalysisUnexpected,
+		analysisResults: entity.AnalysisResults{},
+		getErr:          repository.ErrAnalysisNoResults,
+		addErr:          repository.ErrAnalysisUnexpected,
 	}
 
 	config := &entity.AnalysisConfig{
@@ -252,7 +326,8 @@ func TestProcess_OnAnalyzeProjectUsecase_WhenFailingToSaveAnalysis_ShouldReturnE
 		Expanders:                 []string{"mock"},
 		ExpansionAlgorithmFactory: expanderAbstractFactoryMock{},
 	}
-	uc := usecase.NewAnalyzeProjectUsecase(projectRepositoryMock, sourceCodeRepositoryMock, identifierRepositoryMock, analysisRepositoryMock, config)
+	uc := usecase.NewAnalyzeProjectUsecase(projectRepositoryMock, sourceCodeRepositoryMock,
+		identifierRepositoryMock, analysisRepositoryMock, config)
 
 	projectID, _ := uuid.NewUUID()
 	results, err := uc.Process(context.TODO(), projectID)
@@ -263,7 +338,7 @@ func TestProcess_OnAnalyzeProjectUsecase_WhenFailingToSaveAnalysis_ShouldReturnE
 
 func TestProcess_OnAnalyzeProjectUsecase_WhenAnalyzingIdentifiers_ShouldReturnAnalysisResults(t *testing.T) {
 	project := entity.Project{
-		ID:        "asadfasa345asdfasdfa",
+		ID:        uuid.MustParse("f9b76fde-c342-4328-8650-85da8f21e2be"),
 		Reference: "eroatta/test",
 		Metadata: entity.Metadata{
 			Fullname: "eroatta/test",
@@ -290,7 +365,9 @@ func TestProcess_OnAnalyzeProjectUsecase_WhenAnalyzingIdentifiers_ShouldReturnAn
 	}
 
 	analysisRepositoryMock := analysisRepositoryMock{
-		err: nil,
+		analysisResults: entity.AnalysisResults{},
+		getErr:          repository.ErrAnalysisNoResults,
+		addErr:          nil,
 	}
 
 	config := &entity.AnalysisConfig{
@@ -308,7 +385,7 @@ func TestProcess_OnAnalyzeProjectUsecase_WhenAnalyzingIdentifiers_ShouldReturnAn
 	results, err := uc.Process(context.TODO(), projectID)
 
 	assert.NoError(t, err)
-	assert.Equal(t, "asadfasa345asdfasdfa", results.ID)
+	assert.NotEmpty(t, results.ID)
 	assert.Equal(t, "eroatta/test", results.ProjectName)
 	assert.Equal(t, 1, results.FilesTotal)
 	assert.Equal(t, 1, results.FilesValid)

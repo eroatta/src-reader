@@ -5,13 +5,14 @@ import (
 	"time"
 
 	"github.com/eroatta/src-reader/entity"
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestToDTO_OnProjectMapper_ShouldReturnProjectDTO(t *testing.T) {
 	now := time.Now()
 	entity := entity.Project{
-		ID:        "715f17550be5f7222a815ff80966adaf",
+		ID:        uuid.MustParse("f9b76fde-c342-4328-8650-85da8f21e2be"),
 		Status:    "done",
 		Reference: "src-d/go-siva",
 		CreatedAt: now,
@@ -44,7 +45,7 @@ func TestToDTO_OnProjectMapper_ShouldReturnProjectDTO(t *testing.T) {
 	pm := &projectMapper{}
 	dto := pm.toDTO(entity)
 
-	assert.Equal(t, "715f17550be5f7222a815ff80966adaf", dto.ID)
+	assert.Equal(t, "f9b76fde-c342-4328-8650-85da8f21e2be", dto.ID)
 	assert.Equal(t, "done", dto.Status)
 	assert.Equal(t, "src-d/go-siva", dto.ProjecRef)
 	assert.Equal(t, now, dto.CreatedAt)
@@ -71,7 +72,7 @@ func TestToDTO_OnProjectMapper_ShouldReturnProjectDTO(t *testing.T) {
 func TestToEntity_OnProjectMapper_ShouldReturnProjectEntity(t *testing.T) {
 	now := time.Now()
 	dto := projectDTO{
-		ID:        "715f17550be5f7222a815ff80966adaf",
+		ID:        "f9b76fde-c342-4328-8650-85da8f21e2be",
 		Status:    "done",
 		ProjecRef: "src-d/go-siva",
 		CreatedAt: now,
@@ -104,7 +105,7 @@ func TestToEntity_OnProjectMapper_ShouldReturnProjectEntity(t *testing.T) {
 	pm := &projectMapper{}
 	ent := pm.toEntity(dto)
 
-	assert.Equal(t, "715f17550be5f7222a815ff80966adaf", ent.ID)
+	assert.Equal(t, uuid.MustParse("f9b76fde-c342-4328-8650-85da8f21e2be"), ent.ID)
 	assert.Equal(t, "done", ent.Status)
 	assert.Equal(t, "src-d/go-siva", ent.Reference)
 	assert.Equal(t, now, ent.CreatedAt)

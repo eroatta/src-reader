@@ -134,7 +134,7 @@ func TestPOST_OnProjectCreationHandler_WithSuccess_ShouldReturnHTTP201(t *testin
 	router := rest.NewServer()
 	rest.RegisterCreateProjectUsecase(router, mockCreateUsecase{
 		project: entity.Project{
-			ID:        "715f17550be5f7222a815ff80966adaf",
+			ID:        uuid.MustParse("f9b76fde-c342-4328-8650-85da8f21e2be"),
 			Status:    "done",
 			Reference: "src-d/go-siva",
 			Metadata: entity.Metadata{
@@ -175,7 +175,7 @@ func TestPOST_OnProjectCreationHandler_WithSuccess_ShouldReturnHTTP201(t *testin
 	assert.Equal(t, http.StatusCreated, w.Code)
 	assert.JSONEq(t, `
 		{
-			"id": "715f17550be5f7222a815ff80966adaf",
+			"id": "f9b76fde-c342-4328-8650-85da8f21e2be",
 			"status": "done",
 			"reference": "src-d/go-siva",
 			"metadata": {
@@ -275,7 +275,7 @@ func TestGET_OnProjectGetterHandler_WithSuccess_ShouldReturnHTTP200(t *testing.T
 	router := rest.NewServer()
 	rest.RegisterGetProjectUsecase(router, mockGetUsecase{
 		project: entity.Project{
-			ID:        "6ba7b810-9dad-11d1-80b4-00c04fd430c8",
+			ID:        uuid.MustParse("6ba7b810-9dad-11d1-80b4-00c04fd430c8"),
 			Status:    "done",
 			Reference: "src-d/go-siva",
 			Metadata: entity.Metadata{

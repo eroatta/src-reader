@@ -6,7 +6,9 @@ import (
 
 	"github.com/eroatta/src-reader/entity"
 	"github.com/eroatta/src-reader/repository"
+	"github.com/google/uuid"
 	log "github.com/sirupsen/logrus"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -37,4 +39,26 @@ func (adb *AnalysisDB) Add(ctx context.Context, analysis entity.AnalysisResults)
 	}
 
 	return nil
+}
+
+// GetByProjectID retrieves an existing analysis for the given Project, from the underlying MongoDB collection.
+func (adb *AnalysisDB) GetByProjectID(ctx context.Context, projectID uuid.UUID) (entity.AnalysisResults, error) {
+	results := adb.collection.FindOne(ctx, bson.M{"project_id": projectID.String()})
+	switch results.Err() {
+	case nil:
+		// do nothing
+	case mongo.ErrNoDocuments:
+		return entity.AnalysisResults{}, repository.ErrAnalysisNoResults
+	default:
+		log.WithError(results.Err()).Errorf("error searching analysis for project_id: %v", projectID)
+		return entity.AnalysisResults{}, repository.ErrAnalysisUnexpected
+	}
+
+	var dto analysisDTO
+	if err := results.Decode(&dto); err != nil {
+		log.WithError(err).Errorf("error decoding results for analysis with project_id: %v", projectID)
+		return entity.AnalysisResults{}, repository.ErrAnalysisUnexpected
+	}
+
+	return adb.mapper.toEntity(dto), nil
 }

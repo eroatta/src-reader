@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/eroatta/src-reader/entity"
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -61,7 +62,7 @@ func TestToDTO_OnIdentifierMapper_ShouldReturnIdentifierDTO(t *testing.T) {
 		},
 	}
 	project := entity.Project{
-		ID: "715f17550be5f7222a815ff80966adaf",
+		ID: uuid.MustParse("f9b76fde-c342-4328-8650-85da8f21e2be"),
 		Metadata: entity.Metadata{
 			Fullname: "src-d/go-siva",
 		},
@@ -89,7 +90,7 @@ func TestToDTO_OnIdentifierMapper_ShouldReturnIdentifierDTO(t *testing.T) {
 		{Order: 2, SplittingAlgorithm: "conserv", From: "output", Values: []string{"output"}},
 	}, dto.Expansions["noexp"])
 	assert.Equal(t, "default_output", dto.JoinedExpansions["noexp"])
-	assert.Equal(t, "715f17550be5f7222a815ff80966adaf", dto.AnalysisID)
+	assert.Equal(t, "f9b76fde-c342-4328-8650-85da8f21e2be", dto.AnalysisID)
 	assert.Equal(t, "src-d/go-siva", dto.ProjectRef)
 	assert.Equal(t, time.Now().Format("2006-02-01"), dto.CreatedAt.Format("2006-02-01"))
 	assert.False(t, dto.Exported)

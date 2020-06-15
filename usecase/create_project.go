@@ -68,9 +68,9 @@ func (uc createProjectUsecase) Process(ctx context.Context, projectRef string) (
 		return entity.Project{}, ErrUnableToRetrieveMetadata
 	}
 
-	id, _ := uuid.NewUUID()
+	projectID, _ := uuid.NewUUID()
 	project = entity.Project{
-		ID:        id.String(),
+		ID:        projectID,
 		Reference: projectRef,
 		CreatedAt: time.Now(),
 		Metadata:  metadata,
