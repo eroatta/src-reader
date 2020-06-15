@@ -205,6 +205,7 @@ func TestPOST_OnAnalysisCreationHandler_WithSuccess_ShouldReturnHTTP201(t *testi
 		a: entity.AnalysisResults{
 			ID:                      uuid.MustParse("f17e675d-7823-4510-a04b-86e8c1f239ea"),
 			ProjectName:             "src-d/go-siva",
+			ProjectID:               uuid.MustParse("6ba7b810-9dad-11d1-80b4-00c04fd430c8"),
 			DateCreated:             now,
 			PipelineMiners:          []string{"miner_1", "miner_2"},
 			PipelineSplitters:       []string{"splitter_1", "splitter_2"},
@@ -232,8 +233,9 @@ func TestPOST_OnAnalysisCreationHandler_WithSuccess_ShouldReturnHTTP201(t *testi
 	assert.JSONEq(t, `
 		{
 			"id": "f17e675d-7823-4510-a04b-86e8c1f239ea",
-			"project_ref": "src-d/go-siva",
 			"created_at": "2020-05-05T22:00:00Z",
+			"project_ref": "src-d/go-siva",
+			"project_id": "6ba7b810-9dad-11d1-80b4-00c04fd430c8",
 			"miners": [
 				"miner_1", 
 				"miner_2"

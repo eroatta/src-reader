@@ -19,6 +19,7 @@ type analysisResponse struct {
 	ID          string          `json:"id"`
 	CreatedAt   time.Time       `json:"created_at"`
 	ProjectRef  string          `json:"project_ref"`
+	ProjectID   string          `json:"project_id"`
 	Miners      []string        `json:"miners"`
 	Splitters   []string        `json:"splitters"`
 	Expanders   []string        `json:"expanders"`
@@ -76,8 +77,9 @@ func createAnalysis(ctx *gin.Context, uc usecase.AnalyzeProjectUsecase) {
 
 	response := analysisResponse{
 		ID:         analysis.ID.String(),
-		ProjectRef: analysis.ProjectName,
 		CreatedAt:  analysis.DateCreated,
+		ProjectRef: analysis.ProjectName,
+		ProjectID:  analysis.ProjectID.String(),
 		Miners:     analysis.PipelineMiners,
 		Splitters:  analysis.PipelineSplitters,
 		Expanders:  analysis.PipelineExpanders,
