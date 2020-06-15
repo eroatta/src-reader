@@ -61,15 +61,13 @@ func TestToDTO_OnIdentifierMapper_ShouldReturnIdentifierDTO(t *testing.T) {
 			Score:     0.99,
 		},
 	}
-	project := entity.Project{
-		ID: uuid.MustParse("f9b76fde-c342-4328-8650-85da8f21e2be"),
-		Metadata: entity.Metadata{
-			Fullname: "src-d/go-siva",
-		},
+	analysis := entity.AnalysisResults{
+		ID:          uuid.MustParse("f9b76fde-c342-4328-8650-85da8f21e2be"),
+		ProjectName: "src-d/go-siva",
 	}
 
 	im := &identifierMapper{}
-	dto := im.toDTO(identifier, project)
+	dto := im.toDTO(identifier, analysis)
 
 	assert.Equal(t, "filename:cmd/siva/impl/list.go+++pkg:impl+++declType:var+++name:defaultOutput", dto.ID)
 	assert.Equal(t, "impl", dto.Package)

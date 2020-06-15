@@ -16,8 +16,8 @@ var (
 
 // IdentifierRepository represents a repository able to store and retrieve identifiers.
 type IdentifierRepository interface {
-	// Add associates an identifier with a given project.
-	Add(ctx context.Context, project entity.Project, ident entity.Identifier) error
+	// Add associates an identifier with a given Analysis.
+	Add(ctx context.Context, analysis entity.AnalysisResults, ident entity.Identifier) error
 	// FindAllByProject retrives a list of identifiers associated to the given project reference.
 	FindAllByProject(ctx context.Context, projectRef string) ([]entity.Identifier, error)
 	// FindAllByProjectAndFile retrieve a list of identifiers that match the given criteria.

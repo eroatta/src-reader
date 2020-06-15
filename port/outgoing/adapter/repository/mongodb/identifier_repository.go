@@ -31,8 +31,8 @@ func NewMongoDBIdentifierRepository(client *mongo.Client, dbname string) *Identi
 }
 
 // Add transforms and stores an Identifier entity into a document on the underlying MongoDB collection.
-func (idb *IdentifierDB) Add(ctx context.Context, project entity.Project, ident entity.Identifier) error {
-	dto := idb.mapper.toDTO(ident, project)
+func (idb *IdentifierDB) Add(ctx context.Context, analysis entity.AnalysisResults, ident entity.Identifier) error {
+	dto := idb.mapper.toDTO(ident, analysis)
 	_, err := idb.collection.InsertOne(ctx, dto)
 	if err != nil {
 		log.WithError(err).Error(fmt.Sprintf("error inserting record %v", ident))

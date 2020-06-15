@@ -54,7 +54,7 @@ func (im *identifierMapper) fromStringToToken(str string) token.Token {
 }
 
 // toDTO maps the entity for Identifier into a Data Transfer Object.
-func (im *identifierMapper) toDTO(ent entity.Identifier, projectEnt entity.Project) identifierDTO {
+func (im *identifierMapper) toDTO(ent entity.Identifier, analysisEnt entity.AnalysisResults) identifierDTO {
 	dto := identifierDTO{
 		ID:              ent.ID,
 		Package:         ent.Package,
@@ -63,8 +63,8 @@ func (im *identifierMapper) toDTO(ent entity.Identifier, projectEnt entity.Proje
 		Position:        ent.Position,
 		Name:            ent.Name,
 		Type:            im.fromTokenToString(ent.Type),
-		AnalysisID:      projectEnt.ID.String(),
-		ProjectRef:      projectEnt.Metadata.Fullname,
+		AnalysisID:      analysisEnt.ID.String(),
+		ProjectRef:      analysisEnt.ProjectName,
 		CreatedAt:       time.Now(),
 		Exported:        ent.Exported(),
 		Normalization: normalizationDTO{

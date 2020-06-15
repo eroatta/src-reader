@@ -178,7 +178,7 @@ func (uc analyzeProjectUsecase) Process(ctx context.Context, projectID uuid.UUID
 			analysisResults.IdentifiersError++
 		}
 
-		err := uc.identifierRepository.Add(ctx, project, ident)
+		err := uc.identifierRepository.Add(ctx, analysisResults, ident)
 		if err != nil {
 			log.WithError(err).Error(fmt.Sprintf("unable to save identifier %s, on file %s for project %s",
 				ident.Name, ident.File, analysisResults.ProjectName))

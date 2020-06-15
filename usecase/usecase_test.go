@@ -77,7 +77,7 @@ type identifierRepositoryMock struct {
 	err    error
 }
 
-func (i identifierRepositoryMock) Add(ctx context.Context, project entity.Project, ident entity.Identifier) error {
+func (i identifierRepositoryMock) Add(ctx context.Context, analysis entity.AnalysisResults, ident entity.Identifier) error {
 	return i.err
 }
 
