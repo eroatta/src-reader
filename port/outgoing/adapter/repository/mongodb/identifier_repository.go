@@ -3,7 +3,6 @@ package mongodb
 import (
 	"context"
 	"fmt"
-	"strings"
 
 	"github.com/eroatta/src-reader/entity"
 	"github.com/eroatta/src-reader/repository"
@@ -68,9 +67,7 @@ func (idb *IdentifierDB) FindAllByAnalysisID(ctx context.Context, analysisID uui
 
 // FindAllByProject retrieves all the identifiers related to a given project, from the underlying MongoDB collection.
 func (idb *IdentifierDB) FindAllByProjectAndFile(ctx context.Context, projectRef string, filename string) ([]entity.Identifier, error) {
-	// TODO: review how to handle URL
-	cursor, err := idb.collection.Find(ctx,
-		bson.M{"project_ref": strings.TrimPrefix(projectRef, "https://github.com/"), "file": filename})
+	cursor, err := idb.collection.Find(ctx, bson.M{"project_ref": projectRef, "file": filename})
 	if err != nil {
 		log.WithError(err).Error(fmt.Sprintf("error looking documents for %s on file %s", projectRef, filename))
 		return []entity.Identifier{}, repository.ErrIdentifierUnexpected
