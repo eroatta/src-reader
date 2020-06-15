@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/eroatta/src-reader/entity"
+	"github.com/google/uuid"
 )
 
 // identifierMapper maps an Identifier between its model and database representations.
@@ -152,6 +153,8 @@ func (im *identifierMapper) toEntity(dto identifierDTO) entity.Identifier {
 
 	return entity.Identifier{
 		ID:         dto.ID,
+		ProjectRef: dto.ProjectRef,
+		AnalysisID: uuid.MustParse(dto.AnalysisID),
 		Package:    dto.Package,
 		File:       dto.File,
 		Position:   dto.Position,

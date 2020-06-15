@@ -7,14 +7,16 @@ import (
 
 	"github.com/eroatta/src-reader/usecase"
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	log "github.com/sirupsen/logrus"
 )
 
 type createInsightsCommand struct {
-	Repository string `json:"repository" validate:"url"`
+	AnalysisID string `json:"analysis_id" validate:"uuid"`
 }
 
 type insightsResponse struct {
+	AnalysisID string                  `json:"analysis_id"`
 	ProjectRef string                  `json:"project_ref"`
 	Summary    insightsSummaryResponse `json:"identifiers"`
 	Overall    float64                 `json:"accuracy"`
@@ -60,12 +62,12 @@ func createInsights(ctx *gin.Context, uc usecase.GainInsightsUsecase) {
 		return
 	}
 
-	insights, err := uc.Process(ctx, cmd.Repository)
+	insights, err := uc.Process(ctx, uuid.MustParse(cmd.AnalysisID))
 	switch err {
 	case nil:
 		// do nothing
 	case usecase.ErrIdentifiersNotFound:
-		setBadRequestResponse(ctx, fmt.Errorf("non-existing identifiers for %s", cmd.Repository))
+		setBadRequestResponse(ctx, fmt.Errorf("non-existing identifiers for analysis ID %v", cmd.AnalysisID))
 		return
 	default:
 		setInternalErrorResponse(ctx, err)
@@ -73,13 +75,14 @@ func createInsights(ctx *gin.Context, uc usecase.GainInsightsUsecase) {
 	}
 
 	response := insightsResponse{
-		ProjectRef: cmd.Repository,
+		AnalysisID: cmd.AnalysisID,
 		Summary:    insightsSummaryResponse{},
 		Packages:   make([]packageResponse, 0),
 	}
 	weighted := 0.0
 
 	for _, insight := range insights {
+		response.ProjectRef = insight.ProjectRef
 		response.Summary.Total += insight.TotalIdentifiers
 		response.Summary.Exported += insight.TotalExported
 		weighted += insight.TotalWeight

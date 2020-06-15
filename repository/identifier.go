@@ -5,6 +5,7 @@ import (
 	"errors"
 
 	"github.com/eroatta/src-reader/entity"
+	"github.com/google/uuid"
 )
 
 var (
@@ -18,8 +19,8 @@ var (
 type IdentifierRepository interface {
 	// Add associates an identifier with a given Analysis.
 	Add(ctx context.Context, analysis entity.AnalysisResults, ident entity.Identifier) error
-	// FindAllByProject retrives a list of identifiers associated to the given project reference.
-	FindAllByProject(ctx context.Context, projectRef string) ([]entity.Identifier, error)
+	// FindAllByAnalysis retrives a list of identifiers associated to the given analysis.
+	FindAllByAnalysisID(ctx context.Context, analysisID uuid.UUID) ([]entity.Identifier, error)
 	// FindAllByProjectAndFile retrieve a list of identifiers that match the given criteria.
 	FindAllByProjectAndFile(ctx context.Context, projectRef string, filename string) ([]entity.Identifier, error)
 }

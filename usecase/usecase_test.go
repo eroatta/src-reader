@@ -81,7 +81,7 @@ func (i identifierRepositoryMock) Add(ctx context.Context, analysis entity.Analy
 	return i.err
 }
 
-func (i identifierRepositoryMock) FindAllByProject(ctx context.Context, projectRef string) ([]entity.Identifier, error) {
+func (i identifierRepositoryMock) FindAllByAnalysisID(ctx context.Context, analysisID uuid.UUID) ([]entity.Identifier, error) {
 	return i.idents, i.err
 }
 

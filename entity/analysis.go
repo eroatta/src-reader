@@ -37,6 +37,8 @@ type File struct {
 // parent information, and splits/expansions.
 type Identifier struct {
 	ID            string
+	ProjectRef    string
+	AnalysisID    uuid.UUID
 	Package       string
 	File          string
 	Position      token.Pos

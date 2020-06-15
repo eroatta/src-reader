@@ -7,6 +7,7 @@ import (
 	"github.com/eroatta/src-reader/entity"
 	"github.com/eroatta/src-reader/repository"
 	"github.com/eroatta/src-reader/usecase"
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -24,7 +25,8 @@ func TestProcess_OnGainInsightsUsecase_WhenNoIdentifiers_ShouldReturnError(t *te
 
 	uc := usecase.NewGainInsightsUsecase(identifierRepositoryMock, nil)
 
-	insights, err := uc.Process(context.TODO(), "eroatta/test")
+	analysisID, _ := uuid.NewUUID()
+	insights, err := uc.Process(context.TODO(), analysisID)
 
 	assert.EqualError(t, err, usecase.ErrIdentifiersNotFound.Error())
 	assert.Empty(t, insights)
@@ -38,7 +40,8 @@ func TestProcess_OnGainInsightsUsecase_WhenErrorReadingIdentifiers_ShouldReturnE
 
 	uc := usecase.NewGainInsightsUsecase(identifierRepositoryMock, nil)
 
-	insights, err := uc.Process(context.TODO(), "eroatta/test")
+	analysisID, _ := uuid.NewUUID()
+	insights, err := uc.Process(context.TODO(), analysisID)
 
 	assert.EqualError(t, err, usecase.ErrUnableToReadIdentifiers.Error())
 	assert.Empty(t, insights)
@@ -58,13 +61,15 @@ func TestProcess_OnGainInsightsUsecase_WhenFailingToSaveInsights_ShouldReturnErr
 
 	uc := usecase.NewGainInsightsUsecase(identifierRepositoryMock, insightsRepositoryMock)
 
-	insights, err := uc.Process(context.TODO(), "eroatta/test")
+	analysisID, _ := uuid.NewUUID()
+	insights, err := uc.Process(context.TODO(), analysisID)
 
 	assert.EqualError(t, err, usecase.ErrUnableToGainInsights.Error())
 	assert.Empty(t, insights)
 }
 
 func TestProcess_OnGainInsightsUsecase_ShouldReturnInsightsByPackage(t *testing.T) {
+	analysisID, _ := uuid.NewUUID()
 	identifierRepositoryMock := identifierRepositoryMock{
 		idents: []entity.Identifier{
 			{
@@ -82,6 +87,8 @@ func TestProcess_OnGainInsightsUsecase_ShouldReturnInsightsByPackage(t *testing.
 					Algorithm: "conserv+no_exp",
 					Score:     0.98,
 				},
+				AnalysisID: analysisID,
+				ProjectRef: "test/mytest",
 			},
 			{
 				Package: "main",
@@ -104,6 +111,8 @@ func TestProcess_OnGainInsightsUsecase_ShouldReturnInsightsByPackage(t *testing.
 					Algorithm: "conserv+no_exp",
 					Score:     0.93,
 				},
+				AnalysisID: analysisID,
+				ProjectRef: "test/mytest",
 			},
 			{
 				Package: "main",
@@ -126,6 +135,8 @@ func TestProcess_OnGainInsightsUsecase_ShouldReturnInsightsByPackage(t *testing.
 					Algorithm: "conserv+no_exp",
 					Score:     0.93,
 				},
+				AnalysisID: analysisID,
+				ProjectRef: "test/mytest",
 			},
 			{
 				Package: "main_test",
@@ -146,6 +157,8 @@ func TestProcess_OnGainInsightsUsecase_ShouldReturnInsightsByPackage(t *testing.
 					Algorithm: "conserv+no_exp",
 					Score:     1.0,
 				},
+				AnalysisID: analysisID,
+				ProjectRef: "test/mytest",
 			},
 		},
 		err: nil,
@@ -157,13 +170,13 @@ func TestProcess_OnGainInsightsUsecase_ShouldReturnInsightsByPackage(t *testing.
 
 	uc := usecase.NewGainInsightsUsecase(identifierRepositoryMock, insightsRepositoryMock)
 
-	insights, err := uc.Process(context.TODO(), "eroatta/test")
+	insights, err := uc.Process(context.TODO(), analysisID)
 
 	assert.NoError(t, err)
 	assert.Equal(t, 2, len(insights))
 	assert.ElementsMatch(t, []entity.Insight{
 		{
-			ProjectRef:       "eroatta/test",
+			ProjectRef:       "test/mytest",
 			Package:          "main",
 			TotalIdentifiers: 3,
 			TotalExported:    1,
@@ -180,7 +193,7 @@ func TestProcess_OnGainInsightsUsecase_ShouldReturnInsightsByPackage(t *testing.
 			},
 		},
 		{
-			ProjectRef:       "eroatta/test",
+			ProjectRef:       "test/mytest",
 			Package:          "main_test",
 			TotalIdentifiers: 1,
 			TotalExported:    1,

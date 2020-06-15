@@ -7,6 +7,7 @@ import (
 
 	"github.com/eroatta/src-reader/entity"
 	"github.com/eroatta/src-reader/repository"
+	"github.com/google/uuid"
 	log "github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -42,19 +43,18 @@ func (idb *IdentifierDB) Add(ctx context.Context, analysis entity.AnalysisResult
 	return nil
 }
 
-// FindAllByProject retrieves all the identifiers related to a given project, from the underlying MongoDB collection.
-func (idb *IdentifierDB) FindAllByProject(ctx context.Context, projectRef string) ([]entity.Identifier, error) {
-	// TODO: review how to handle URL
-	cursor, err := idb.collection.Find(ctx, bson.M{"project_ref": strings.TrimPrefix(projectRef, "https://github.com/")})
+// FindAllByAnalysisID retrieves all the identifiers related to a given analysis, from the underlying MongoDB collection.
+func (idb *IdentifierDB) FindAllByAnalysisID(ctx context.Context, analysisID uuid.UUID) ([]entity.Identifier, error) {
+	cursor, err := idb.collection.Find(ctx, bson.M{"analysis_id": analysisID.String()})
 	if err != nil {
-		log.WithError(err).Error(fmt.Sprintf("error looking documents for %s", projectRef))
+		log.WithError(err).Error(fmt.Sprintf("error looking documents for analysis ID %v", analysisID))
 		return []entity.Identifier{}, repository.ErrIdentifierUnexpected
 	}
 
 	var elements []identifierDTO
 	err = cursor.All(ctx, &elements)
 	if err != nil {
-		log.WithError(err).Error(fmt.Sprintf("error decoding found documents for %s", projectRef))
+		log.WithError(err).Error(fmt.Sprintf("error decoding found documents for analysis ID %v", analysisID))
 		return []entity.Identifier{}, repository.ErrIdentifierUnexpected
 	}
 

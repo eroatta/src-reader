@@ -6,6 +6,7 @@ import (
 
 	"github.com/eroatta/src-reader/entity"
 	"github.com/eroatta/src-reader/repository"
+	"github.com/google/uuid"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -19,7 +20,7 @@ var (
 )
 
 type GainInsightsUsecase interface {
-	Process(ctx context.Context, projectRef string) ([]entity.Insight, error)
+	Process(ctx context.Context, analysisID uuid.UUID) ([]entity.Insight, error)
 }
 
 func NewGainInsightsUsecase(identr repository.IdentifierRepository, insr repository.InsightRepository) GainInsightsUsecase {
@@ -34,16 +35,16 @@ type gainInsightsUsecase struct {
 	insr   repository.InsightRepository
 }
 
-func (uc gainInsightsUsecase) Process(ctx context.Context, projectRef string) ([]entity.Insight, error) {
+func (uc gainInsightsUsecase) Process(ctx context.Context, analysisID uuid.UUID) ([]entity.Insight, error) {
 	// grab each identifier
-	identifiers, err := uc.identr.FindAllByProject(ctx, projectRef)
+	identifiers, err := uc.identr.FindAllByAnalysisID(ctx, analysisID)
 	switch err {
 	case nil:
 		// do nothing
 	case repository.ErrIdentifierNoResults:
 		return []entity.Insight{}, ErrIdentifiersNotFound
 	default:
-		log.WithError(err).Errorf("unable to retrieve identifiers for %s", projectRef)
+		log.WithError(err).Errorf("unable to retrieve identifiers for analysis ID: %v", analysisID)
 		return []entity.Insight{}, ErrUnableToReadIdentifiers
 	}
 
@@ -52,7 +53,7 @@ func (uc gainInsightsUsecase) Process(ctx context.Context, projectRef string) ([
 		metrics, ok := byPackages[ident.FullPackageName()]
 		if !ok {
 			metrics = entity.Insight{
-				ProjectRef:      projectRef,
+				ProjectRef:      ident.ProjectRef,
 				Package:         ident.Package,
 				TotalSplits:     make(map[string]int),
 				TotalExpansions: make(map[string]int),
@@ -67,7 +68,7 @@ func (uc gainInsightsUsecase) Process(ctx context.Context, projectRef string) ([
 	insights := asArray(byPackages)
 	err = uc.insr.AddAll(ctx, insights)
 	if err != nil {
-		log.WithError(err).Errorf("unable to store insights for %s", projectRef)
+		log.WithError(err).Errorf("unable to store insights for analysis ID: %v", analysisID)
 		return []entity.Insight{}, ErrUnableToGainInsights
 	}
 

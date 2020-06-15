@@ -11,6 +11,7 @@ import (
 	"github.com/eroatta/src-reader/entity"
 	"github.com/eroatta/src-reader/port/incoming/adapter/rest"
 	"github.com/eroatta/src-reader/usecase"
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -49,7 +50,7 @@ func TestPOST_OnInsightsCreationHandler_WithEmptyBody_ShouldReturnHTTP400(t *tes
 			"name": "validation_error",
 			"message": "missing or invalid data",
 			"details": [
-				"invalid field 'repository' with value null or empty"
+				"invalid field 'analysis_id' with value null or empty"
 			]
 		}`,
 		w.Body.String())
@@ -61,7 +62,7 @@ func TestPOST_OnInsightsCreationHandler_WithWrongDataType_ShouldReturnHTTP400(t 
 
 	w := httptest.NewRecorder()
 	body := `{
-		"repository": 1
+		"analysis_id": 1
 	}`
 	req, _ := http.NewRequest("POST", "/insights", strings.NewReader(body))
 	router.ServeHTTP(w, req)
@@ -72,7 +73,7 @@ func TestPOST_OnInsightsCreationHandler_WithWrongDataType_ShouldReturnHTTP400(t 
 			"name": "validation_error",
 			"message": "missing or invalid data",
 			"details": [
-				"json: cannot unmarshal number into Go struct field createInsightsCommand.repository of type string"
+				"json: cannot unmarshal number into Go struct field createInsightsCommand.analysis_id of type string"
 			]
 		}`,
 		w.Body.String())
@@ -84,7 +85,7 @@ func TestPOST_OnInsightsCreationHandler_WithInvalidRepository_ShouldReturnHTTP40
 
 	w := httptest.NewRecorder()
 	body := `{
-		"repository": "./github.com/eroatta/src-reader"
+		"analysis_id": "./github.com/eroatta/src-reader"
 	}`
 	req, _ := http.NewRequest("POST", "/insights", strings.NewReader(body))
 	router.ServeHTTP(w, req)
@@ -95,7 +96,7 @@ func TestPOST_OnInsightsCreationHandler_WithInvalidRepository_ShouldReturnHTTP40
 			"name": "validation_error",
 			"message": "missing or invalid data",
 			"details": [
-				"invalid field 'repository' with value ./github.com/eroatta/src-reader"
+				"invalid field 'analysis_id' with value ./github.com/eroatta/src-reader"
 			]
 		}`,
 		w.Body.String())
@@ -110,7 +111,7 @@ func TestPOST_OnInsightsCreationHandler_WithNotFoundIdentifiers_ShouldReturnHTTP
 
 	w := httptest.NewRecorder()
 	body := `{
-		"repository": "https://github.com/eroatta/src-reader"
+		"analysis_id": "a9f42bb8-92e6-4344-852b-2a9d8dd5b503"
 	}`
 	req, _ := http.NewRequest("POST", "/insights", strings.NewReader(body))
 	router.ServeHTTP(w, req)
@@ -121,7 +122,7 @@ func TestPOST_OnInsightsCreationHandler_WithNotFoundIdentifiers_ShouldReturnHTTP
 			"name": "validation_error",
 			"message": "missing or invalid data",
 			"details": [
-				"non-existing identifiers for https://github.com/eroatta/src-reader"
+				"non-existing identifiers for analysis ID a9f42bb8-92e6-4344-852b-2a9d8dd5b503"
 			]
 		}`,
 		w.Body.String())
@@ -136,7 +137,7 @@ func TestPOST_OnInsightsCreationHandler_WithInternalError_ShouldReturnHTTP500(t 
 
 	w := httptest.NewRecorder()
 	body := `{
-		"repository": "https://github.com/eroatta/src-reader"
+		"analysis_id": "a9f42bb8-92e6-4344-852b-2a9d8dd5b503"
 	}`
 	req, _ := http.NewRequest("POST", "/insights", strings.NewReader(body))
 	router.ServeHTTP(w, req)
@@ -196,7 +197,7 @@ func TestPOST_OnInsightsCreationHandler_WithSuccess_ShouldReturnHTTP201(t *testi
 
 	w := httptest.NewRecorder()
 	body := `{
-		"repository": "https://github.com/eroatta/src-reader"
+		"analysis_id": "a9f42bb8-92e6-4344-852b-2a9d8dd5b503"
 	}`
 	req, _ := http.NewRequest("POST", "/insights", strings.NewReader(body))
 	router.ServeHTTP(w, req)
@@ -204,7 +205,8 @@ func TestPOST_OnInsightsCreationHandler_WithSuccess_ShouldReturnHTTP201(t *testi
 	assert.Equal(t, http.StatusCreated, w.Code)
 	assert.JSONEq(t, `
 		{
-			"project_ref": "https://github.com/eroatta/src-reader",
+			"analysis_id": "a9f42bb8-92e6-4344-852b-2a9d8dd5b503",
+			"project_ref": "eroatta/test",
 			"identifiers": {
 				"total": 4,
 				"exported": 2
@@ -244,6 +246,6 @@ type mockGainInsightsUsecase struct {
 	err error
 }
 
-func (m mockGainInsightsUsecase) Process(ctx context.Context, url string) ([]entity.Insight, error) {
+func (m mockGainInsightsUsecase) Process(ctx context.Context, analysisID uuid.UUID) ([]entity.Insight, error) {
 	return m.ins, m.err
 }
