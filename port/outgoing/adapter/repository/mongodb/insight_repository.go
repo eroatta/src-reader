@@ -5,7 +5,9 @@ import (
 
 	"github.com/eroatta/src-reader/entity"
 	"github.com/eroatta/src-reader/repository"
+	"github.com/google/uuid"
 	log "github.com/sirupsen/logrus"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -43,4 +45,33 @@ func (idb *InsightDB) AddAll(ctx context.Context, insights []entity.Insight) err
 	log.WithField("count", len(results.InsertedIDs)).Debug("inserted insights")
 
 	return nil
+}
+
+// GetByAnalysisID finds a set of existings insights on the underlying MongoDB collection, and returns
+// them as entity.Insight.
+func (idb *InsightDB) GetByAnalysisID(ctx context.Context, analysisID uuid.UUID) ([]entity.Insight, error) {
+	cursor, err := idb.collecton.Find(ctx, bson.M{"analysis_id": analysisID.String()})
+	switch err {
+	case nil:
+		// do nothing
+	case mongo.ErrNoDocuments:
+		return []entity.Insight{}, repository.ErrInsightNoResults
+	default:
+		log.WithError(err).Errorf("error searching insights with analysis_id: %v", analysisID)
+		return []entity.Insight{}, repository.ErrInsightUnexpected
+	}
+
+	var elements []insightDTO
+	err = cursor.All(ctx, &elements)
+	if err != nil {
+		log.WithError(err).Errorf("error decoding found documents for analysis_id: %v", analysisID)
+		return []entity.Insight{}, repository.ErrInsightUnexpected
+	}
+
+	insights := make([]entity.Insight, len(elements))
+	for i, element := range elements {
+		insights[i] = idb.mapper.toEntity(element)
+	}
+
+	return insights, nil
 }

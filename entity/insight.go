@@ -1,8 +1,11 @@
 package entity
 
+import "github.com/google/uuid"
+
 type Insight struct {
 	ID               string
 	ProjectRef       string
+	AnalysisID       uuid.UUID
 	Package          string
 	TotalIdentifiers int
 	TotalExported    int

@@ -17,13 +17,46 @@ func TestNewGainInsightsUsecase_ShouldReturnNewInstance(t *testing.T) {
 	assert.NotNil(t, uc)
 }
 
+func TestProcess_OnGainInsightsUsecase_WhenPreviousInsights_ShouldReturnError(t *testing.T) {
+	insightsRepositoryMock := insightsRepositoryMock{
+		insights: []entity.Insight{},
+		getErr:   nil,
+	}
+
+	uc := usecase.NewGainInsightsUsecase(nil, insightsRepositoryMock)
+
+	analysisID, _ := uuid.NewUUID()
+	insights, err := uc.Process(context.TODO(), analysisID)
+
+	assert.EqualError(t, err, usecase.ErrPreviousInsightsFound.Error())
+	assert.Empty(t, insights)
+}
+
+func TestProcess_OnGainInsightsUsecase_WhenErrorCheckingPreviousInsights_ShouldReturnError(t *testing.T) {
+	insightsRepositoryMock := insightsRepositoryMock{
+		insights: []entity.Insight{},
+		getErr:   repository.ErrInsightUnexpected,
+	}
+
+	uc := usecase.NewGainInsightsUsecase(nil, insightsRepositoryMock)
+
+	analysisID, _ := uuid.NewUUID()
+	insights, err := uc.Process(context.TODO(), analysisID)
+
+	assert.EqualError(t, err, usecase.ErrUnableToGainInsights.Error())
+	assert.Empty(t, insights)
+}
+
 func TestProcess_OnGainInsightsUsecase_WhenNoIdentifiers_ShouldReturnError(t *testing.T) {
 	identifierRepositoryMock := identifierRepositoryMock{
 		idents: []entity.Identifier{},
 		err:    repository.ErrIdentifierNoResults,
 	}
+	insightsRepositoryMock := insightsRepositoryMock{
+		getErr: repository.ErrInsightNoResults,
+	}
 
-	uc := usecase.NewGainInsightsUsecase(identifierRepositoryMock, nil)
+	uc := usecase.NewGainInsightsUsecase(identifierRepositoryMock, insightsRepositoryMock)
 
 	analysisID, _ := uuid.NewUUID()
 	insights, err := uc.Process(context.TODO(), analysisID)
@@ -37,8 +70,11 @@ func TestProcess_OnGainInsightsUsecase_WhenErrorReadingIdentifiers_ShouldReturnE
 		idents: []entity.Identifier{},
 		err:    repository.ErrIdentifierUnexpected,
 	}
+	insightsRepositoryMock := insightsRepositoryMock{
+		getErr: repository.ErrInsightNoResults,
+	}
 
-	uc := usecase.NewGainInsightsUsecase(identifierRepositoryMock, nil)
+	uc := usecase.NewGainInsightsUsecase(identifierRepositoryMock, insightsRepositoryMock)
 
 	analysisID, _ := uuid.NewUUID()
 	insights, err := uc.Process(context.TODO(), analysisID)
@@ -56,7 +92,9 @@ func TestProcess_OnGainInsightsUsecase_WhenFailingToSaveInsights_ShouldReturnErr
 	}
 
 	insightsRepositoryMock := insightsRepositoryMock{
-		err: repository.ErrInsightUnexpected,
+		insights: []entity.Insight{},
+		getErr:   repository.ErrInsightNoResults,
+		addErr:   repository.ErrInsightUnexpected,
 	}
 
 	uc := usecase.NewGainInsightsUsecase(identifierRepositoryMock, insightsRepositoryMock)
@@ -165,7 +203,8 @@ func TestProcess_OnGainInsightsUsecase_ShouldReturnInsightsByPackage(t *testing.
 	}
 
 	insightsRepositoryMock := insightsRepositoryMock{
-		err: nil,
+		getErr: repository.ErrInsightNoResults,
+		addErr: nil,
 	}
 
 	uc := usecase.NewGainInsightsUsecase(identifierRepositoryMock, insightsRepositoryMock)
@@ -177,6 +216,7 @@ func TestProcess_OnGainInsightsUsecase_ShouldReturnInsightsByPackage(t *testing.
 	assert.ElementsMatch(t, []entity.Insight{
 		{
 			ProjectRef:       "test/mytest",
+			AnalysisID:       analysisID,
 			Package:          "main",
 			TotalIdentifiers: 3,
 			TotalExported:    1,
@@ -194,6 +234,7 @@ func TestProcess_OnGainInsightsUsecase_ShouldReturnInsightsByPackage(t *testing.
 		},
 		{
 			ProjectRef:       "test/mytest",
+			AnalysisID:       analysisID,
 			Package:          "main_test",
 			TotalIdentifiers: 1,
 			TotalExported:    1,

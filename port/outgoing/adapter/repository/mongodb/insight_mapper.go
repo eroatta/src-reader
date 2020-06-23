@@ -11,7 +11,7 @@ import (
 type insightMapper struct{}
 
 // toDTO maps the entity for entity.Insight into a Data Transfer Object.
-func (is *insightMapper) toDTO(ent entity.Insight) insightDTO {
+func (im *insightMapper) toDTO(ent entity.Insight) insightDTO {
 	files := make([]string, 0)
 	for file := range ent.Files {
 		files = append(files, file)
@@ -29,6 +29,7 @@ func (is *insightMapper) toDTO(ent entity.Insight) insightDTO {
 
 	return insightDTO{
 		ProjectRef:       ent.ProjectRef,
+		AnalysisID:       ent.AnalysisID.String(),
 		CreatedAt:        time.Now(),
 		Package:          ent.Package,
 		Accuracy:         ent.Rate(),
@@ -43,10 +44,15 @@ func (is *insightMapper) toDTO(ent entity.Insight) insightDTO {
 	}
 }
 
+func (im *insightMapper) toEntity(dto insightDTO) entity.Insight {
+	return entity.Insight{}
+}
+
 type insightDTO struct {
 	ID               string             `bson:"_id,omitempty"`
 	CreatedAt        time.Time          `bson:"created_at"`
 	ProjectRef       string             `bson:"project_ref"`
+	AnalysisID       string             `bson:"analysis_id`
 	Package          string             `bson:"package"`
 	Accuracy         float64            `bson:"accuracy"`
 	TotalIdentifiers int                `bson:"total_identifiers"`

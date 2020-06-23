@@ -66,6 +66,9 @@ func createInsights(ctx *gin.Context, uc usecase.GainInsightsUsecase) {
 	switch err {
 	case nil:
 		// do nothing
+	case usecase.ErrPreviousInsightsFound:
+		setBadRequestResponse(ctx, fmt.Errorf("previous insights exist for analysis with ID: %v", cmd.AnalysisID))
+		return
 	case usecase.ErrIdentifiersNotFound:
 		setBadRequestResponse(ctx, fmt.Errorf("non-existing identifiers for analysis ID %v", cmd.AnalysisID))
 		return

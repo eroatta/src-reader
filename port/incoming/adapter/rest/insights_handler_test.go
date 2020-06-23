@@ -102,6 +102,31 @@ func TestPOST_OnInsightsCreationHandler_WithInvalidRepository_ShouldReturnHTTP40
 		w.Body.String())
 }
 
+func TestPOST_OnInsightsCreationHandler_WithPreviousInsights_ShouldReturnHTTP400(t *testing.T) {
+	router := rest.NewServer()
+	rest.RegisterGainInsightsUsecase(router, mockGainInsightsUsecase{
+		ins: []entity.Insight{},
+		err: usecase.ErrPreviousInsightsFound,
+	})
+
+	w := httptest.NewRecorder()
+	body := `{
+		"analysis_id": "a9f42bb8-92e6-4344-852b-2a9d8dd5b503"
+	}`
+	req, _ := http.NewRequest("POST", "/insights", strings.NewReader(body))
+	router.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusBadRequest, w.Code)
+	assert.JSONEq(t, `
+		{
+			"name": "validation_error",
+			"message": "missing or invalid data",
+			"details": [
+				"previous insights exist for analysis with ID: a9f42bb8-92e6-4344-852b-2a9d8dd5b503"
+			]
+		}`,
+		w.Body.String())
+}
 func TestPOST_OnInsightsCreationHandler_WithNotFoundIdentifiers_ShouldReturnHTTP400(t *testing.T) {
 	router := rest.NewServer()
 	rest.RegisterGainInsightsUsecase(router, mockGainInsightsUsecase{

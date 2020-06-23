@@ -11,6 +11,8 @@ import (
 )
 
 var (
+	// ErrPreviousInsightsFound indicates there are existing insights.
+	ErrPreviousInsightsFound = errors.New("existing previous insights for the analysis")
 	// ErrIdentifiersNotFound indicates that no identifiers were found to process.
 	ErrIdentifiersNotFound = errors.New("no identifiers found for the project")
 	// ErrUnableToReadIdentifiers indicates that the identifiers couldn't be retrieved.
@@ -36,6 +38,17 @@ type gainInsightsUsecase struct {
 }
 
 func (uc gainInsightsUsecase) Process(ctx context.Context, analysisID uuid.UUID) ([]entity.Insight, error) {
+	insights, err := uc.insr.GetByAnalysisID(ctx, analysisID)
+	switch err {
+	case repository.ErrInsightNoResults:
+		// do nothing
+	case nil:
+		return insights, ErrPreviousInsightsFound
+	default:
+		log.WithError(err).Errorf("unable to check for previous insights on analysis ID: %v", analysisID)
+		return []entity.Insight{}, ErrUnableToGainInsights
+	}
+
 	// grab each identifier
 	identifiers, err := uc.identr.FindAllByAnalysisID(ctx, analysisID)
 	switch err {
@@ -54,6 +67,7 @@ func (uc gainInsightsUsecase) Process(ctx context.Context, analysisID uuid.UUID)
 		if !ok {
 			metrics = entity.Insight{
 				ProjectRef:      ident.ProjectRef,
+				AnalysisID:      analysisID,
 				Package:         ident.Package,
 				TotalSplits:     make(map[string]int),
 				TotalExpansions: make(map[string]int),
@@ -65,7 +79,7 @@ func (uc gainInsightsUsecase) Process(ctx context.Context, analysisID uuid.UUID)
 		byPackages[ident.FullPackageName()] = metrics
 	}
 
-	insights := asArray(byPackages)
+	insights = asArray(byPackages)
 	err = uc.insr.AddAll(ctx, insights)
 	if err != nil {
 		log.WithError(err).Errorf("unable to store insights for analysis ID: %v", analysisID)

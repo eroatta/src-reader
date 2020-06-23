@@ -110,11 +110,17 @@ func (a analysisRepositoryMock) GetByProjectID(ctx context.Context, projectID uu
 
 // insights repository mock
 type insightsRepositoryMock struct {
-	err error
+	insights []entity.Insight
+	addErr   error
+	getErr   error
 }
 
 func (i insightsRepositoryMock) AddAll(ctx context.Context, insights []entity.Insight) error {
-	return i.err
+	return i.addErr
+}
+
+func (i insightsRepositoryMock) GetByAnalysisID(ctx context.Context, analysisID uuid.UUID) ([]entity.Insight, error) {
+	return i.insights, i.getErr
 }
 
 // end insights repository mock
