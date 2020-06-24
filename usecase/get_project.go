@@ -15,7 +15,7 @@ type GetProjectUsecase interface {
 	Process(ctx context.Context, ID uuid.UUID) (entity.Project, error)
 }
 
-// NewGetPNewGetProjectUsecase initializes a new GetProjectUsecase instance.
+// NewGetProjectUsecase initializes a new GetProjectUsecase instance.
 func NewGetProjectUsecase(pr repository.ProjectRepository) GetProjectUsecase {
 	return getProjectUsecase{
 		projectRepository: pr,

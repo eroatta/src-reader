@@ -47,6 +47,7 @@ func main() {
 	analyzeProjectUsecase := usecase.NewAnalyzeProjectUsecase(projectRepository, sourceCodeRepository,
 		identifierRepository, analysisRepository, defaultAnalysisConfig)
 	gainInsightsUsecase := usecase.NewGainInsightsUsecase(identifierRepository, insightRepository)
+	getInsightsUsecase := usecase.NewGetInsightsUsecase(insightRepository)
 	originalFileUsecase := usecase.NewOriginalFileUsecase(projectRepository, sourceCodeRepository)
 	rewrittenFileUsecase := usecase.NewRewrittenFileUsecase(projectRepository, sourceCodeRepository, identifierRepository)
 
@@ -55,6 +56,7 @@ func main() {
 	rest.RegisterCreateProjectUsecase(router, importProjectUsecase)
 	rest.RegisterAnalyzeProjectUsecase(router, analyzeProjectUsecase)
 	rest.RegisterGainInsightsUsecase(router, gainInsightsUsecase)
+	rest.RegisterGetInsightsUsecase(router, getInsightsUsecase)
 	rest.RegisterOriginalFileUsecase(router, originalFileUsecase)
 	rest.RegisterRewrittenFileUsecase(router, rewrittenFileUsecase)
 

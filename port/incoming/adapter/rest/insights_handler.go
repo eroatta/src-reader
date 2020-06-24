@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"sort"
 
+	"github.com/eroatta/src-reader/entity"
 	"github.com/eroatta/src-reader/usecase"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -41,7 +42,6 @@ func RegisterGainInsightsUsecase(r *gin.Engine, uc usecase.GainInsightsUsecase) 
 	r.POST("/insights", func(c *gin.Context) {
 		createInsights(c, uc)
 	})
-	// r.GET("/insigths/$id", handler)
 	// r.DELETE("/insights/$id", handler)
 
 	return r
@@ -77,8 +77,12 @@ func createInsights(ctx *gin.Context, uc usecase.GainInsightsUsecase) {
 		return
 	}
 
+	ctx.JSON(http.StatusCreated, getInsightsResponse(cmd.AnalysisID, insights))
+}
+
+func getInsightsResponse(analysisID string, insights []entity.Insight) insightsResponse {
 	response := insightsResponse{
-		AnalysisID: cmd.AnalysisID,
+		AnalysisID: analysisID,
 		Summary:    insightsSummaryResponse{},
 		Packages:   make([]packageResponse, 0),
 	}
@@ -108,5 +112,38 @@ func createInsights(ctx *gin.Context, uc usecase.GainInsightsUsecase) {
 	}
 	response.Overall = weighted / float64(response.Summary.Total)
 
-	ctx.JSON(http.StatusCreated, response)
+	return response
+}
+
+// RegisterGetInsightsUsecase sets the endpoint and the handler on the REST service to
+// handle the retrieval of previously calculated insights.
+func RegisterGetInsightsUsecase(r *gin.Engine, uc usecase.GetInsightsUsecase) *gin.Engine {
+	r.GET("/insights/:id", func(c *gin.Context) {
+		getInsights(c, uc)
+	})
+
+	return r
+}
+
+func getInsights(ctx *gin.Context, uc usecase.GetInsightsUsecase) {
+	analysisID, err := uuid.Parse(ctx.Param("id"))
+	if err != nil {
+		setNotFoundResponse(ctx, fmt.Errorf("insights for ID: %s can't be found", ctx.Param("id")))
+		return
+	}
+
+	insights, err := uc.Process(ctx, analysisID)
+	switch err {
+	case nil:
+		// do nothing
+	case usecase.ErrInsightsNotFound:
+		setNotFoundResponse(ctx, fmt.Errorf("insights for ID: %v can't be found", analysisID))
+		return
+	default:
+		log.WithError(err).Error("unexpected error executing getInsightsUsecase")
+		setInternalErrorResponse(ctx, fmt.Errorf("error accessing insights for ID: %v", analysisID))
+		return
+	}
+
+	ctx.JSON(http.StatusOK, getInsightsResponse(analysisID.String(), insights))
 }

@@ -266,11 +266,149 @@ func TestPOST_OnInsightsCreationHandler_WithSuccess_ShouldReturnHTTP201(t *testi
 		w.Body.String())
 }
 
+func TestGET_OnInsightsGetHandler_WithInvalidInsightsID_ShouldReturn404(t *testing.T) {
+	router := rest.NewServer()
+	rest.RegisterGetInsightsUsecase(router, nil)
+
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest("GET", "/insights/invalid-id", nil)
+	router.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusNotFound, w.Code)
+}
+
+func TestGET_OnInsightsGetHandler_WithNoExistingInsights_ShouldReturn404(t *testing.T) {
+	retrieveInsightsMock := mockGetInsightsUsecase{
+		ins: []entity.Insight{},
+		err: usecase.ErrInsightsNotFound,
+	}
+
+	router := rest.NewServer()
+	rest.RegisterGetInsightsUsecase(router, retrieveInsightsMock)
+
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest("GET", "/insights/ed2cd46a-4afd-4d49-a6ea-1c8d12d40134", nil)
+	router.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusNotFound, w.Code)
+}
+
+func TestGET_OnInsightsGetHandler_WithErrorReadingInsights_ShouldReturn500(t *testing.T) {
+	retrieveInsightsMock := mockGetInsightsUsecase{
+		ins: []entity.Insight{},
+		err: usecase.ErrUnexpected,
+	}
+
+	router := rest.NewServer()
+	rest.RegisterGetInsightsUsecase(router, retrieveInsightsMock)
+
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest("GET", "/insights/ed2cd46a-4afd-4d49-a6ea-1c8d12d40134", nil)
+	router.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusInternalServerError, w.Code)
+}
+
+func TestGET_OnInsightsGetHandler_WithExistingInsights_ShouldReturn200(t *testing.T) {
+	retrieveInsightsMock := mockGetInsightsUsecase{
+		ins: []entity.Insight{
+			{
+				ProjectRef:       "eroatta/test",
+				Package:          "main",
+				TotalIdentifiers: 3,
+				TotalExported:    1,
+				TotalSplits: map[string]int{
+					"conserv": 5,
+				},
+				TotalExpansions: map[string]int{
+					"no_exp": 5,
+				},
+				TotalWeight: 2.267,
+				Files: map[string]struct{}{
+					"main.go":   {},
+					"helper.go": {},
+				},
+			},
+			{
+				ProjectRef:       "eroatta/test",
+				Package:          "main_test",
+				TotalIdentifiers: 1,
+				TotalExported:    1,
+				TotalSplits: map[string]int{
+					"conserv": 1,
+				},
+				TotalExpansions: map[string]int{
+					"no_exp": 1,
+				},
+				TotalWeight: 1.0,
+				Files: map[string]struct{}{
+					"main_test.go": {},
+				},
+			},
+		},
+		err: nil,
+	}
+
+	router := rest.NewServer()
+	rest.RegisterGetInsightsUsecase(router, retrieveInsightsMock)
+
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest("GET", "/insights/a9f42bb8-92e6-4344-852b-2a9d8dd5b503", nil)
+	router.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.JSONEq(t, `
+		{
+			"analysis_id": "a9f42bb8-92e6-4344-852b-2a9d8dd5b503",
+			"project_ref": "eroatta/test",
+			"identifiers": {
+				"total": 4,
+				"exported": 2
+			},
+			"accuracy": 0.81675,
+			"packages": [
+				{
+					"name": "main",
+					"accuracy": 0.7556666666666666,
+					"identifiers": {
+						"total": 3,
+						"exported": 1
+					},
+					"files": [
+						"helper.go",
+						"main.go"
+					]
+				},
+				{
+					"name": "main_test",
+					"accuracy": 1.00,
+					"identifiers": {
+						"total": 1,
+						"exported": 1
+					},
+					"files": [
+						"main_test.go"
+					]
+				}
+			]
+		}`,
+		w.Body.String())
+}
+
 type mockGainInsightsUsecase struct {
 	ins []entity.Insight
 	err error
 }
 
 func (m mockGainInsightsUsecase) Process(ctx context.Context, analysisID uuid.UUID) ([]entity.Insight, error) {
+	return m.ins, m.err
+}
+
+type mockGetInsightsUsecase struct {
+	ins []entity.Insight
+	err error
+}
+
+func (m mockGetInsightsUsecase) Process(ctx context.Context, insightsID uuid.UUID) ([]entity.Insight, error) {
 	return m.ins, m.err
 }
