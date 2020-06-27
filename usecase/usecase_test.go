@@ -113,6 +113,7 @@ type insightsRepositoryMock struct {
 	insights []entity.Insight
 	addErr   error
 	getErr   error
+	delErr   error
 }
 
 func (i insightsRepositoryMock) AddAll(ctx context.Context, insights []entity.Insight) error {
@@ -121,6 +122,10 @@ func (i insightsRepositoryMock) AddAll(ctx context.Context, insights []entity.In
 
 func (i insightsRepositoryMock) GetByAnalysisID(ctx context.Context, analysisID uuid.UUID) ([]entity.Insight, error) {
 	return i.insights, i.getErr
+}
+
+func (i insightsRepositoryMock) DeleteAllByAnalisysID(ctx context.Context, analysisID uuid.UUID) error {
+	return i.delErr
 }
 
 // end insights repository mock
