@@ -395,6 +395,71 @@ func TestGET_OnInsightsGetHandler_WithExistingInsights_ShouldReturn200(t *testin
 		w.Body.String())
 }
 
+func TestDELETE_OnInsightsDeleteHandler_WithInvalidAnalysisID_ShouldReturn404(t *testing.T) {
+	router := rest.NewServer()
+	rest.RegisterDeleteInsightsUsecase(router, nil)
+
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest("DELETE", "/insights/invalid-id", nil)
+	router.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusNotFound, w.Code)
+}
+
+func TestDELETE_OnInsightsDeleteHandler_WhenNoExistingInsights_ShouldReturn204(t *testing.T) {
+	deleteInsightsUsecaseMock := mockDeleteInsightsUsecase{
+		err: usecase.ErrInsightsNotFound,
+	}
+
+	router := rest.NewServer()
+	rest.RegisterDeleteInsightsUsecase(router, deleteInsightsUsecaseMock)
+
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest("DELETE", "/insights/ed2cd46a-4afd-4d49-a6ea-1c8d12d40134", nil)
+	router.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusNoContent, w.Code)
+}
+
+func TestDELETE_OnInsightsDeleteHandler_WhenErrorDeletingInsights_ShouldReturn500(t *testing.T) {
+	deleteInsightsUsecaseMock := mockDeleteInsightsUsecase{
+		err: usecase.ErrUnexpected,
+	}
+
+	router := rest.NewServer()
+	rest.RegisterDeleteInsightsUsecase(router, deleteInsightsUsecaseMock)
+
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest("DELETE", "/insights/ed2cd46a-4afd-4d49-a6ea-1c8d12d40134", nil)
+	router.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusInternalServerError, w.Code)
+	assert.JSONEq(t, `
+		{
+			"name": "internal_error",
+			"message": "internal server error",
+			"details": [
+				"error deleting insights for ID: ed2cd46a-4afd-4d49-a6ea-1c8d12d40134"
+			]
+		}`,
+		w.Body.String())
+}
+
+func TestDELETE_OnInsightsDeleteHandler_WhenDeletedInsights_ShouldReturn204(t *testing.T) {
+	deleteInsightsUsecaseMock := mockDeleteInsightsUsecase{
+		err: nil,
+	}
+
+	router := rest.NewServer()
+	rest.RegisterDeleteInsightsUsecase(router, deleteInsightsUsecaseMock)
+
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest("DELETE", "/insights/ed2cd46a-4afd-4d49-a6ea-1c8d12d40134", nil)
+	router.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusNoContent, w.Code)
+}
+
 type mockGainInsightsUsecase struct {
 	ins []entity.Insight
 	err error
@@ -411,4 +476,12 @@ type mockGetInsightsUsecase struct {
 
 func (m mockGetInsightsUsecase) Process(ctx context.Context, insightsID uuid.UUID) ([]entity.Insight, error) {
 	return m.ins, m.err
+}
+
+type mockDeleteInsightsUsecase struct {
+	err error
+}
+
+func (m mockDeleteInsightsUsecase) Process(ctx context.Context, analysisID uuid.UUID) error {
+	return m.err
 }

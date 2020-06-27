@@ -147,3 +147,28 @@ func getInsights(ctx *gin.Context, uc usecase.GetInsightsUsecase) {
 
 	ctx.JSON(http.StatusOK, getInsightsResponse(analysisID.String(), insights))
 }
+
+func RegisterDeleteInsightsUsecase(r *gin.Engine, uc usecase.DeleteInsightsUsecase) *gin.Engine {
+	r.DELETE("/insights/:id", func(c *gin.Context) {
+		deleteInsights(c, uc)
+	})
+
+	return r
+}
+
+func deleteInsights(ctx *gin.Context, uc usecase.DeleteInsightsUsecase) {
+	analysisID, err := uuid.Parse(ctx.Param("id"))
+	if err != nil {
+		setNotFoundResponse(ctx, fmt.Errorf("insights for ID: %s can't be found", ctx.Param("id")))
+		return
+	}
+
+	err = uc.Process(ctx, analysisID)
+	if err != nil && err != usecase.ErrInsightsNotFound {
+		log.WithError(err).Error("unexpected error executing deleteInsightsUsecase")
+		setInternalErrorResponse(ctx, fmt.Errorf("error deleting insights for ID: %v", analysisID))
+		return
+	}
+
+	ctx.JSON(http.StatusNoContent, nil)
+}
