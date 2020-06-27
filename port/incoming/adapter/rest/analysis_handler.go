@@ -38,9 +38,6 @@ func RegisterAnalyzeProjectUsecase(r *gin.Engine, uc usecase.AnalyzeProjectUseca
 	r.POST("/analysis", func(c *gin.Context) {
 		createAnalysis(c, uc)
 	})
-	// r.GET("/analysis/$id", internal.getAnalysis)
-	// r.DELETE("/analysis/$id", internal.deleteAnalysis)
-	// r.GET("/analysis/$id/identifiers", internal.getIdentifiers)
 
 	return r
 }
@@ -97,4 +94,29 @@ func createAnalysis(ctx *gin.Context, uc usecase.AnalyzeProjectUsecase) {
 		},
 	}
 	ctx.JSON(http.StatusCreated, response)
+}
+
+func RegisterDeleteAnalysisUsecase(r *gin.Engine, uc usecase.DeleteAnalysisUsecase) *gin.Engine {
+	r.DELETE("/analysis/:id", func(c *gin.Context) {
+		deleteAnalysis(c, uc)
+	})
+
+	return r
+}
+
+func deleteAnalysis(ctx *gin.Context, uc usecase.DeleteAnalysisUsecase) {
+	analysisID, err := uuid.Parse(ctx.Param("id"))
+	if err != nil {
+		setNotFoundResponse(ctx, fmt.Errorf("analysis %s can't be found", ctx.Param("id")))
+		return
+	}
+
+	err = uc.Process(ctx, analysisID)
+	if err != nil && err != usecase.ErrAnalysisNotFound {
+		log.WithError(err).Error("unexpected error executing deleteAnalysisUsecase")
+		setInternalErrorResponse(ctx, fmt.Errorf("error deleting analysis with ID: %v", analysisID))
+		return
+	}
+
+	ctx.JSON(http.StatusNoContent, nil)
 }

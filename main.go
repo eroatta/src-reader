@@ -49,6 +49,7 @@ func main() {
 	gainInsightsUsecase := usecase.NewGainInsightsUsecase(identifierRepository, insightRepository)
 	getInsightsUsecase := usecase.NewGetInsightsUsecase(insightRepository)
 	deleteInsightsUsecase := usecase.NewDeleteInsightsUsecase(insightRepository)
+	deleteAnalysisUsecase := usecase.NewDeleteAnalysisUsecase(deleteInsightsUsecase, identifierRepository, analysisRepository)
 	originalFileUsecase := usecase.NewOriginalFileUsecase(projectRepository, sourceCodeRepository)
 	rewrittenFileUsecase := usecase.NewRewrittenFileUsecase(projectRepository, sourceCodeRepository, identifierRepository)
 
@@ -56,6 +57,7 @@ func main() {
 	router := rest.NewServer()
 	rest.RegisterCreateProjectUsecase(router, importProjectUsecase)
 	rest.RegisterAnalyzeProjectUsecase(router, analyzeProjectUsecase)
+	rest.RegisterDeleteAnalysisUsecase(router, deleteAnalysisUsecase)
 	rest.RegisterGainInsightsUsecase(router, gainInsightsUsecase)
 	rest.RegisterGetInsightsUsecase(router, getInsightsUsecase)
 	rest.RegisterDeleteInsightsUsecase(router, deleteInsightsUsecase)

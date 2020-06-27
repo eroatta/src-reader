@@ -268,6 +268,71 @@ func TestPOST_OnAnalysisCreationHandler_WithSuccess_ShouldReturnHTTP201(t *testi
 		w.Body.String())
 }
 
+func TestDELETE_OnAnalysisDeleteHandler_WhenInvalidAnalysisID_ShouldReturn404(t *testing.T) {
+	router := rest.NewServer()
+	rest.RegisterDeleteAnalysisUsecase(router, nil)
+
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest("DELETE", "/analysis/invalid-id", nil)
+	router.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusNotFound, w.Code)
+}
+
+func TestDELETE_OnAnalysisDeleteHandler_WhenErrorExecutingUsecase_ShouldReturn500(t *testing.T) {
+	deleteAnalysisUsecaseMock := mockDeleteAnalysisUsecase{
+		err: usecase.ErrUnexpected,
+	}
+
+	router := rest.NewServer()
+	rest.RegisterDeleteAnalysisUsecase(router, deleteAnalysisUsecaseMock)
+
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest("DELETE", "/analysis/ed2cd46a-4afd-4d49-a6ea-1c8d12d40134", nil)
+	router.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusInternalServerError, w.Code)
+	assert.JSONEq(t, `
+		{
+			"name": "internal_error",
+			"message": "internal server error",
+			"details": [
+				"error deleting analysis with ID: ed2cd46a-4afd-4d49-a6ea-1c8d12d40134"
+			]
+		}`,
+		w.Body.String())
+}
+
+func TestDELETE_OnAnalysisDeleteHandler_WhenDeletedAnalysis_ShouldReturn204(t *testing.T) {
+	deleteAnalysisUsecaseMock := mockDeleteAnalysisUsecase{
+		err: nil,
+	}
+
+	router := rest.NewServer()
+	rest.RegisterDeleteAnalysisUsecase(router, deleteAnalysisUsecaseMock)
+
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest("DELETE", "/analysis/ed2cd46a-4afd-4d49-a6ea-1c8d12d40134", nil)
+	router.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusNoContent, w.Code)
+}
+
+func TestDELETE_OnAnalysisDeleteHandler_WhenAlreadyDeletedAnalysis_ShouldReturn204(t *testing.T) {
+	deleteAnalysisUsecaseMock := mockDeleteAnalysisUsecase{
+		err: usecase.ErrAnalysisNotFound,
+	}
+
+	router := rest.NewServer()
+	rest.RegisterDeleteAnalysisUsecase(router, deleteAnalysisUsecaseMock)
+
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest("DELETE", "/analysis/ed2cd46a-4afd-4d49-a6ea-1c8d12d40134", nil)
+	router.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusNoContent, w.Code)
+}
+
 type mockAnalyzeUsecase struct {
 	a   entity.AnalysisResults
 	err error
@@ -275,4 +340,12 @@ type mockAnalyzeUsecase struct {
 
 func (m mockAnalyzeUsecase) Process(ctx context.Context, projectID uuid.UUID) (entity.AnalysisResults, error) {
 	return m.a, m.err
+}
+
+type mockDeleteAnalysisUsecase struct {
+	err error
+}
+
+func (m mockDeleteAnalysisUsecase) Process(ctx context.Context, analysisID uuid.UUID) error {
+	return m.err
 }
