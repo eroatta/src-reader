@@ -87,3 +87,18 @@ func (idb *IdentifierDB) FindAllByProjectAndFile(ctx context.Context, projectRef
 
 	return identifiers, nil
 }
+
+// DeleteAllByAnalysisID removes a set of existing identifires from the underlying MongoDB collection.
+func (idb *IdentifierDB) DeleteAllByAnalysisID(ctx context.Context, analysisID uuid.UUID) error {
+	results, err := idb.collection.DeleteMany(ctx, bson.M{"analysis_id": analysisID.String()})
+	if err != nil {
+		log.WithError(err).Errorf("error deleting identifiers with analysis_id: %v", analysisID)
+		return repository.ErrIdentifierUnexpected
+	}
+
+	if results.DeletedCount == 0 {
+		return repository.ErrIdentifierNoResults
+	}
+
+	return nil
+}

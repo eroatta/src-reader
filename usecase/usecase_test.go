@@ -75,6 +75,7 @@ func (m sourceCodeRepositoryMock) Read(ctx context.Context, location string, fil
 type identifierRepositoryMock struct {
 	idents []entity.Identifier
 	err    error
+	delErr error
 }
 
 func (i identifierRepositoryMock) Add(ctx context.Context, analysis entity.AnalysisResults, ident entity.Identifier) error {
@@ -89,6 +90,10 @@ func (i identifierRepositoryMock) FindAllByProjectAndFile(ctx context.Context, p
 	return i.idents, i.err
 }
 
+func (i identifierRepositoryMock) DeleteAllByAnalysisID(ctx context.Context, analysisID uuid.UUID) error {
+	return i.delErr
+}
+
 // end identifier repository mock
 
 // analysis repository mock
@@ -96,6 +101,7 @@ type analysisRepositoryMock struct {
 	analysisResults entity.AnalysisResults
 	addErr          error
 	getErr          error
+	delErr          error
 }
 
 func (a analysisRepositoryMock) Add(ctx context.Context, analysis entity.AnalysisResults) error {
@@ -104,6 +110,10 @@ func (a analysisRepositoryMock) Add(ctx context.Context, analysis entity.Analysi
 
 func (a analysisRepositoryMock) GetByProjectID(ctx context.Context, projectID uuid.UUID) (entity.AnalysisResults, error) {
 	return a.analysisResults, a.getErr
+}
+
+func (a analysisRepositoryMock) Delete(ctx context.Context, ID uuid.UUID) error {
+	return a.delErr
 }
 
 // end analysis repository mock

@@ -21,4 +21,6 @@ type AnalysisRepository interface {
 	Add(ctx context.Context, analysis entity.AnalysisResults) error
 	// GetByProjectID retrieves an existing analysis for the given Project.
 	GetByProjectID(ctx context.Context, projectID uuid.UUID) (entity.AnalysisResults, error)
+	// Delete removes an Analysis from the current repository, using its ID.
+	Delete(ctx context.Context, id uuid.UUID) error
 }

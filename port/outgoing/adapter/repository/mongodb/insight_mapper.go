@@ -52,7 +52,7 @@ type insightDTO struct {
 	ID               string             `bson:"_id,omitempty"`
 	CreatedAt        time.Time          `bson:"created_at"`
 	ProjectRef       string             `bson:"project_ref"`
-	AnalysisID       string             `bson:"analysis_id`
+	AnalysisID       string             `bson:"analysis_id"`
 	Package          string             `bson:"package"`
 	Accuracy         float64            `bson:"accuracy"`
 	TotalIdentifiers int                `bson:"total_identifiers"`
