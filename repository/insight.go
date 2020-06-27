@@ -18,5 +18,5 @@ var (
 type InsightRepository interface {
 	AddAll(ctx context.Context, insights []entity.Insight) error
 	GetByAnalysisID(ctx context.Context, analysisID uuid.UUID) ([]entity.Insight, error)
-	DeleteAllByAnalisysID(ctx context.Context, analysisID uuid.UUID) error
+	DeleteAllByAnalysisID(ctx context.Context, analysisID uuid.UUID) error
 }

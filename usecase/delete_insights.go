@@ -23,7 +23,7 @@ type deleteInsightsUsecase struct {
 }
 
 func (uc deleteInsightsUsecase) Process(ctx context.Context, analysisID uuid.UUID) error {
-	err := uc.insightsRepository.DeleteAllByAnalisysID(ctx, analysisID)
+	err := uc.insightsRepository.DeleteAllByAnalysisID(ctx, analysisID)
 	switch err {
 	case nil:
 		// do nothing

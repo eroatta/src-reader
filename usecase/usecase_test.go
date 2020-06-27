@@ -124,7 +124,7 @@ func (i insightsRepositoryMock) GetByAnalysisID(ctx context.Context, analysisID 
 	return i.insights, i.getErr
 }
 
-func (i insightsRepositoryMock) DeleteAllByAnalisysID(ctx context.Context, analysisID uuid.UUID) error {
+func (i insightsRepositoryMock) DeleteAllByAnalysisID(ctx context.Context, analysisID uuid.UUID) error {
 	return i.delErr
 }
 

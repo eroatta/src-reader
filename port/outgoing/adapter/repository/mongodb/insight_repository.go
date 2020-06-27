@@ -77,7 +77,7 @@ func (idb *InsightDB) GetByAnalysisID(ctx context.Context, analysisID uuid.UUID)
 }
 
 // DeleteAllByAnalysisID removes a set of existing insights on the underlying MongoDB collection.
-func (idb *InsightDB) DeleteAllByAnalisysID(ctx context.Context, analysisID uuid.UUID) error {
+func (idb *InsightDB) DeleteAllByAnalysisID(ctx context.Context, analysisID uuid.UUID) error {
 	results, err := idb.collection.DeleteMany(ctx, bson.M{"analysis_id": analysisID.String()})
 	if err != nil {
 		log.WithError(err).Errorf("error deleting insights with analysis_id: %v", analysisID)
