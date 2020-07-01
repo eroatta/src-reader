@@ -65,14 +65,14 @@ func (adb *AnalysisDB) GetByProjectID(ctx context.Context, projectID uuid.UUID) 
 
 // Delete removes an existing Analysis from the underlying MongoDB collection.
 func (adb *AnalysisDB) Delete(ctx context.Context, id uuid.UUID) error {
-	results, err := adb.collection.DeleteOne(ctx, bson.M{"id": id.String()})
+	results, err := adb.collection.DeleteOne(ctx, bson.M{"_id": id.String()})
 	if err != nil {
 		log.WithError(err).Errorf("error deleting analysis with id: %v", id)
-		return repository.ErrInsightUnexpected
+		return repository.ErrAnalysisUnexpected
 	}
 
 	if results.DeletedCount == 0 {
-		return repository.ErrInsightNoResults
+		return repository.ErrAnalysisNoResults
 	}
 
 	return nil

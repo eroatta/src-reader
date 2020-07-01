@@ -18,6 +18,8 @@ var (
 	ErrSourceCodeUnableToRemove = errors.New("unable to remove source code")
 	// ErrSourceCodeUnableReadFile indicates that the requested file couldn't be accessed or read from the underlying storage.
 	ErrSourceCodeUnableReadFile = errors.New("unable to access or read file")
+	// ErrSourceCodeNotFound indicates the source code is not present on the underlying storage.
+	ErrSourceCodeNotFound = errors.New("unable to locate source code")
 )
 
 // SourceCodeRepository represents a repository capable of handle source code.

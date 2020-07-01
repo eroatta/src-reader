@@ -71,3 +71,17 @@ func (pdb *ProjectDB) find(ctx context.Context, filter interface{}) (entity.Proj
 
 	return pdb.mapper.toEntity(dto), nil
 }
+
+// Delete removes an existing Project from the underlying MongoDB collection.
+func (pdb *ProjectDB) Delete(ctx context.Context, projectID uuid.UUID) error {
+	results, err := pdb.collection.DeleteOne(ctx, bson.M{"_id": projectID.String()})
+	if err != nil {
+		log.WithError(err).Errorf("error deleting project with id: %v", projectID)
+		return repository.ErrProjectUnexpected
+	}
+
+	if results.DeletedCount == 0 {
+		return repository.ErrProjectNoResults
+	}
+	return nil
+}

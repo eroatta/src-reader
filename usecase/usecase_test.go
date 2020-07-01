@@ -13,6 +13,7 @@ type projectRepositoryMock struct {
 	project entity.Project
 	getErr  error
 	addErr  error
+	delErr  error
 }
 
 func (m projectRepositoryMock) Add(ctx context.Context, p entity.Project) error {
@@ -25,6 +26,10 @@ func (m projectRepositoryMock) Get(ctx context.Context, ID uuid.UUID) (entity.Pr
 
 func (m projectRepositoryMock) GetByReference(ctx context.Context, projectRef string) (entity.Project, error) {
 	return m.project, m.getErr
+}
+
+func (m projectRepositoryMock) Delete(ctx context.Context, ID uuid.UUID) error {
+	return m.delErr
 }
 
 // end project repository mock

@@ -23,4 +23,6 @@ type ProjectRepository interface {
 	Get(ctx context.Context, ID uuid.UUID) (entity.Project, error)
 	// GetByReference retrieves a Project using its reference name.
 	GetByReference(ctx context.Context, projectRef string) (entity.Project, error)
+	// Delete removes an existing Project from the current repository.
+	Delete(ctx context.Context, ID uuid.UUID) error
 }
