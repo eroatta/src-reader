@@ -64,8 +64,6 @@ func RegisterCreateProjectUsecase(r *gin.Engine, uc usecase.CreateProjectUsecase
 		createProject(c, uc)
 	})
 
-	// r.DELETE("/projects/$id", internal.deleteProject)
-
 	return r
 }
 
@@ -123,6 +121,31 @@ func getProject(ctx *gin.Context, uc usecase.GetProjectUsecase) {
 	}
 
 	ctx.JSON(http.StatusOK, toProjectResponse(project))
+}
+
+func RegisterDeleteProjectUsecase(r *gin.Engine, uc usecase.DeleteProjectUsecase) *gin.Engine {
+	r.DELETE("/projects/:id", func(c *gin.Context) {
+		deleteProject(c, uc)
+	})
+
+	return r
+}
+
+func deleteProject(ctx *gin.Context, uc usecase.DeleteProjectUsecase) {
+	projectID, err := uuid.Parse(ctx.Param("id"))
+	if err != nil {
+		setNotFoundResponse(ctx, fmt.Errorf("project %s can't be found", ctx.Param("id")))
+		return
+	}
+
+	err = uc.Process(ctx, projectID)
+	if err != nil && err != usecase.ErrProjectNotFound {
+		log.WithError(err).Error("unexpected error executing deleteProjectUsecase")
+		setInternalErrorResponse(ctx, fmt.Errorf("error deleting project with ID: %v", projectID))
+		return
+	}
+
+	ctx.JSON(http.StatusNoContent, nil)
 }
 
 func toProjectResponse(project entity.Project) projectResponse {

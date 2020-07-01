@@ -344,6 +344,71 @@ func TestGET_OnProjectGetterHandler_WithSuccess_ShouldReturnHTTP200(t *testing.T
 		w.Body.String())
 }
 
+func TestDELETE_OnProjectDeleteHandler_WhenInvalidProjectID_ShouldReturn404(t *testing.T) {
+	router := rest.NewServer()
+	rest.RegisterDeleteProjectUsecase(router, nil)
+
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest("DELETE", "/projects/invalid-id", nil)
+	router.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusNotFound, w.Code)
+}
+
+func TestDELETE_OnProjectDeleteHandler_WhenErrorExecutingUsecase_ShouldReturn500(t *testing.T) {
+	deleteProjectUsecaseMock := mockDeleteUsecase{
+		err: usecase.ErrUnexpected,
+	}
+
+	router := rest.NewServer()
+	rest.RegisterDeleteProjectUsecase(router, deleteProjectUsecaseMock)
+
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest("DELETE", "/projects/ed2cd46a-4afd-4d49-a6ea-1c8d12d40134", nil)
+	router.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusInternalServerError, w.Code)
+	assert.JSONEq(t, `
+		{
+			"name": "internal_error",
+			"message": "internal server error",
+			"details": [
+				"error deleting project with ID: ed2cd46a-4afd-4d49-a6ea-1c8d12d40134"
+			]
+		}`,
+		w.Body.String())
+}
+
+func TestDELETE_OnProjectDeleteHandler_WhenDeletedProject_ShouldReturn204(t *testing.T) {
+	deleteProjectUsecaseMock := mockDeleteUsecase{
+		err: nil,
+	}
+
+	router := rest.NewServer()
+	rest.RegisterDeleteProjectUsecase(router, deleteProjectUsecaseMock)
+
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest("DELETE", "/projects/ed2cd46a-4afd-4d49-a6ea-1c8d12d40134", nil)
+	router.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusNoContent, w.Code)
+}
+
+func TestDELETE_OnProjectDeleteHandler_WhenAlreadyDeletedProject_ShouldReturn204(t *testing.T) {
+	deleteDeleteUsecaseMock := mockDeleteUsecase{
+		err: usecase.ErrProjectNotFound,
+	}
+
+	router := rest.NewServer()
+	rest.RegisterDeleteProjectUsecase(router, deleteDeleteUsecaseMock)
+
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest("DELETE", "/projects/ed2cd46a-4afd-4d49-a6ea-1c8d12d40134", nil)
+	router.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusNoContent, w.Code)
+}
+
 type mockCreateUsecase struct {
 	project entity.Project
 	err     error
@@ -360,4 +425,12 @@ type mockGetUsecase struct {
 
 func (m mockGetUsecase) Process(ctx context.Context, ID uuid.UUID) (entity.Project, error) {
 	return m.project, m.err
+}
+
+type mockDeleteUsecase struct {
+	err error
+}
+
+func (m mockDeleteUsecase) Process(ctx context.Context, ID uuid.UUID) error {
+	return m.err
 }
