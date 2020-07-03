@@ -9,13 +9,16 @@ import (
 )
 
 var (
-	ErrFileNotFound = errors.New("TODO")
+	// ErrFileNotFound indicates the requested file was not found.
+	ErrFileNotFound = errors.New("requested file not found")
 )
 
+// OriginalFileUsecase defines the contract to retrieve a file with its original content.
 type OriginalFileUsecase interface {
 	Process(ctx context.Context, projectRef string, filename string) ([]byte, error)
 }
 
+// NewOriginalFileUsecase initializes a new OriginalFileUsecase instance.
 func NewOriginalFileUsecase(pr repository.ProjectRepository, scr repository.SourceCodeRepository) OriginalFileUsecase {
 	return &originalFileUsecase{
 		pr:  pr,

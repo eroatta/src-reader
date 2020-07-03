@@ -10,6 +10,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// RegisterOriginalFileUsecase defines the proper URI and HTTP method to execute the OriginalFileUsecase.
 func RegisterOriginalFileUsecase(r *gin.Engine, uc usecase.OriginalFileUsecase) *gin.Engine {
 	r.GET("/files/originals/:owner/:project/*file", func(c *gin.Context) {
 		getFile(c, uc)
@@ -18,6 +19,7 @@ func RegisterOriginalFileUsecase(r *gin.Engine, uc usecase.OriginalFileUsecase) 
 	return r
 }
 
+// RegisterRewrittenFileUsecase defines the proper URI and HTTP method to execute the RewrittenFileUsecase.
 func RegisterRewrittenFileUsecase(r *gin.Engine, uc usecase.RewrittenFileUsecase) *gin.Engine {
 	r.GET("/files/rewritten/:owner/:project/*file", func(c *gin.Context) {
 		getFile(c, uc)

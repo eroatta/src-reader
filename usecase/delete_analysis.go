@@ -12,10 +12,13 @@ import (
 // ErrAnalysisNotFound indicates there is no analysis to be processed on the usecase.
 var ErrAnalysisNotFound = errors.New("analysis not found")
 
+// DeleteAnalysisUsecase defines the contract for the use case related to delete an existing analysis.
 type DeleteAnalysisUsecase interface {
+	// Process handles the process to delete an existing Analysis, given its ID.
 	Process(ctx context.Context, analysisID uuid.UUID) error
 }
 
+// NewDeleteAnalysisUsecase create initializes a DeleteAnalysisUsecase instance.
 func NewDeleteAnalysisUsecase(duc DeleteInsightsUsecase, ir repository.IdentifierRepository, ar repository.AnalysisRepository) DeleteAnalysisUsecase {
 	return deleteAnalysisUsecase{
 		deleteInsightsUsecase: duc,

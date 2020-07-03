@@ -148,6 +148,8 @@ func getInsights(ctx *gin.Context, uc usecase.GetInsightsUsecase) {
 	ctx.JSON(http.StatusOK, getInsightsResponse(analysisID.String(), insights))
 }
 
+// RegisterDeleteInsightsUsecase defines the proper URI and HTTP method to execute the
+// DeleteInsightsUsecase.
 func RegisterDeleteInsightsUsecase(r *gin.Engine, uc usecase.DeleteInsightsUsecase) *gin.Engine {
 	r.DELETE("/insights/:id", func(c *gin.Context) {
 		deleteInsights(c, uc)

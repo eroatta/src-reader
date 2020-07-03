@@ -11,7 +11,8 @@ import (
 )
 
 var (
-	ErrInsightsNotFound = errors.New("TODO")
+	// ErrInsightsNotFound indicates that no Insights were found.
+	ErrInsightsNotFound = errors.New("no insights found")
 )
 
 // GetInsightsUsecase handles the retrieval of Insights by its ID.

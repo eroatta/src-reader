@@ -34,6 +34,8 @@ type summaryResponse struct {
 	ErrorSamples []string `json:"error_samples"`
 }
 
+// RegisterAnalyzeProjectUsecase defines the proper URI and HTTP method to execute
+// the AnalyzeProjectUsecase.
 func RegisterAnalyzeProjectUsecase(r *gin.Engine, uc usecase.AnalyzeProjectUsecase) *gin.Engine {
 	r.POST("/analysis", func(c *gin.Context) {
 		createAnalysis(c, uc)
@@ -96,6 +98,8 @@ func createAnalysis(ctx *gin.Context, uc usecase.AnalyzeProjectUsecase) {
 	ctx.JSON(http.StatusCreated, response)
 }
 
+// RegisterDeleteAnalysisUsecase defines the proper URI and HTTP method to execute the
+// DeleteAnalysisUsecase.
 func RegisterDeleteAnalysisUsecase(r *gin.Engine, uc usecase.DeleteAnalysisUsecase) *gin.Engine {
 	r.DELETE("/analysis/:id", func(c *gin.Context) {
 		deleteAnalysis(c, uc)

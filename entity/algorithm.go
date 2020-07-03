@@ -26,7 +26,8 @@ type MinerFactory interface {
 	Make() (Miner, error)
 }
 
-// TODO: move it?
+// ExtractorFactory defines the contract for the factory functions capable of
+// building Extractors.
 type ExtractorFactory func(filename string) Extractor
 
 // Extractor is used to define a custom identifier extractor.

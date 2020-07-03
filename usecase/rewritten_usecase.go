@@ -15,10 +15,13 @@ import (
 	"golang.org/x/tools/go/ast/astutil"
 )
 
+// RewrittenFileUsecase defines the contract to retrieve a file with the new content, based
+// on the identifiers analysis process.
 type RewrittenFileUsecase interface {
 	Process(ctx context.Context, projectRef string, filename string) ([]byte, error)
 }
 
+// NewRewrittenFileUsecase initializes a new RewrittenFileUsecase instance.
 func NewRewrittenFileUsecase(pr repository.ProjectRepository, scr repository.SourceCodeRepository, ir repository.IdentifierRepository) RewrittenFileUsecase {
 	return &rewrittenFileUsecase{
 		pr:  pr,
