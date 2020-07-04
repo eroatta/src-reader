@@ -1,21 +1,45 @@
 @@startuml System Use Cases
 
-actor User
+skinparam usecase {
+    BackgroundColor<< Main >> LightGreen
+    BorderColor<< Main >> SeaGreen
+}
+
+actor Analyzer
+actor Visualizer
 
 rectangle "src-reader" {
-    usecase (Create Project) as CreateProject
-    usecase (Analyze Project) as AnalyzeProject
-    usecase (Extract Insights \nfrom analysis) as ExtractInsights
-    usecase (Retrieve original File) as RetrieveOriginalFile
-    usecase (Retrieve rewritten File) as RetrieveRewrittenFile
+    usecase (Create Project) as CreateProject << Main >>
+    usecase (Retrive Project) as GetProject
+    usecase (Analyze Project) as AnalyzeProject << Main >>
+    usecase (Delete Project) as DeleteProject
+    usecase (Extract Insights \nfrom analysis) as GainInsights << Main >>
+    usecase (Delete Analysis) as DeleteAnalysis
+    usecase (Retrieve Insights) as GetInsights
+    usecase (Delete Insights) as DeleteInsights
+    usecase (Retrieve original File) as RetrieveOriginalFile << Main >>
+    usecase (Retrieve rewritten File) as RetrieveRewrittenFile << Main >>
+
+    note "Both use cases are needed to \ncompare files with original and modified ASTs." as N1
+    N1 .left. RetrieveRewrittenFile
+    N1 .left. RetrieveOriginalFile
 }
+
+DeleteProject ..> DeleteAnalysis : << includes >>
+DeleteAnalysis ..> DeleteInsights : << includes >>
 
 left to right direction
 
-User --> CreateProject
-User --> AnalyzeProject
-User --> ExtractInsights
-User --> RetrieveOriginalFile
-User --> RetrieveRewrittenFile
+Analyzer --> CreateProject
+Analyzer --> DeleteProject
+Analyzer --> AnalyzeProject
+Analyzer --> DeleteAnalysis
+Analyzer --> GainInsights
+Analyzer --> DeleteInsights
+
+Visualizer --> GetProject
+Visualizer --> GetInsights
+Visualizer --> RetrieveOriginalFile
+Visualizer --> RetrieveRewrittenFile
 
 @@enduml
