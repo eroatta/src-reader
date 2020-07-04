@@ -65,7 +65,7 @@ func (idb *IdentifierDB) FindAllByAnalysisID(ctx context.Context, analysisID uui
 	return identifiers, nil
 }
 
-// FindAllByProject retrieves all the identifiers related to a given project, from the underlying MongoDB collection.
+// FindAllByProjectAndFile retrieves all the identifiers for a file related to a given project, from the underlying MongoDB collection.
 func (idb *IdentifierDB) FindAllByProjectAndFile(ctx context.Context, projectRef string, filename string) ([]entity.Identifier, error) {
 	cursor, err := idb.collection.Find(ctx, bson.M{"project_ref": projectRef, "file": filename})
 	if err != nil {

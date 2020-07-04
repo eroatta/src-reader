@@ -93,7 +93,7 @@ func printableError(err error) string {
 	return ""
 }
 
-// FindAllFindAllByProject finds all the identifiers that match the given project reference.
+// FindAllByProject finds all the identifiers that match the given project reference.
 // It's unimplemented on the current repository.
 func (r *CSVIdentifierRepository) FindAllByProject(ctx context.Context, projectRef string) ([]entity.Identifier, error) {
 	return []entity.Identifier{}, errors.New("unimplemented method")

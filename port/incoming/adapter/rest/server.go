@@ -15,6 +15,7 @@ import (
 // request bodies.
 var requestValidator = validator.New()
 
+// NewServer creates and initializes a new gin.Engine instance with the basic endpoints set up.
 func NewServer() *gin.Engine {
 	r := gin.Default()
 

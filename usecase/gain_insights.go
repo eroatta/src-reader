@@ -17,14 +17,17 @@ var (
 	ErrIdentifiersNotFound = errors.New("no identifiers found for the project")
 	// ErrUnableToReadIdentifiers indicates that the identifiers couldn't be retrieved.
 	ErrUnableToReadIdentifiers = errors.New("unable to retrieve and read identifiers")
-	// ErrUnableToSaveInsights indicates that an error occurred while trying to store the insights.
+	// ErrUnableToGainInsights indicates that an error occurred while trying to store the insights.
 	ErrUnableToGainInsights = errors.New("unable to gain insights from identifiers")
 )
 
+// GainInsightsUsecase defines the contract for the usecase to analyze results and gain insights
+// from a previous analysis.
 type GainInsightsUsecase interface {
 	Process(ctx context.Context, analysisID uuid.UUID) ([]entity.Insight, error)
 }
 
+// NewGainInsightsUsecase initializes a new GainInsightsUsecase instance.
 func NewGainInsightsUsecase(identr repository.IdentifierRepository, insr repository.InsightRepository) GainInsightsUsecase {
 	return gainInsightsUsecase{
 		identr: identr,

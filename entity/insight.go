@@ -2,6 +2,7 @@ package entity
 
 import "github.com/google/uuid"
 
+// Insight represents information extracted and summarized from an Analysis, for a package.
 type Insight struct {
 	ID               string
 	ProjectRef       string
@@ -15,18 +16,22 @@ type Insight struct {
 	Files            map[string]struct{}
 }
 
+// AvgSplits returns the average number of splits for a particular algorithm.
 func (i Insight) AvgSplits(algorithm string) float64 {
 	return float64(i.TotalSplits[algorithm]) / float64(i.TotalIdentifiers)
 }
 
+// AvgExpansions returns the average number of expansions for a particular algorithm.
 func (i Insight) AvgExpansions(algorithm string) float64 {
 	return float64(i.TotalExpansions[algorithm]) / float64(i.TotalIdentifiers)
 }
 
+// Rate returns the correctness rate for the Insight.
 func (i Insight) Rate() float64 {
 	return i.TotalWeight / float64(i.TotalIdentifiers)
 }
 
+// Include includes an identifier into the analysis for the current package Insight.
 func (i *Insight) Include(ident Identifier) {
 	if i.Package != ident.FullPackageName() {
 		return

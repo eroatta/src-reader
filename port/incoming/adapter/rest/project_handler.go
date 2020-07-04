@@ -59,6 +59,7 @@ type sourcecodeResponse struct {
 	Files    []string `json:"files"`
 }
 
+// RegisterCreateProjectUsecase defines the proper URI and HTTP method to execute the CreateProjectUsecase.
 func RegisterCreateProjectUsecase(r *gin.Engine, uc usecase.CreateProjectUsecase) *gin.Engine {
 	r.POST("/projects", func(c *gin.Context) {
 		createProject(c, uc)
@@ -92,6 +93,7 @@ func createProject(ctx *gin.Context, uc usecase.CreateProjectUsecase) {
 	ctx.JSON(http.StatusCreated, toProjectResponse(project))
 }
 
+// RegisterGetProjectUsecase defines the proper URI and HTTP method to execute the GetProjectUsecase.
 func RegisterGetProjectUsecase(r *gin.Engine, uc usecase.GetProjectUsecase) *gin.Engine {
 	r.GET("/projects/:id", func(c *gin.Context) {
 		getProject(c, uc)
@@ -123,6 +125,7 @@ func getProject(ctx *gin.Context, uc usecase.GetProjectUsecase) {
 	ctx.JSON(http.StatusOK, toProjectResponse(project))
 }
 
+// RegisterDeleteProjectUsecase defines the proper URI and HTTP method to execute the DeleteProjectUsecase.
 func RegisterDeleteProjectUsecase(r *gin.Engine, uc usecase.DeleteProjectUsecase) *gin.Engine {
 	r.DELETE("/projects/:id", func(c *gin.Context) {
 		deleteProject(c, uc)

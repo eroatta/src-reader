@@ -9,10 +9,12 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+// DeleteProjectUsecase defines the contract for the usecase related to delete a project.
 type DeleteProjectUsecase interface {
 	Process(ctx context.Context, projectID uuid.UUID) error
 }
 
+// NewDeleteProjectUsecase initializes a new DeleteProjectUsecase instance.
 func NewDeleteProjectUsecase(duc DeleteAnalysisUsecase, ar repository.AnalysisRepository,
 	scr repository.SourceCodeRepository, pr repository.ProjectRepository) DeleteProjectUsecase {
 	return deleteProjectUsecase{
