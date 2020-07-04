@@ -53,4 +53,198 @@ package repository {
     }
 }
 
+package entity {
+    class entity.Project {
+        + ID : uuid.UUID
+        + Status : string
+        + Reference : string
+        + CreatedAt : time.Time
+        + Metadata : Metadata
+        + SourceCode : SourceCode
+    }
+
+    class entity.Metadata {
+        + RemoteID : string
+        + Owner : string
+        + Fullname : string
+        + Description : string
+        + CloneURL : string
+        + DefaultBranch : string
+        + License :string
+        + CreatedAt : time.Time
+        + UpdatedAt : time.Time
+        + IsFork : bool
+        + Size : int32
+        + Stargazers : int32
+        + Watchers : int32
+        + Forks : int32
+    }
+    entity.Project -- entity.Metadata
+
+    class entity.SourceCode {
+        + Hash : string
+        + Location : string
+        + Files : []string
+    }
+    entity.Project -- entity.SourceCode
+
+    class entity.File {
+        + Name : string
+        + Raw : []byte
+        + AST : ast.File
+        + FileSet : token.FileSet
+        + Error : error
+    }
+    note right of entity.File
+    Review, we should probably move it to
+    the usecase package (used by AnalyzeUsecasse).
+    end note
+
+    class entity.Identifer {
+        + ID : string
+        + ProjectRef : string
+        + AnalysisID : uuid.UUID
+        + Package : string
+        + File : string
+        + Position : token.Pos
+        + Name : string
+        + Type : token.Type
+        + Node : ast.Node
+        + Splits : map[string][]Split
+        + Expansions : map[string][]Expansion
+        + Error error
+        + Normalization : Normalization
+        + FullPackageName() : string
+        + Exported() : bool
+        + Normalize()
+    }
+
+    class entity.Split {
+        + Order : int
+        + Value : string
+    }
+    entity.Identifer -- entity.Split : has several
+
+    class entity.Expansion {
+        + Order : int
+        + From : string
+        + Values : []string
+        + SplittingAlgorithm : string
+    }
+    entity.Identifer -- entity.Expansion : has several
+
+    class entity.Normalization {
+        + Word : string
+        + Algorithm : string
+        + Score : float64
+    }
+    entity.Identifer -- entity.Normalization : after evaluation has
+
+    class entity.AnalysisResults {
+        + ID : uuid.UUID
+        + DateCreated : time.Time
+        + ProjectID : uuid.UUID
+        + ProjectName : string
+        + PipelineMiners : []string
+        + PipelineSplitters : []string
+        + PipelineExpanders : []string
+        + FilesTotal : int
+        + FilesValid : int
+        + FilesError : int
+        + FilesErrorSamples : []string
+        + IdentifiersTotal : int
+        + IdentifiersValid : int
+        + IdentifiersError : int
+        + IdentifiersErrorSamples : []string
+    }
+
+    class entity.Insight {
+        + ID : string
+        + ProjectRef : string
+        + AnalysisID : uuid.UUID
+        + Package : string
+        + TotalIdentifiers : int
+        + TotalExported : int
+        + TotalSplits : map[string]int
+        + TotalExpansions : map[string]int
+        + TotalWeight : float64
+        + Files : map[string]struct{}
+        + AvgSplits(algorithm) : float64
+        + AvgExpansions(algorithm) : float64
+        + Rate() : float64
+        + Include(identifier)
+    }
+    entity.Insight --> entity.Identifer : extracted from
+
+    class entity.AnalysisConfig {
+        + Miners : []string
+        + MinerAlgorithmFactory : MinerAbstractFactory
+        + ExtractorFactory : ExtractorFactory
+        + SplittingAlgorithmFactory : SplitterAbstractFactory
+        + Splitters : []string
+        + ExpansionAlgorithmFactory : ExpanderAbstractFactory
+        + Expanders : []string
+    }
+
+    interface entity.Extractor {
+        + Visit(node) : ast.Visitor
+        + Identifiers() : []Identifer
+    }
+
+    interface entity.ExtractorFactory
+    entity.ExtractorFactory --> entity.Extractor : creates
+    entity.AnalysisConfig --> entity.ExtractorFactory : requires
+
+    interface entity.Miner {
+        + Name() : string
+        + Visit(node) : ast.Visitor
+        + SetCurrentFile(filename)
+        + Results() : interface{}
+    }
+
+    interface entity.MinerFactory {
+        + Make() : Miner, error
+    }
+    entity.MinerFactory --> entity.Miner : builds instances of
+
+    interface entity.MinerAbstractFactory {
+        + Get(algorithm) : MinerFactory, error
+    }
+    entity.MinerAbstractFactory --> entity.MinerFactory : retrieves
+    entity.AnalysisConfig --> entity.MinerAbstractFactory : requires
+
+    interface entity.Splitter {
+        + Name() : string
+        + Split(token) : []Split
+    }
+
+    interface entity.SplitterFactory {
+        + Make(miners) : Splitter, error
+    }
+    entity.SplitterFactory --> entity.Splitter : builds instances of
+
+    interface entity.SplitterAbstractFactory {
+        + Get(algorithm) : SplitterFactory, error
+    }
+    entity.SplitterAbstractFactory --> entity.SplitterFactory : retrieves
+    entity.AnalysisConfig --> entity.SplitterAbstractFactory : requires
+
+    interface entity.Expander {
+        + Name() : string
+        + ApplicableOn() : string
+        + Expand(identifier) : []Expansio
+    }
+
+    interface entity.ExpanderFactory {
+        + Make(miners) : Expander, error
+    }
+    entity.ExpanderFactory --> entity.Expander : builds instances of
+
+    interface entity.ExpanderAbstractFactory {
+        + Get(algorithm) : ExpanderFactory, error
+    }
+    entity.ExpanderAbstractFactory --> entity.ExpanderFactory : retrieves
+    entity.AnalysisConfig --> entity.ExpanderAbstractFactory : requires
+}
+
 @@enduml
