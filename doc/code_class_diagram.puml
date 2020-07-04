@@ -1,15 +1,56 @@
 @@startuml Code Class Diagram
 
-class Repository {
-    Name string
-    URL string
-    Hash string
-    DateCreated string
-    Error error
-}
+package repository {
+    interface repository.ProjectRepository {
+        + ErrProjectNoResults
+        + ErrProjectUnexpected
+        + Add(context, project) : error
+        + Get(context, id) : entity.Project, error
+        + GetByReference(context, projectRef) : entity.Project, error
+        + Delete(context, id) : error
+    }
 
-class File {
-    
+    interface repository.MetadataRepository {
+        + ErrMetadataUnexpected
+        + RetrieveMetadata(context, remoteRepository) : entity.Metadata, error
+    }
+
+    interface repository.SourceCodeRepository {
+        + ErrSourceCodeUnableCreateDestination
+        + ErrSourceCodeUnableCloneRemoteRepository
+        + ErrSourceCodeUnableAccessMetadata
+        + ErrSourceCodeUnableToRemove
+        + ErrSourceCodeUnableReadFile
+        + ErrSourceCodeNotFound
+        + Clone(context, fullname, cloneURL) : entity.SourceCode, error
+        + Remove(context, location) : error
+        + Read(context, location, filename) : []byte, error
+    }
+
+    interface repository.AnalysisRepository {
+        + ErrAnalysisNoResults
+        + ErrAnalysisUnexpected
+        + Add(context, analysis) : error
+        + GetByProjectID(context, projectID) : entity.AnalysisResults, error
+        + Delete(context, analysisID) : error
+    }
+
+    interface repository.IdentifierRepository {
+        + ErrIdentifierNoResults
+        + ErrIdentifierUnexpected
+        + Add(context, analysis, identifier) : error
+        + FindAllByAnalysisID(context, analysisID) : []entity.Identifier, error
+        + FindAllByProjectAndFile(context, projectRef, filename) : []entity.Identifier, error
+        + DeleteAllByAnalysisID(context, analysisID) : error
+    }
+
+    interface repository.InsightRepository {
+        + ErrInsightNoResults
+        + ErrInsightUnexpected
+        + AddAll(context, insights) : error
+        + GetByAnalysisID(context, analysisID) : []entity.Insight, error
+        + DeleteAllByAnalysisID(context, analysisID) : error
+    }
 }
 
 @@enduml
