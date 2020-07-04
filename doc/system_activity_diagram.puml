@@ -1,4 +1,4 @@
-@@startuml System Activity Diagram
+@@startuml system_activity_diagram
 
 start
 :Clone the repository;

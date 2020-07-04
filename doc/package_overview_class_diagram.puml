@@ -1,4 +1,4 @@
-@@startuml Code Class Diagram
+@@startuml package_overview_class_diagram
 
 package repository {
     interface repository.ProjectRepository {
@@ -246,5 +246,33 @@ package entity {
     entity.ExpanderAbstractFactory --> entity.ExpanderFactory : retrieves
     entity.AnalysisConfig --> entity.ExpanderAbstractFactory : requires
 }
+
+package usecase {
+    class usecase.Exported <<(E, Orange)>> {
+        + NewCreateProjectUsecase() : CreateProjectUsecase
+        + NewAnalyzeProjectUsecase() : AnalyzeProjectUsecase
+        + NewGainInsightsUsecase() : GainInsightsUsecase
+        + NewGetInsightsUsecase() : GetInsightsUsecase
+        + NewGetProjectUsecase() : GetProjecUsecase
+        + NewDeleteAnalysisUsecase() : DeleteAnalysisUsecase
+        + NewDeleteInsightsUsecase() : DeleteInsightsUsecase
+        + NewDeleteProjectUsecase() : DeleteProjectUsecase
+        + NewOriginalFileUsecase() : OriginalFileUsecase
+        + NewRewrittenFileUsecase() : RewrittenFileUsecase
+    }
+}
+
+package port.incoming.adapter.rest {}
+port.incoming.adapter.rest --> usecase : exposes
+
+package port.outgoing.adapter {
+    package port.outgoing.repository {}
+    package port.outgoing.algorithm {}
+    package port.outgoing.frequencytable {}
+}
+port.outgoing.repository --> repository : << implements >>
+
+usecase --> repository : uses
+repository --> entity : provides access to
 
 @@enduml

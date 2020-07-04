@@ -1,0 +1,68 @@
+@@startuml package_usecase_class_diagram
+
+package usecase {
+    class usecase.Exported <<(E, Orange)>> {
+        + NewCreateProjectUsecase() : CreateProjectUsecase
+        + NewAnalyzeProjectUsecase() : AnalyzeProjectUsecase
+        + NewGainInsightsUsecase() : GainInsightsUsecase
+        + NewGetInsightsUsecase() : GetInsightsUsecase
+        + NewGetProjectUsecase() : GetProjecUsecase
+        + NewDeleteAnalysisUsecase() : DeleteAnalysisUsecase
+        + NewDeleteInsightsUsecase() : DeleteInsightsUsecase
+        + NewDeleteProjectUsecase() : DeleteProjectUsecase
+        + NewOriginalFileUsecase() : OriginalFileUsecase
+        + NewRewrittenFileUsecase() : RewrittenFileUsecase
+    }
+
+    interface usecase.CreateProjectUsecase {
+        + Process(context, projectRef) : entity.Project, error
+    }
+    usecase.Exported -down-> usecase.CreateProjectUsecase : builds
+
+    interface usecase.AnalyzeProjectUsecase {
+        + Process(context, projectID) : entity.AnalysisResults, error
+    }
+    usecase.Exported -up-> usecase.AnalyzeProjectUsecase : builds
+
+    interface usecase.GainInsightsUsecase {
+        + Process(context, analysisID) : []entity.Insight, error
+    }
+    usecase.Exported -up-> usecase.GainInsightsUsecase : builds
+
+    interface usecase.GetInsightsUsecase {
+        + Process(context, id) : []entity.Insight, error
+    }
+    usecase.Exported -up-> usecase.GetInsightsUsecase : builds
+
+    interface usecase.GetProjecUsecase {
+        + Process(context, id) : entity.Project, error
+    }
+    usecase.Exported -left-> usecase.GetProjecUsecase : builds
+
+    interface usecase.DeleteAnalysisUsecase {
+        + Process(context, analysisID) : error
+    }
+    usecase.Exported -left-> usecase.DeleteAnalysisUsecase : builds
+
+    interface usecase.DeleteInsightsUsecase {
+        + Process(context, analysisID) : error
+    }
+    usecase.Exported -left-> usecase.DeleteInsightsUsecase : builds
+
+    interface usecase.DeleteProjectUsecase {
+        + Process(context, projectID) : error
+    }
+    usecase.Exported -down-> usecase.DeleteProjectUsecase : builds
+
+    interface usecase.OriginalFileUsecase {
+        + Process(context, projectRef, filename) : []byte, error
+    }
+    usecase.Exported -down-> usecase.OriginalFileUsecase : builds
+
+    interface usecase.RewrittenFileUsecase {
+        + Process(context, projectRef, filename) : []byte, error
+    }
+    usecase.Exported -down-> usecase.RewrittenFileUsecase : builds
+}
+
+@@enduml

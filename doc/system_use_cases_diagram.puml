@@ -1,4 +1,4 @@
-@@startuml System Use Cases
+@@startuml system_use_cases_diagram
 
 skinparam usecase {
     BackgroundColor<< Main >> LightGreen

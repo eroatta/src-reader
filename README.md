@@ -13,6 +13,10 @@ The tool main use cases allows you to:
 * **Extract** insights from the identifiers that are considered valuable, and determine the project's quality level.
 * **Modify** an AST with the best applicable identifier names and generate a new file.
 
+The following activity diagram shows the a general overview of the included steps on the process.
+
+![Steps](./doc/system_activity_diagram.png)
+
 _Currently, the only supported language is Golang._
 
 ## Features
@@ -22,6 +26,14 @@ _Currently, the only supported language is Golang._
 ## Architecture Overview
 
 _WIP_
+
+## Packages Overview class diagram
+
+![packages overview class diagram](./doc/package_overview_class_diagram.png)
+
+### Class Diagram: usecase
+
+![usecase class diagram](./doc/package_usecase_class_diagram.png)
 
 ## License
 
