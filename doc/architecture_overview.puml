@@ -1,0 +1,49 @@
+@@startuml architecture_overview
+
+component [src-reader] as srcreader
+() "REST API" as srcreaderapi
+database "Local Storage" as Local
+database MongoDB
+
+component monstache #LightGreen
+component prometheus #LightGreen
+
+component grafana #Orange
+() "Web UI" as viz #Orange
+database ElasticSearch #Orange
+component [diff-viewer] as diffviewer #Orange
+() "HTML" as diffviewerapi #Orange
+
+cloud GitHub #LightSteelBlue
+cloud Client #LightSteelBlue
+
+Client -right-> srcreaderapi : consumes
+srcreader -left- srcreaderapi
+srcreader -up-> GitHub : access metadata and \nclones repositories from
+srcreader -down-> MongoDB : stores results
+srcreader -down-> Local : stores \nsource code
+srcreader -right-> prometheus : send metrics to
+
+monstache -left-> MongoDB : reads from
+monstache -right-> ElasticSearch : writes to
+
+grafana -left-> prometheus : collect metrics from
+grafana --> ElasticSearch : uses it as datasource \n for timeseries queries
+grafana -up- viz
+grafana -up-> diffviewerapi
+note right of grafana
+    Includes several dashboard to
+    explore the data extracted on
+    the analysis process and review
+    the results.
+end note
+
+diffviewer -down- diffviewerapi : exposes
+diffviewer -left-> srcreaderapi : consumes
+note right of diffviewer
+    Handles the comparison between the original
+    and the rewritten file, and exposes it as a
+    GitHub-like differences comparator.
+end note
+
+@@enduml

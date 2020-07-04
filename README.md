@@ -25,7 +25,13 @@ _Currently, the only supported language is Golang._
 
 ## Architecture Overview
 
-_WIP_
+![architecture overview](./doc/architecture_overview.png)
+
+* **Yellow components** represent project/analysis/insights handler components.
+They retrieve the source code, store it, analyze it, and extract insights from it.
+* **Orange** components are used for visualization.
+This visualizations include golden signals, projects, analysis, identifiers, insights and comparisons.
+* **Green components** are used for synchronization, so generated data from the yellow components can be visualized on the _orange components_.
 
 ## Packages Overview class diagram
 
