@@ -1,0 +1,92 @@
+---
+  - id: 8
+    orgId: 1
+    name: Elasticsearch / Analysis
+    type: elasticsearch
+    typeLogoUrl: public/app/plugins/datasource/elasticsearch/img/elasticsearch.svg
+    access: proxy
+    url: http://elasticsearch:9200
+    password: ''
+    user: ''
+    database: reader.analysis
+    basicAuth: false
+    isDefault: false
+    jsonData:
+      esVersion: 70
+      logLevelField: ''
+      logMessageField: ''
+      maxConcurrentShardRequests: 5
+      timeField: created_at
+    readOnly: false
+  - id: 7
+    orgId: 1
+    name: Elasticsearch / Identifiers
+    type: elasticsearch
+    typeLogoUrl: public/app/plugins/datasource/elasticsearch/img/elasticsearch.svg
+    access: proxy
+    url: http://elasticsearch:9200
+    password: ''
+    user: ''
+    database: reader.identifiers
+    basicAuth: false
+    isDefault: false
+    jsonData:
+      esVersion: 70
+      logLevelField: ''
+      logMessageField: ''
+      maxConcurrentShardRequests: 5
+      timeField: created_at
+    readOnly: false
+  - id: 10
+    orgId: 1
+    name: Elasticsearch / Insights
+    type: elasticsearch
+    typeLogoUrl: public/app/plugins/datasource/elasticsearch/img/elasticsearch.svg
+    access: proxy
+    url: http://elasticsearch:9200
+    password: ''
+    user: ''
+    database: reader.insight
+    basicAuth: false
+    isDefault: false
+    jsonData:
+      esVersion: 70
+      logLevelField: ''
+      logMessageField: ''
+      maxConcurrentShardRequests: 5
+      timeField: created_at
+    readOnly: false
+  - id: 9
+    orgId: 1
+    name: Elasticsearch / Projects
+    type: elasticsearch
+    typeLogoUrl: public/app/plugins/datasource/elasticsearch/img/elasticsearch.svg
+    access: proxy
+    url: http://elasticsearch:9200
+    password: ''
+    user: ''
+    database: reader.projects
+    basicAuth: false
+    isDefault: false
+    jsonData:
+      esVersion: 70
+      logLevelField: ''
+      logMessageField: ''
+      maxConcurrentShardRequests: 5
+      timeField: metadata.created_at
+    readOnly: false
+  - id: 2
+    orgId: 1
+    name: Prometheus
+    type: prometheus
+    typeLogoUrl: public/app/plugins/datasource/prometheus/img/prometheus_logo.svg
+    access: proxy
+    url: http://prometheus:9090
+    password: ''
+    user: ''
+    database: ''
+    basicAuth: false
+    isDefault: true
+    jsonData: {}
+    readOnly: false
+  
