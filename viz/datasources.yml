@@ -1,13 +1,16 @@
----
-  - id: 8
-    orgId: 1
-    name: Elasticsearch / Analysis
+# config file version
+apiVersion: 1
+
+# list of datasources to insert/update depending what is available in the database
+datasources:
+  - name: Elasticsearch / Analysis
     type: elasticsearch
     typeLogoUrl: public/app/plugins/datasource/elasticsearch/img/elasticsearch.svg
     access: proxy
+    orgId: 1
     url: http://elasticsearch:9200
-    password: ''
-    user: ''
+    password:
+    user:
     database: reader.analysis
     basicAuth: false
     isDefault: false
@@ -18,15 +21,15 @@
       maxConcurrentShardRequests: 5
       timeField: created_at
     readOnly: false
-  - id: 7
-    orgId: 1
-    name: Elasticsearch / Identifiers
+
+  - name: Elasticsearch / Identifiers
     type: elasticsearch
     typeLogoUrl: public/app/plugins/datasource/elasticsearch/img/elasticsearch.svg
     access: proxy
+    orgId: 1
     url: http://elasticsearch:9200
-    password: ''
-    user: ''
+    password:
+    user:
     database: reader.identifiers
     basicAuth: false
     isDefault: false
@@ -37,15 +40,15 @@
       maxConcurrentShardRequests: 5
       timeField: created_at
     readOnly: false
-  - id: 10
-    orgId: 1
-    name: Elasticsearch / Insights
+
+  - name: Elasticsearch / Insights
     type: elasticsearch
     typeLogoUrl: public/app/plugins/datasource/elasticsearch/img/elasticsearch.svg
     access: proxy
+    orgId: 1
     url: http://elasticsearch:9200
-    password: ''
-    user: ''
+    password:
+    user:
     database: reader.insight
     basicAuth: false
     isDefault: false
@@ -56,15 +59,15 @@
       maxConcurrentShardRequests: 5
       timeField: created_at
     readOnly: false
-  - id: 9
-    orgId: 1
-    name: Elasticsearch / Projects
+
+  - name: Elasticsearch / Projects
     type: elasticsearch
     typeLogoUrl: public/app/plugins/datasource/elasticsearch/img/elasticsearch.svg
     access: proxy
+    orgId: 1
     url: http://elasticsearch:9200
-    password: ''
-    user: ''
+    password:
+    user:
     database: reader.projects
     basicAuth: false
     isDefault: false
@@ -75,16 +78,16 @@
       maxConcurrentShardRequests: 5
       timeField: metadata.created_at
     readOnly: false
-  - id: 2
-    orgId: 1
-    name: Prometheus
+
+  - name: Prometheus
     type: prometheus
     typeLogoUrl: public/app/plugins/datasource/prometheus/img/prometheus_logo.svg
     access: proxy
+    orgId: 1
     url: http://prometheus:9090
-    password: ''
-    user: ''
-    database: ''
+    password:
+    user:
+    database:
     basicAuth: false
     isDefault: true
     jsonData: {}

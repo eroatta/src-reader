@@ -17,7 +17,7 @@
   "gnetId": null,
   "graphTooltip": 0,
   "id": 8,
-  "iteration": 1591181132239,
+  "iteration": 1594161561079,
   "links": [],
   "panels": [
     {
@@ -354,7 +354,7 @@
       "type": "table"
     },
     {
-      "datasource": "Elasticsearch / Insights",
+      "datasource": "Elasticsearch / Identifiers",
       "gridPos": {
         "h": 10,
         "w": 9,
@@ -376,28 +376,66 @@
       "skipSameURL": true,
       "targets": [
         {
-          "bucketAggs": [],
+          "bucketAggs": [
+            {
+              "$$hashKey": "object:798604",
+              "fake": true,
+              "field": "project_ref.keyword",
+              "id": "4",
+              "settings": {
+                "min_doc_count": 1,
+                "order": "desc",
+                "orderBy": "_term",
+                "size": "10"
+              },
+              "type": "terms"
+            },
+            {
+              "$$hashKey": "object:798613",
+              "fake": true,
+              "field": "package.keyword",
+              "id": "5",
+              "settings": {
+                "min_doc_count": 1,
+                "order": "desc",
+                "orderBy": "_term",
+                "size": "10"
+              },
+              "type": "terms"
+            },
+            {
+              "$$hashKey": "object:628553",
+              "fake": true,
+              "field": "file.keyword",
+              "id": "3",
+              "settings": {
+                "min_doc_count": 1,
+                "order": "desc",
+                "orderBy": "_term",
+                "size": "10"
+              },
+              "type": "terms"
+            }
+          ],
           "metrics": [
             {
               "$$hashKey": "object:974",
               "field": "select field",
               "id": "1",
               "meta": {},
-              "settings": {
-                "size": 500
-              },
-              "type": "raw_document"
+              "settings": {},
+              "type": "cardinality"
             }
           ],
           "refId": "A",
           "timeField": "created_at"
         }
       ],
-      "template": "<pre>{{ response }}</pre>",
+      "template": "<div ng-repeat=\"value in response[0].rows\">\n  <li><a href=\"http://localhost:5000/rewrites/{{value[0]}}/{{value[2]}}\" target=\"_blank\">{{value[0]}}/{{value[2]}}</a></li>\n</div>",
       "templateResponse": true,
       "timeFrom": null,
       "timeShift": null,
-      "title": "Panel Title",
+      "title": "Comparison between Original and Rewritten",
       "type": "ryantxu-ajax-panel",
       "url": "https://raw.githubusercontent.com/ryantxu/ajax-panel/master/static/example.txt",
       "withCredentials": false
@@ -448,7 +486,7 @@
     ]
   },
   "time": {
-    "from": "now-2d",
+    "from": "now-90d",
     "to": "now"
   },
   "timepicker": {
@@ -471,5 +509,5 @@
   "variables": {
     "list": []
   },
-  "version": 6
+  "version": 7
 }

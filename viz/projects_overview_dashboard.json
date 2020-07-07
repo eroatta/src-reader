@@ -2,7 +2,7 @@
   "annotations": {
     "list": [
       {
-        "$$hashKey": "object:79",
+        "$$hashKey": "object:293",
         "builtIn": 1,
         "datasource": "-- Grafana --",
         "enable": true,
@@ -16,21 +16,18 @@
   "editable": true,
   "gnetId": null,
   "graphTooltip": 0,
-  "id": 6,
-  "iteration": 1590363327347,
+  "id": 7,
   "links": [],
   "panels": [
     {
-      "cacheTimeout": null,
-      "datasource": "Elasticsearch / Projects",
+      "datasource": "Elasticsearch / Identifiers",
       "gridPos": {
         "h": 8,
-        "w": 5,
+        "w": 6,
         "x": 0,
         "y": 0
       },
-      "id": 4,
-      "links": [],
+      "id": 2,
       "options": {
         "colorMode": "value",
         "fieldOptions": {
@@ -40,17 +37,15 @@
           "defaults": {
             "decimals": 0,
             "mappings": [],
-            "nullValueMode": "connected",
             "thresholds": {
               "mode": "absolute",
               "steps": [
                 {
-                  "color": "light-blue",
+                  "color": "semi-dark-orange",
                   "value": null
                 }
               ]
-            },
-            "unit": "none"
+            }
           },
           "overrides": [],
           "values": false
@@ -64,8 +59,8 @@
         {
           "bucketAggs": [
             {
-              "$$hashKey": "object:741",
-              "field": "metadata.created_at",
+              "$$hashKey": "object:378",
+              "field": "created_at",
               "id": "2",
               "settings": {
                 "interval": "auto",
@@ -77,21 +72,20 @@
           ],
           "metrics": [
             {
-              "$$hashKey": "object:739",
-              "field": "metadata.fullname.keyword",
+              "$$hashKey": "object:376",
+              "field": "select field",
               "id": "1",
-              "meta": {},
-              "settings": {},
-              "type": "cardinality"
+              "type": "count"
             }
           ],
+          "query": "*",
           "refId": "A",
-          "timeField": "metadata.created_at"
+          "timeField": "created_at"
         }
       ],
       "timeFrom": null,
       "timeShift": null,
-      "title": "Imported Projects",
+      "title": "Extracted Identifiers",
       "type": "stat"
     },
     {
@@ -99,134 +93,25 @@
       "bars": true,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "Elasticsearch / Projects",
+      "datasource": "Elasticsearch / Identifiers",
       "fill": 1,
       "fillGradient": 0,
       "gridPos": {
         "h": 8,
-        "w": 19,
-        "x": 5,
+        "w": 12,
+        "x": 6,
         "y": 0
       },
       "hiddenSeries": false,
-      "id": 2,
-      "legend": {
-        "avg": false,
-        "current": false,
-        "max": false,
-        "min": false,
-        "show": false,
-        "total": false,
-        "values": false
-      },
-      "lines": false,
-      "linewidth": 1,
-      "nullPointMode": "null",
-      "options": {
-        "dataLinks": []
-      },
-      "percentage": false,
-      "pointradius": 2,
-      "points": false,
-      "renderer": "flot",
-      "seriesOverrides": [],
-      "spaceLength": 10,
-      "stack": false,
-      "steppedLine": false,
-      "targets": [
-        {
-          "bucketAggs": [
-            {
-              "$$hashKey": "object:93",
-              "field": "metadata.created_at",
-              "id": "2",
-              "settings": {
-                "interval": "1M",
-                "min_doc_count": 0,
-                "trimEdges": 0
-              },
-              "type": "date_histogram"
-            }
-          ],
-          "metrics": [
-            {
-              "$$hashKey": "object:91",
-              "field": "select field",
-              "id": "1",
-              "type": "count"
-            }
-          ],
-          "refId": "A",
-          "timeField": "metadata.created_at"
-        }
-      ],
-      "thresholds": [],
-      "timeFrom": null,
-      "timeRegions": [],
-      "timeShift": null,
-      "title": "Distribution of creation dates",
-      "tooltip": {
-        "shared": true,
-        "sort": 0,
-        "value_type": "individual"
-      },
-      "type": "graph",
-      "xaxis": {
-        "buckets": null,
-        "mode": "time",
-        "name": null,
-        "show": true,
-        "values": []
-      },
-      "yaxes": [
-        {
-          "$$hashKey": "object:193",
-          "decimals": 0,
-          "format": "short",
-          "label": "",
-          "logBase": 1,
-          "max": null,
-          "min": null,
-          "show": true
-        },
-        {
-          "$$hashKey": "object:194",
-          "format": "short",
-          "label": null,
-          "logBase": 1,
-          "max": null,
-          "min": null,
-          "show": true
-        }
-      ],
-      "yaxis": {
-        "align": false,
-        "alignLevel": null
-      }
-    },
-    {
-      "aliasColors": {},
-      "bars": true,
-      "dashLength": 10,
-      "dashes": false,
-      "datasource": "Elasticsearch / Projects",
-      "fill": 1,
-      "fillGradient": 0,
-      "gridPos": {
-        "h": 8,
-        "w": 9,
-        "x": 0,
-        "y": 8
-      },
-      "hiddenSeries": false,
       "id": 6,
-      "interval": "",
       "legend": {
+        "alignAsTable": false,
         "avg": false,
         "current": false,
         "max": false,
         "min": false,
-        "show": false,
+        "rightSide": true,
+        "show": true,
         "total": false,
         "values": false
       },
@@ -237,7 +122,6 @@
         "dataLinks": []
       },
       "percentage": false,
-      "pluginVersion": "6.7.3",
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
@@ -249,9 +133,9 @@
         {
           "bucketAggs": [
             {
-              "$$hashKey": "object:1469",
+              "$$hashKey": "object:945",
               "fake": true,
-              "field": "metadata.license.keyword",
+              "field": "type.keyword",
               "id": "3",
               "settings": {
                 "min_doc_count": 1,
@@ -262,8 +146,8 @@
               "type": "terms"
             },
             {
-              "$$hashKey": "object:1443",
-              "field": "metadata.created_at",
+              "$$hashKey": "object:933",
+              "field": "created_at",
               "id": "2",
               "settings": {
                 "interval": "auto",
@@ -275,23 +159,21 @@
           ],
           "metrics": [
             {
-              "$$hashKey": "object:1441",
+              "$$hashKey": "object:931",
               "field": "select field",
               "id": "1",
-              "meta": {},
-              "settings": {},
               "type": "count"
             }
           ],
           "refId": "A",
-          "timeField": "metadata.created_at"
+          "timeField": "created_at"
         }
       ],
       "thresholds": [],
       "timeFrom": null,
       "timeRegions": [],
       "timeShift": null,
-      "title": "Distribution of Licenses",
+      "title": "Identifier Type Distribution",
       "tooltip": {
         "shared": false,
         "sort": 0,
@@ -309,7 +191,7 @@
       },
       "yaxes": [
         {
-          "$$hashKey": "object:1073",
+          "$$hashKey": "object:899",
           "decimals": 0,
           "format": "short",
           "label": "",
@@ -319,7 +201,7 @@
           "show": true
         },
         {
-          "$$hashKey": "object:1074",
+          "$$hashKey": "object:900",
           "format": "short",
           "label": null,
           "logBase": 1,
@@ -334,46 +216,63 @@
       }
     },
     {
-      "datasource": "Elasticsearch / Projects",
+      "aliasColors": {},
+      "bars": true,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": "Elasticsearch / Identifiers",
+      "fill": 1,
+      "fillGradient": 0,
       "gridPos": {
         "h": 8,
-        "w": 5,
-        "x": 9,
-        "y": 8
+        "w": 6,
+        "x": 18,
+        "y": 0
       },
+      "hiddenSeries": false,
       "id": 8,
-      "options": {
-        "colorMode": "value",
-        "fieldOptions": {
-          "calcs": [
-            "mean"
-          ],
-          "defaults": {
-            "mappings": [],
-            "thresholds": {
-              "mode": "absolute",
-              "steps": [
-                {
-                  "color": "light-yellow",
-                  "value": null
-                }
-              ]
-            }
-          },
-          "overrides": [],
-          "values": false
-        },
-        "graphMode": "none",
-        "justifyMode": "auto",
-        "orientation": "auto"
+      "legend": {
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "show": false,
+        "total": false,
+        "values": false
       },
-      "pluginVersion": "6.7.3",
+      "lines": false,
+      "linewidth": 1,
+      "nullPointMode": "null",
+      "options": {
+        "dataLinks": []
+      },
+      "percentage": false,
+      "pointradius": 2,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
       "targets": [
         {
           "bucketAggs": [
             {
-              "$$hashKey": "object:7886",
-              "field": "metadata.created_at",
+              "$$hashKey": "object:1129",
+              "fake": true,
+              "field": "is_exported",
+              "id": "3",
+              "settings": {
+                "min_doc_count": 1,
+                "order": "desc",
+                "orderBy": "_term",
+                "size": "10"
+              },
+              "type": "terms"
+            },
+            {
+              "$$hashKey": "object:1117",
+              "field": "created_at",
               "id": "2",
               "settings": {
                 "interval": "auto",
@@ -385,32 +284,72 @@
           ],
           "metrics": [
             {
-              "$$hashKey": "object:7884",
-              "field": "source_code.files_count",
+              "$$hashKey": "object:1115",
+              "field": "select field",
               "id": "1",
-              "meta": {},
-              "settings": {},
-              "type": "avg"
+              "type": "count"
             }
           ],
           "refId": "A",
-          "timeField": "metadata.created_at"
+          "timeField": "created_at"
         }
       ],
+      "thresholds": [],
       "timeFrom": null,
+      "timeRegions": [],
       "timeShift": null,
-      "title": "Average Files per Repository",
-      "type": "stat"
+      "title": "Package Exported Identifiers",
+      "tooltip": {
+        "shared": false,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "series",
+        "name": null,
+        "show": true,
+        "values": [
+          "total"
+        ]
+      },
+      "yaxes": [
+        {
+          "$$hashKey": "object:1083",
+          "decimals": 0,
+          "format": "short",
+          "label": "",
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        },
+        {
+          "$$hashKey": "object:1084",
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
     },
     {
-      "datasource": "Elasticsearch / Projects",
+      "datasource": "Elasticsearch / Analysis",
       "gridPos": {
         "h": 8,
-        "w": 5,
-        "x": 14,
+        "w": 6,
+        "x": 0,
         "y": 8
       },
-      "id": 9,
+      "id": 4,
+      "interval": "",
       "options": {
         "colorMode": "value",
         "fieldOptions": {
@@ -427,9 +366,7 @@
                   "value": null
                 }
               ]
-            },
-            "title": "",
-            "unit": "deckbytes"
+            }
           },
           "overrides": [],
           "values": false
@@ -443,8 +380,8 @@
         {
           "bucketAggs": [
             {
-              "$$hashKey": "object:1809",
-              "field": "metadata.created_at",
+              "$$hashKey": "object:479",
+              "field": "created_at",
               "id": "2",
               "settings": {
                 "interval": "auto",
@@ -456,64 +393,77 @@
           ],
           "metrics": [
             {
-              "$$hashKey": "object:1807",
-              "field": "metadata.size",
+              "$$hashKey": "object:477",
+              "field": "identifiers_summary.total",
               "id": "1",
+              "inlineScript": null,
               "meta": {},
-              "settings": {},
+              "settings": {
+                "missing": null
+              },
               "type": "avg"
             }
           ],
           "refId": "A",
-          "timeField": "metadata.created_at"
+          "timeField": "created_at"
         }
       ],
       "timeFrom": null,
       "timeShift": null,
-      "title": "Average Repository Size",
+      "title": "Average Extracted Identifiers per Repository",
       "type": "stat"
     },
     {
-      "datasource": "Elasticsearch / Projects",
+      "aliasColors": {},
+      "breakPoint": "50%",
+      "cacheTimeout": null,
+      "combine": {
+        "label": "Others",
+        "threshold": 0
+      },
+      "datasource": "Elasticsearch / Identifiers",
+      "fontSize": "80%",
+      "format": "short",
       "gridPos": {
         "h": 8,
-        "w": 5,
-        "x": 19,
+        "w": 12,
+        "x": 6,
         "y": 8
       },
       "id": 10,
-      "options": {
-        "colorMode": "value",
-        "fieldOptions": {
-          "calcs": [
-            "mean"
-          ],
-          "defaults": {
-            "mappings": [],
-            "thresholds": {
-              "mode": "absolute",
-              "steps": [
-                {
-                  "color": "light-red",
-                  "value": null
-                }
-              ]
-            }
-          },
-          "overrides": [],
-          "values": false
-        },
-        "graphMode": "none",
-        "justifyMode": "auto",
-        "orientation": "auto"
+      "interval": null,
+      "legend": {
+        "header": "",
+        "percentage": true,
+        "percentageDecimals": null,
+        "show": true,
+        "values": true
       },
-      "pluginVersion": "6.7.3",
+      "legendType": "Right side",
+      "links": [],
+      "maxDataPoints": 1,
+      "nullPointMode": "connected",
+      "pieType": "donut",
+      "strokeWidth": 1,
       "targets": [
         {
           "bucketAggs": [
             {
-              "$$hashKey": "object:1865",
-              "field": "metadata.created_at",
+              "$$hashKey": "object:296",
+              "fake": true,
+              "field": "type.keyword",
+              "id": "3",
+              "settings": {
+                "min_doc_count": 1,
+                "order": "desc",
+                "orderBy": "_term",
+                "size": "10"
+              },
+              "type": "terms"
+            },
+            {
+              "$$hashKey": "object:276",
+              "field": "created_at",
               "id": "2",
               "settings": {
                 "interval": "auto",
@@ -525,93 +475,168 @@
           ],
           "metrics": [
             {
-              "$$hashKey": "object:1863",
-              "field": "metadata.stargazers",
+              "$$hashKey": "object:274",
+              "field": "select field",
               "id": "1",
-              "meta": {},
-              "settings": {},
-              "type": "avg"
+              "type": "count"
             }
           ],
           "refId": "A",
-          "timeField": "metadata.created_at"
+          "timeField": "created_at"
         }
       ],
       "timeFrom": null,
       "timeShift": null,
-      "title": "Average Repository Stargazers",
-      "type": "stat"
+      "title": "Identifier Type Distribution (%)",
+      "type": "grafana-piechart-panel",
+      "valueName": "total"
+    },
+    {
+      "aliasColors": {},
+      "breakPoint": "50%",
+      "cacheTimeout": null,
+      "combine": {
+        "label": "Others",
+        "threshold": 0
+      },
+      "datasource": "Elasticsearch / Identifiers",
+      "fontSize": "80%",
+      "format": "short",
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 18,
+        "y": 8
+      },
+      "id": 11,
+      "interval": null,
+      "legend": {
+        "percentage": true,
+        "show": true,
+        "values": true
+      },
+      "legendType": "On graph",
+      "links": [],
+      "maxDataPoints": 1,
+      "nullPointMode": "connected",
+      "pieType": "donut",
+      "strokeWidth": 1,
+      "targets": [
+        {
+          "bucketAggs": [
+            {
+              "$$hashKey": "object:1129",
+              "fake": true,
+              "field": "is_exported",
+              "id": "3",
+              "settings": {
+                "min_doc_count": 1,
+                "order": "desc",
+                "orderBy": "_term",
+                "size": "10"
+              },
+              "type": "terms"
+            },
+            {
+              "$$hashKey": "object:1117",
+              "field": "created_at",
+              "id": "2",
+              "settings": {
+                "interval": "auto",
+                "min_doc_count": 0,
+                "trimEdges": 0
+              },
+              "type": "date_histogram"
+            }
+          ],
+          "metrics": [
+            {
+              "$$hashKey": "object:1115",
+              "field": "select field",
+              "id": "1",
+              "type": "count"
+            }
+          ],
+          "refId": "A",
+          "timeField": "created_at"
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "Package Exported Identifiers (%)",
+      "type": "grafana-piechart-panel",
+      "valueName": "total"
     },
     {
       "columns": [
         {
-          "$$hashKey": "object:2131",
-          "text": "metadata.owner",
-          "value": "metadata.owner"
+          "$$hashKey": "object:816",
+          "text": "project_ref",
+          "value": "project_ref"
         },
         {
-          "$$hashKey": "object:2144",
-          "text": "metadata.fullname",
-          "value": "metadata.fullname"
+          "$$hashKey": "object:825",
+          "text": "file",
+          "value": "file"
         },
         {
-          "$$hashKey": "object:2156",
-          "text": "metadata.license",
-          "value": "metadata.license"
+          "$$hashKey": "object:837",
+          "text": "name",
+          "value": "name"
         },
         {
-          "$$hashKey": "object:2171",
-          "text": "metadata.created_at",
-          "value": "metadata.created_at"
+          "$$hashKey": "object:1187",
+          "text": "type",
+          "value": "type"
         },
         {
-          "$$hashKey": "object:2189",
-          "text": "metadata.updated_at",
-          "value": "metadata.updated_at"
+          "$$hashKey": "object:1379",
+          "text": "is_exported",
+          "value": "is_exported"
         },
         {
-          "$$hashKey": "object:2210",
-          "text": "metadata.size",
-          "value": "metadata.size"
+          "$$hashKey": "object:1733",
+          "text": "joined_splits.conserv",
+          "value": "joined_splits.conserv"
         },
         {
-          "$$hashKey": "object:2234",
-          "text": "metadata.stargazers",
-          "value": "metadata.stargazers"
+          "$$hashKey": "object:1757",
+          "text": "joined_splits.greedy",
+          "value": "joined_splits.greedy"
         },
         {
-          "$$hashKey": "object:2261",
-          "text": "metadata.forks",
-          "value": "metadata.forks"
+          "$$hashKey": "object:1784",
+          "text": "joined_splits.samurai",
+          "value": "joined_splits.samurai"
         }
       ],
-      "datasource": "Elasticsearch / Projects",
+      "datasource": "Elasticsearch / Identifiers",
       "fontSize": "100%",
       "gridPos": {
-        "h": 15,
-        "w": 17,
+        "h": 11,
+        "w": 24,
         "x": 0,
         "y": 16
       },
-      "id": 12,
+      "id": 13,
       "pageSize": null,
       "showHeader": true,
       "sort": {
-        "col": null,
-        "desc": false
+        "col": 0,
+        "desc": true
       },
       "styles": [
         {
-          "$$hashKey": "object:2001",
-          "alias": "Owner",
+          "$$hashKey": "object:709",
+          "alias": "Repository",
           "align": "left",
           "dateFormat": "YYYY-MM-DD HH:mm:ss",
-          "pattern": "metadata.owner",
+          "pattern": "project_ref",
           "type": "string"
         },
         {
-          "$$hashKey": "object:2002",
-          "alias": "Repository",
+          "$$hashKey": "object:710",
+          "alias": "File",
           "align": "left",
           "colorMode": null,
           "colors": [
@@ -620,14 +645,14 @@
             "rgba(50, 172, 45, 0.97)"
           ],
           "decimals": 2,
-          "pattern": "metadata.fullname",
+          "pattern": "file",
           "thresholds": [],
           "type": "string",
           "unit": "short"
         },
         {
-          "$$hashKey": "object:2535",
-          "alias": "License",
+          "$$hashKey": "object:1105",
+          "alias": "Name",
           "align": "left",
           "colorMode": null,
           "colors": [
@@ -638,15 +663,51 @@
           "dateFormat": "YYYY-MM-DD HH:mm:ss",
           "decimals": 2,
           "mappingType": 1,
-          "pattern": "metadata.license",
+          "pattern": "name",
+          "thresholds": [],
+          "type": "string",
+          "unit": "short"
+        },
+        {
+          "$$hashKey": "object:1277",
+          "alias": "Type",
+          "align": "left",
+          "colorMode": null,
+          "colors": [
+            "rgba(245, 54, 54, 0.9)",
+            "rgba(237, 129, 40, 0.89)",
+            "rgba(50, 172, 45, 0.97)"
+          ],
+          "dateFormat": "YYYY-MM-DD HH:mm:ss",
+          "decimals": 2,
+          "mappingType": 1,
+          "pattern": "type",
+          "thresholds": [],
+          "type": "string",
+          "unit": "short"
+        },
+        {
+          "$$hashKey": "object:1381",
+          "alias": "Exported",
+          "align": "left",
+          "colorMode": null,
+          "colors": [
+            "rgba(245, 54, 54, 0.9)",
+            "rgba(237, 129, 40, 0.89)",
+            "rgba(50, 172, 45, 0.97)"
+          ],
+          "dateFormat": "YYYY-MM-DD HH:mm:ss",
+          "decimals": 2,
+          "mappingType": 1,
+          "pattern": "is_exported",
           "thresholds": [],
           "type": "string",
           "unit": "short",
           "valueMaps": []
         },
         {
-          "$$hashKey": "object:2808",
-          "alias": "Created At",
+          "$$hashKey": "object:1786",
+          "alias": "Conserv",
           "align": "left",
           "colorMode": null,
           "colors": [
@@ -654,17 +715,18 @@
             "rgba(237, 129, 40, 0.89)",
             "rgba(50, 172, 45, 0.97)"
           ],
-          "dateFormat": "YYYY-MM-DD",
+          "dateFormat": "YYYY-MM-DD HH:mm:ss",
           "decimals": 2,
           "mappingType": 1,
-          "pattern": "metadata.created_at",
+          "pattern": "joined_splits.conserv",
+          "preserveFormat": false,
           "thresholds": [],
-          "type": "date",
+          "type": "string",
           "unit": "short"
         },
         {
-          "$$hashKey": "object:2971",
-          "alias": "Updated At",
+          "$$hashKey": "object:1982",
+          "alias": "Greedy",
           "align": "left",
           "colorMode": null,
           "colors": [
@@ -672,54 +734,18 @@
             "rgba(237, 129, 40, 0.89)",
             "rgba(50, 172, 45, 0.97)"
           ],
-          "dateFormat": "YYYY-MM-DD",
-          "decimals": 2,
-          "mappingType": 1,
-          "pattern": "metadata.updated_at",
-          "thresholds": [],
-          "type": "date",
-          "unit": "short"
-        },
-        {
-          "$$hashKey": "object:3134",
-          "alias": "Size",
-          "align": "auto",
-          "colorMode": null,
-          "colors": [
-            "rgba(245, 54, 54, 0.9)",
-            "rgba(237, 129, 40, 0.89)",
-            "rgba(50, 172, 45, 0.97)"
-          ],
           "dateFormat": "YYYY-MM-DD HH:mm:ss",
           "decimals": 2,
           "mappingType": 1,
-          "pattern": "metadata.size",
+          "pattern": "joined_splits.greedy",
           "thresholds": [],
-          "type": "number",
-          "unit": "deckbytes"
-        },
-        {
-          "$$hashKey": "object:3245",
-          "alias": "Stargazers",
-          "align": "auto",
-          "colorMode": null,
-          "colors": [
-            "rgba(245, 54, 54, 0.9)",
-            "rgba(237, 129, 40, 0.89)",
-            "rgba(50, 172, 45, 0.97)"
-          ],
-          "dateFormat": "YYYY-MM-DD HH:mm:ss",
-          "decimals": 0,
-          "mappingType": 1,
-          "pattern": "metadata.stargazers",
-          "thresholds": [],
-          "type": "number",
+          "type": "string",
           "unit": "short"
         },
         {
-          "$$hashKey": "object:3431",
-          "alias": "Forks",
-          "align": "auto",
+          "$$hashKey": "object:2128",
+          "alias": "Samurai",
+          "align": "left",
           "colorMode": null,
           "colors": [
             "rgba(245, 54, 54, 0.9)",
@@ -727,11 +753,11 @@
             "rgba(50, 172, 45, 0.97)"
           ],
           "dateFormat": "YYYY-MM-DD HH:mm:ss",
-          "decimals": 0,
+          "decimals": 2,
           "mappingType": 1,
-          "pattern": "metadata.forks",
+          "pattern": "joined_splits.samurai",
           "thresholds": [],
-          "type": "number",
+          "type": "string",
           "unit": "short"
         }
       ],
@@ -740,7 +766,7 @@
           "bucketAggs": [],
           "metrics": [
             {
-              "$$hashKey": "object:2034",
+              "$$hashKey": "object:742",
               "field": "select field",
               "id": "1",
               "meta": {},
@@ -751,42 +777,215 @@
             }
           ],
           "refId": "A",
-          "timeField": "metadata.created_at"
+          "timeField": "created_at"
         }
       ],
       "timeFrom": null,
       "timeShift": null,
-      "title": "List of Projects/Repositories",
+      "title": "Identifiers Splits (by Algorithm)",
       "transform": "json",
       "type": "table"
     },
     {
-      "datasource": "Elasticsearch / Projects",
+      "columns": [
+        {
+          "$$hashKey": "object:816",
+          "text": "project_ref",
+          "value": "project_ref"
+        },
+        {
+          "$$hashKey": "object:825",
+          "text": "file",
+          "value": "file"
+        },
+        {
+          "$$hashKey": "object:837",
+          "text": "name",
+          "value": "name"
+        },
+        {
+          "$$hashKey": "object:1187",
+          "text": "type",
+          "value": "type"
+        },
+        {
+          "$$hashKey": "object:1379",
+          "text": "is_exported",
+          "value": "is_exported"
+        },
+        {
+          "$$hashKey": "object:6523",
+          "text": "joined_expansions.noexp",
+          "value": "joined_expansions.noexp"
+        },
+        {
+          "$$hashKey": "object:6547",
+          "text": "joined_expansions.basic",
+          "value": "joined_expansions.basic"
+        },
+        {
+          "$$hashKey": "object:6574",
+          "text": "joined_expansions.amap",
+          "value": "joined_expansions.amap"
+        }
+      ],
+      "datasource": "Elasticsearch / Identifiers",
+      "fontSize": "100%",
       "gridPos": {
-        "h": 15,
-        "w": 7,
-        "x": 17,
-        "y": 16
+        "h": 11,
+        "w": 24,
+        "x": 0,
+        "y": 27
       },
-      "header_js": "{}",
-      "id": 15,
-      "method": "GET",
-      "mode": "template",
-      "params_js": "{\n from:ctrl.range.from.format('x'),  // x is unix ms timestamp\n to:ctrl.range.to.format('x'), \n height:ctrl.height,\n now:Date.now(),\n interval: ctrl.template('$__interval'),\n sample: 'Not escaped: $__interval',\n since:ctrl.lastRequestTime\n}",
-      "request": "query",
-      "responseType": "text",
-      "showErrors": true,
-      "showTime": false,
-      "showTimeFormat": "LTS",
-      "showTimePrefix": null,
-      "showTimeValue": "request",
-      "skipSameURL": true,
+      "id": 14,
+      "pageSize": null,
+      "showHeader": true,
+      "sort": {
+        "col": 0,
+        "desc": true
+      },
+      "styles": [
+        {
+          "$$hashKey": "object:709",
+          "alias": "Repository",
+          "align": "left",
+          "dateFormat": "YYYY-MM-DD HH:mm:ss",
+          "pattern": "project_ref",
+          "type": "string"
+        },
+        {
+          "$$hashKey": "object:710",
+          "alias": "File",
+          "align": "left",
+          "colorMode": null,
+          "colors": [
+            "rgba(245, 54, 54, 0.9)",
+            "rgba(237, 129, 40, 0.89)",
+            "rgba(50, 172, 45, 0.97)"
+          ],
+          "decimals": 2,
+          "pattern": "file",
+          "thresholds": [],
+          "type": "string",
+          "unit": "short"
+        },
+        {
+          "$$hashKey": "object:1105",
+          "alias": "Name",
+          "align": "left",
+          "colorMode": null,
+          "colors": [
+            "rgba(245, 54, 54, 0.9)",
+            "rgba(237, 129, 40, 0.89)",
+            "rgba(50, 172, 45, 0.97)"
+          ],
+          "dateFormat": "YYYY-MM-DD HH:mm:ss",
+          "decimals": 2,
+          "mappingType": 1,
+          "pattern": "name",
+          "thresholds": [],
+          "type": "string",
+          "unit": "short"
+        },
+        {
+          "$$hashKey": "object:1277",
+          "alias": "Type",
+          "align": "left",
+          "colorMode": null,
+          "colors": [
+            "rgba(245, 54, 54, 0.9)",
+            "rgba(237, 129, 40, 0.89)",
+            "rgba(50, 172, 45, 0.97)"
+          ],
+          "dateFormat": "YYYY-MM-DD HH:mm:ss",
+          "decimals": 2,
+          "mappingType": 1,
+          "pattern": "type",
+          "thresholds": [],
+          "type": "string",
+          "unit": "short"
+        },
+        {
+          "$$hashKey": "object:1381",
+          "alias": "Exported",
+          "align": "left",
+          "colorMode": null,
+          "colors": [
+            "rgba(245, 54, 54, 0.9)",
+            "rgba(237, 129, 40, 0.89)",
+            "rgba(50, 172, 45, 0.97)"
+          ],
+          "dateFormat": "YYYY-MM-DD HH:mm:ss",
+          "decimals": 2,
+          "mappingType": 1,
+          "pattern": "is_exported",
+          "thresholds": [],
+          "type": "string",
+          "unit": "short",
+          "valueMaps": []
+        },
+        {
+          "$$hashKey": "object:1786",
+          "alias": "No Expansion",
+          "align": "left",
+          "colorMode": null,
+          "colors": [
+            "rgba(245, 54, 54, 0.9)",
+            "rgba(237, 129, 40, 0.89)",
+            "rgba(50, 172, 45, 0.97)"
+          ],
+          "dateFormat": "YYYY-MM-DD HH:mm:ss",
+          "decimals": 2,
+          "mappingType": 1,
+          "pattern": "joined_expansions.noexp",
+          "preserveFormat": false,
+          "thresholds": [],
+          "type": "string",
+          "unit": "short"
+        },
+        {
+          "$$hashKey": "object:1982",
+          "alias": "Basic",
+          "align": "left",
+          "colorMode": null,
+          "colors": [
+            "rgba(245, 54, 54, 0.9)",
+            "rgba(237, 129, 40, 0.89)",
+            "rgba(50, 172, 45, 0.97)"
+          ],
+          "dateFormat": "YYYY-MM-DD HH:mm:ss",
+          "decimals": 2,
+          "mappingType": 1,
+          "pattern": "joined_expansions.basic",
+          "thresholds": [],
+          "type": "string",
+          "unit": "short"
+        },
+        {
+          "$$hashKey": "object:2128",
+          "alias": "AMAP",
+          "align": "left",
+          "colorMode": null,
+          "colors": [
+            "rgba(245, 54, 54, 0.9)",
+            "rgba(237, 129, 40, 0.89)",
+            "rgba(50, 172, 45, 0.97)"
+          ],
+          "dateFormat": "YYYY-MM-DD HH:mm:ss",
+          "decimals": 2,
+          "mappingType": 1,
+          "pattern": "joined_expansions.amap",
+          "thresholds": [],
+          "type": "string",
+          "unit": "short"
+        }
+      ],
       "targets": [
         {
           "bucketAggs": [],
           "metrics": [
             {
-              "$$hashKey": "object:5155",
+              "$$hashKey": "object:742",
               "field": "select field",
               "id": "1",
               "meta": {},
@@ -797,17 +996,14 @@
             }
           ],
           "refId": "A",
-          "timeField": "metadata.created_at"
+          "timeField": "created_at"
         }
       ],
-      "template": "<div ng-repeat=\"(key, value) in response[0].datapoints\">\r\n    <h2>Repository: {{value.metadata.fullname}}</h2>\r\n    <br>\r\n    <br>\r\n    <h3>Files:</h3>\r\n    <div ng-repeat=\"(k, v) in value.source_code.files\">\r\n        <li>{{v}}</li>\r\n    </div>\r\n    <br>\r\n</div>",
-      "templateResponse": true,
       "timeFrom": null,
       "timeShift": null,
-      "title": "List of Files per Repository",
-      "type": "ryantxu-ajax-panel",
-      "url": "https://raw.githubusercontent.com/ryantxu/ajax-panel/master/static/example.txt",
-      "withCredentials": false
+      "title": "Identifiers Expansions (by Algorithm)",
+      "transform": "json",
+      "type": "table"
     }
   ],
   "schemaVersion": 22,
@@ -817,28 +1013,15 @@
     "list": []
   },
   "time": {
-    "from": "now-5y",
+    "from": "now-90d",
     "to": "now"
   },
-  "timepicker": {
-    "refresh_intervals": [
-      "5s",
-      "10s",
-      "30s",
-      "1m",
-      "5m",
-      "15m",
-      "30m",
-      "1h",
-      "2h",
-      "1d"
-    ]
-  },
+  "timepicker": {},
   "timezone": "",
-  "title": "Projects",
-  "uid": "reyOcVzGk",
+  "title": "Identifiers",
+  "uid": "Lata3NzGk",
   "variables": {
     "list": []
   },
-  "version": 10
+  "version": 4
 }
