@@ -6,6 +6,8 @@ services:
         build: .
         env_file: 
             - .env
+        volumes: 
+            - app_data:/tmp
         ports: 
             - 8080:8080
         restart: always
@@ -86,7 +88,7 @@ services:
         restart: always
     
     grafana:
-        image: grafana/grafana
+        image: grafana/grafana:7.0.5
         depends_on: 
             - prometheus
         environment: 
@@ -97,9 +99,11 @@ services:
             - 3000:3000
         volumes: 
             - grafana_data:/var/lib/grafana
+            - ./viz:/etc/grafana/provisioning
         restart: always
 
 volumes: 
+    app_data: {}
     mongodb_data: {}
     elasticsearch_data: {}
     prometheus_data: {}
